@@ -1,4 +1,7 @@
+require('dotenv').config();
 const findInFiles = require('find-in-files');
+const { requestChangesPercentage } = require('./gitChecks/services/requestChangesPercentaje');
+
 let amountOfJs;
 
 findInFiles.find('', './test', '.js$').then(results => 
@@ -22,3 +25,5 @@ findInFiles.find('=> {', './test', '.js$').then(results =>
 findInFiles.find('([A-Z][a-z]+)+', './test', '.scss$').then(results => 
   console.log('Cantidad de archivos con cammel case en sass: ', Object.keys(results).length)
 );
+
+//requestChangesPercentage();
