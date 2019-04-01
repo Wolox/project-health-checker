@@ -6,5 +6,3 @@ module.exports = {
     CHANGES_REQUESTED: 'CHANGES_REQUESTED'
   }
 }
-
-
