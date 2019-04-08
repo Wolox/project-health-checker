@@ -26,4 +26,3 @@ findInFiles.find('([A-Z][a-z]+)+', './test', '.scss$').then(results =>
   console.log('Cantidad de archivos con cammel case en sass: ', Object.keys(results).length)
 );
 
-//requestChangesPercentage();

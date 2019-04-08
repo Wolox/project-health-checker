@@ -1,6 +1,7 @@
 const axios = require('axios');
 const flattenDeep = require('lodash/flattenDeep');
-const { API, REVIEW_STATE }  = require('../constants');
+
+const { API, REVIEW_STATE, ERROR } = require('../constants');
 
 const config = {
   headers: {
@@ -8,9 +9,10 @@ const config = {
   }
 }
 
-const requestChangesQuery = { // Owner and name should be typed between ""
-  'query':
-    `{repository(owner:"Wolox", name:"tech-guides") {
+const requestChangesQuery = (organization, repoName) => { // Owner and name should be typed between ""
+  return {
+    'query':
+      `{repository(owner:"${organization}", name:"${repoName}") {
       pullRequests(first: 100) {
         edges {
           node {
@@ -25,11 +27,12 @@ const requestChangesQuery = { // Owner and name should be typed between ""
         }
       }
     }}`
+  }
 }
 
-exports.requestChangesPercentage = () =>
-  axios.post(API, requestChangesQuery, config)
-    .then( res => {
+exports.requestChangesPercentage = (organization, repoName) =>
+  axios.post(API, requestChangesQuery(organization, repoName), config)
+    .then(res => {
       const findReviews = pullRequest => pullRequest.node.reviews.edges.map(edge => edge.node)
       const pullRequests = res.data.data.repository.pullRequests.edges
       const reviews = pullRequests.map(pullRequest => findReviews(pullRequest))
@@ -37,4 +40,10 @@ exports.requestChangesPercentage = () =>
       const totalChangesRequested = flattenDeep(reviews).filter(pr => pr.state === REVIEW_STATE.CHANGES_REQUESTED).length
       console.log(`Reviews requesting changes on last 100 PRs: ${(totalChangesRequested * 100 / totalReviews).toFixed(2)}%`)
     })
-    .catch( error => console.log(`ERROR: ${error.response.data.message}`));
+    .catch(error => {
+      if (error.response) {
+        console.log(`ERROR: ${error.response.data.message}`)
+      } else {
+        console.log(ERROR.REPO_NOT_FOUND);
+      }
+    })

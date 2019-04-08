@@ -4,5 +4,8 @@ module.exports = {
     APPROVED: 'APPROVED',
     COMMENTED: 'COMMENTED',
     CHANGES_REQUESTED: 'CHANGES_REQUESTED'
+  },
+  ERROR: {
+    REPO_NOT_FOUND: 'ERROR: Could not find repository'
   }
 }
