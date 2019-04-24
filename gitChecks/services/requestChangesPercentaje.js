@@ -9,7 +9,7 @@ const config = {
   }
 }
 
-const requestChangesQuery = (organization, repoName) => { // Owner and name should be typed between ""
+const requestChangesQuery = (organization= "Wolox", repoName) => { // Owner and name should be typed between ""
   return {
     'query':
       `{repository(owner:"${organization}", name:"${repoName}") {
