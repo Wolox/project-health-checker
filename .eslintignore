@@ -1,0 +1,6 @@
+/build/**
+/script/**
+/gulp/**
+test.js
+!.eslintrc.js
+node_modules/
