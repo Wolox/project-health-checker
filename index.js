@@ -26,6 +26,6 @@ findInFiles.find('([A-Z][a-z]+)+', './test', '.scss$').then(results =>
   console.log('Cantidad de archivos con cammel case en sass: ', Object.keys(results).length)
 );
 
-findInFiles.find('process\.env', './test', '(.js$|.vue$)').then(results =>
+findInFiles.find('process\.env\.', './test', '(.js$)').then(results =>
   console.log('Se necesita .env para correr el proyecto: ', !!Object.keys(results).length)
 );
