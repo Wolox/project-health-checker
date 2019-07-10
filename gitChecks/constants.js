@@ -1,5 +1,5 @@
 module.exports = {
-  API:'https://api.github.com/graphql',
+  API: 'https://api.github.com/graphql',
   REVIEW_STATE: {
     APPROVED: 'APPROVED',
     COMMENTED: 'COMMENTED',
@@ -8,4 +8,4 @@ module.exports = {
   ERROR: {
     REPO_NOT_FOUND: 'ERROR: Could not find repository'
   }
-}
+};

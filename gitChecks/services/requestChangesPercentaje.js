@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const axios = require('axios');
 const flattenDeep = require('lodash/flattenDeep');
 
@@ -9,10 +10,8 @@ const config = {
   }
 };
 
-const requestChangesQuery = (
-  organization = 'Wolox',
-  repoName // Owner and name should be typed between ""
-) => ({
+// Owner and name should be typed between ""
+const repositoryInfoQuery = (organization = 'Wolox', repoName) => ({
   query: `{
         repository(owner:"${organization}", name:"${repoName}") {
          refs(refPrefix: "refs/heads/", first: 100) {

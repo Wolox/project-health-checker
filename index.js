@@ -1,25 +1,29 @@
+/* eslint-disable no-console */
 require('dotenv').config();
 const { find } = require('find-in-files');
 
-const { analyzeMatches } = require('./utils/utils')
-const { requestChangesPercentage } = require('./gitChecks/services/requestChangesPercentaje');
-const { runEnvChecks } = require('./envChecks/envCheck')
+const { analyzeMatches } = require('./utils/utils');
 
-let amountOfJs;
+let amountOfJs = 0;
+const percentage = 100;
 
-find('', './test', '.js$').then(results =>
-  amountOfJs = Object.keys(results).length
-);
+find('', './test', '.js$').then(results => (amountOfJs = Object.keys(results).length));
 
 find("from 'i18next*';", './test', '.js$').then(results =>
   console.log(
-    `Porcentaje de uso de internacionalización del total: ${(analyzeMatches(results).length / amountOfJs * 100).toFixed(2)}%`
+    `Porcentaje de uso de internacionalización del total: ${(
+      analyzeMatches(results).length / amountOfJs * // eslint-disable-line prettier/prettier
+      percentage
+    ).toFixed(2)}%`
   )
 );
 
-find('((=> {)|(\) =>)', './test', '.js$').then(results =>
+find('((=> {)|() =>)', './test', '.js$').then(results =>
   console.log(
-    `Porcentaje de uso de arrow functions del total: ${(analyzeMatches(results).length / amountOfJs * 100).toFixed(2)}%`
+    `Porcentaje de uso de arrow functions del total: ${(
+      analyzeMatches(results).length / amountOfJs * // eslint-disable-line prettier/prettier
+      percentage
+    ).toFixed(2)}%`
   )
 );
 
