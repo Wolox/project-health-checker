@@ -21,6 +21,7 @@ if (args.path) {
 }
 
 let amountOfJs = 0;
+let amountOfJsAppFolder = 0;
 let amountOfActionJs = 0;
 let amountOfScss = 0;
 
@@ -29,9 +30,12 @@ runEnvChecks(testPath);
 findSync('', testPath, '.js$').then(results => (amountOfJs = Object.keys(results).length));
 findSync('', testPath, 'actions.js$').then(results => (amountOfActionJs = Object.keys(results).length));
 findSync('', testPath, 'styles.scss$').then(results => (amountOfScss = Object.keys(results).length));
+findSync('', `${testPath}/src/app`, '.js$').then(
+  results => (amountOfJsAppFolder = Object.keys(results).length)
+);
 
-find("from 'i18next*';", testPath, '.js$').then(results => {
-  const result = calculatePercentage(results, amountOfJs);
+find("from 'i18next*';", `${testPath}/src/app`, '.js$').then(results => {
+  const result = calculatePercentage(results, amountOfJsAppFolder);
   console.log(
     resolveColor(result, limits.i18n),
     `Porcentaje de uso de internacionalización del total: ${result}%`
