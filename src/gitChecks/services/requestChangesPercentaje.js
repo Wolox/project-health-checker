@@ -11,9 +11,9 @@ const config = {
 };
 
 // Owner and name should be typed between ""
-const repositoryInfoQuery = (organization = 'Wolox', repoName) => ({
+const repositoryInfoQuery = (repository, organization = 'Wolox') => ({
   query: `{
-        repository(owner:"${organization}", name:"${repoName}") {
+        repository(owner:"${organization}", name:"${repository}") {
          refs(refPrefix: "refs/heads/", first: 100) {
           edges {
             node {
@@ -44,17 +44,17 @@ const repositoryInfoQuery = (organization = 'Wolox', repoName) => ({
         }
       }}`
 });
-exports.getRepositoryInfo = (organization, repository) =>
-  axios.post(API, repositoryInfoQuery(organization, repository), config);
+exports.getRepositoryInfo = (repository, organization) =>
+  axios.post(API, repositoryInfoQuery(repository, organization), config);
 
 /*
 verificar en caso de que varios revieers te requesteen por los mismos rebotes.
 filtrar las request de commits repetidos
 */
 
-exports.requestChangesPercentage = (organization, repoName) =>
+exports.requestChangesPercentage = (repository, organization) =>
   axios
-    .post(API, repositoryInfoQuery(organization, repoName), config)
+    .post(API, repositoryInfoQuery(repository, organization), config)
     .then(res => {
       const findReviews = pullRequest => pullRequest.node.reviews.edges.map(edge => edge.node);
       const pullRequests = res.data.data.repository.pullRequests.edges;

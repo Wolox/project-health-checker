@@ -4,7 +4,7 @@ const { find, findSync } = require('find-in-files');
 const runReactLinter = require('./linter');
 const { resolveColor, calculatePercentage } = require('../utils');
 const limits = require('../constants/limits');
-const colors = require('../constants/colors');
+const { red } = require('../constants/colors');
 
 let amountOfActionJs = 0;
 
@@ -21,6 +21,6 @@ module.exports = testPath => {
   try {
     runReactLinter(testPath);
   } catch (error) {
-    console.log(colors.red, `Eslint error: ${error}`);
+    console.log(red, `Eslint error: ${error}`);
   }
 };

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const colors = require('../../constants/colors');
+const { red } = require('../../constants/colors');
 const { CLIEngine } = require('eslint');
 const cli = new CLIEngine({
   baseConfig: {
@@ -11,6 +11,6 @@ const cli = new CLIEngine({
 module.exports = testPath => {
   const eslintErrors = cli.executeOnFiles([testPath]).errorCount;
   if (eslintErrors) {
-    console.log(colors.red, `Errores de eslint: ${eslintErrors}`);
+    console.log(red, `Errores de eslint: ${eslintErrors}`);
   }
 };
