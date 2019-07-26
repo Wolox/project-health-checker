@@ -65,12 +65,18 @@ find("from 'redux-recompose';", testPath, 'actions.js$').then(results => {
 
 find(/\n/, testPath, 'layout.js$').then(results => {
   const filtered = Object.keys(results).filter(elem => results[elem].count > limits.lines);
-  console.log('Cantidad de layouts con mas de 150 lineas:', filtered.length);
+  console.log(
+    filtered.length > limits.layoutFiles ? colors.red : colors.green,
+    `Cantidad de layouts con mas de 150 lineas: ${filtered.length}`
+  );
 });
 
 find(/\n/, testPath, 'index.js$').then(results => {
   const filtered = Object.keys(results).filter(elem => results[elem].count > limits.lines);
-  console.log('Cantidad de index con mas de 150 lineas:', filtered.length);
+  console.log(
+    filtered.length > limits.indexFiles ? colors.red : colors.green,
+    `Cantidad de index con mas de 150 lineas: ${filtered.length}`
+  );
 });
 
 read(`${testPath}/.github/CODEOWNERS`, 'utf8', (err, data) => {
