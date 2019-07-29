@@ -3,11 +3,11 @@ const fs = require('fs');
 const { find } = require('find-in-files');
 const colors = require('../constants/colors');
 
-const { analyzeMatches } = require('../utils/utils.js');
+const { analyzeMatches } = require('../utils');
 
 const VALID_ENVS = ['.development', '.stage', '.master'];
 
-module.exports.runEnvChecks = testPath => {
+module.exports = testPath => {
   VALID_ENVS.forEach(elem =>
     fs.access(`${testPath}/.env${elem}`, fs.F_OK, err => {
       if (err) {
