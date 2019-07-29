@@ -3,6 +3,7 @@ const parseArgs = require('minimist');
 
 const runEnvChecks = require('./src/envChecks');
 const runGeneralChecks = require('./src/generalChecks');
+const runGitChecks = require('./src/gitChecks');
 const techs = {
   react: require('./src/reactChecks'),
   angular: require('./src/angularChecks'),
@@ -26,6 +27,15 @@ if (args.tech) {
   techChecks = args.t;
 }
 
+let repoName = testPath.split('/')[1];
+
+if (args.repository) {
+  repoName = args.repository;
+} else if (args.r) {
+  repoName = args.r;
+}
+
 runEnvChecks(testPath);
 runGeneralChecks(testPath);
+runGitChecks(repoName);
 techs[techChecks](testPath);
