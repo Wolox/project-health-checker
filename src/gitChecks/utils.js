@@ -1,5 +1,5 @@
 const { REVIEW_STATE } = require('./constants');
-const flattenDeep = require('lodash/flattenDeep');
+const flattenDeep = require('lodash.flattendeep');
 
 exports.hasBaseBranches = gitResponse =>
   gitResponse.data.data.repository.refs.edges.some(branch => branch.node.name === 'master') &&
