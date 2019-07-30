@@ -1,26 +1,27 @@
-const { red } = require('../constants/colors');
-const { requestChangesPercentage, getRepositoryInfo } = require('./services/requestChangesPercentaje');
+/* eslint-disable no-console */
+const { red, green } = require('../constants/colors');
+const getRepositoryInfo = require('./services/gitService');
+const { ERROR } = require('./constants');
+
+const limits = require('../constants/limits');
+
+const { hasBaseBranches, hasBranchProtection, averageRequestChanges } = require('./utils');
 
 module.exports = (repository, organization) => {
   getRepositoryInfo(repository, organization)
-    .then(
-      response =>
-        response.data.data.repository.refs.edges.some(branch => branch.node.name === 'master') &&
-        response.data.data.repository.refs.edges.some(branch => branch.node.name === 'development')
-    )
-    .catch(error => console.log(red, `Error de git: ${error}`));
-
-  requestChangesPercentage(repository, organization);
-
-  getRepositoryInfo(repository, organization)
-    .then(
-      response =>
-        response.data.data.branchProtectionRules.edges.some(
-          rule => rule.node.pattern === 'development' && rule.node.requiresApprovingReviews
-        ) &&
-        response.data.data.branchProtectionRules.edges.some(
-          rule => rule.node.pattern === 'master' && rule.node.requiresApprovingReviews
-        )
-    )
-    .catch(error => console.log(red, `Error de git: ${error}`));
+    .then(response => {
+      if (hasBaseBranches(response)) {
+        console.log(green, 'Existen las branches development, stage y master');
+      } else {
+        console.log(red, 'No existen las branches development, stage y master');
+      }
+      if (hasBranchProtection(response)) {
+        console.log(green, 'Las branches estan protegidas');
+      } else {
+        console.log(red, 'Las branches no estan protegidas');
+      }
+      const average = averageRequestChanges(response);
+      console.log(average < limits.prRebound ? green : red, `Promedio de cambios pedidos por PR: ${average}`);
+    })
+    .catch(() => console.log(red, `Error de git: ${ERROR.REPO_NOT_FOUND}`));
 };

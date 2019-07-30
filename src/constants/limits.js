@@ -6,5 +6,6 @@ module.exports = {
   codeOwners: 2,
   lines: 150,
   indexFiles: 10,
-  layoutFiles: 5
+  layoutFiles: 5,
+  prRebound: 0.25
 };

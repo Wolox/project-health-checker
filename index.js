@@ -12,8 +12,9 @@ const techs = {
 
 const args = parseArgs(process.argv);
 
-let testPath = './test';
+let testPath = 'test';
 let techChecks = 'react';
+let organization = 'Wolox';
 
 if (args.path) {
   testPath = args.path;
@@ -27,7 +28,7 @@ if (args.tech) {
   techChecks = args.t;
 }
 
-let repoName = testPath.split('/')[1];
+let repoName = testPath;
 
 if (args.repository) {
   repoName = args.repository;
@@ -35,7 +36,13 @@ if (args.repository) {
   repoName = args.r;
 }
 
+if (args.org) {
+  organization = args.org;
+} else if (args.o) {
+  organization = args.o;
+}
+
 runEnvChecks(testPath);
 runGeneralChecks(testPath);
-runGitChecks(repoName);
+runGitChecks(repoName, organization);
 techs[techChecks](testPath);
