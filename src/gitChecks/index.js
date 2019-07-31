@@ -5,7 +5,7 @@ const { ERROR } = require('./constants');
 
 const limits = require('../constants/limits');
 
-const { hasBaseBranches, hasBranchProtection, averageRequestChanges } = require('./utils');
+const { hasBaseBranches, hasBranchProtection, averageRequestChanges, countBranches } = require('./utils');
 
 module.exports = (repository, organization) => {
   getRepositoryInfo(repository, organization)
@@ -19,6 +19,10 @@ module.exports = (repository, organization) => {
         console.log(green, 'Las branches estan protegidas');
       } else {
         console.log(red, 'Las branches no estan protegidas');
+      }
+      const amountOfBranches = countBranches(response);
+      if (amountOfBranches > limits.branches) {
+        console.log(red, `Demasiadas branches: ${amountOfBranches}`);
       }
       const average = averageRequestChanges(response);
       console.log(average < limits.prRebound ? green : red, `Promedio de cambios pedidos por PR: ${average}`);

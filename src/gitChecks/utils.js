@@ -17,12 +17,18 @@ exports.hasBranchProtection = gitResponse =>
     rule => rule.node.pattern === 'master' && rule.node.requiresApprovingReviews
   );
 
-exports.averageRequestChanges = response => {
+exports.averageRequestChanges = gitResponse => {
   const findReviews = pullRequest => pullRequest.node.reviews.edges.map(edge => edge.node);
-  const pullRequests = response.data.data.repository.pullRequests.edges;
+  const pullRequests = gitResponse.data.data.repository.pullRequests.edges;
   const reviews = pullRequests.map(pullRequest => findReviews(pullRequest));
   const totalReviews = flattenDeep(reviews).length;
   const totalChangesRequested = flattenDeep(reviews).filter(pr => pr.state === REVIEW_STATE.CHANGES_REQUESTED)
     .length;
   return (totalChangesRequested / totalReviews).toFixed(2);
 };
+
+exports.countBranches = gitResponse =>
+  gitResponse.data.data.repository.refs.edges.filter(
+    branch =>
+      branch.node.name !== 'master' && branch.node.name !== 'stage' && branch.node.name !== 'development'
+  ).length;
