@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
 const { red, green } = require('../constants/colors');
-const getRepositoryInfo = require('./services/gitService');
+const { getRepositoryInfo, getReleaseInfo } = require('./services/gitService');
 const { ERROR } = require('./constants');
 
 const limits = require('../constants/limits');
 
-const { hasBaseBranches, hasBranchProtection, averageRequestChanges } = require('./utils');
+const { hasBaseBranches, hasBranchProtection, averageRequestChanges, countBranches } = require('./utils');
 
 module.exports = (repository, organization) => {
   getRepositoryInfo(repository, organization)
@@ -20,8 +20,25 @@ module.exports = (repository, organization) => {
       } else {
         console.log(red, 'Las branches no estan protegidas');
       }
+      const amountOfBranches = countBranches(response);
+      if (amountOfBranches > limits.branches) {
+        console.log(red, `Demasiadas branches: ${amountOfBranches}`);
+      }
       const average = averageRequestChanges(response);
       console.log(average < limits.prRebound ? green : red, `Promedio de cambios pedidos por PR: ${average}`);
+    })
+    .catch(() => console.log(red, `Error de git: ${ERROR.REPO_NOT_FOUND}`));
+  getReleaseInfo(repository, organization)
+    .then(response => {
+      const { pullRequests, releases } = response.data.data.repository;
+      if (pullRequests.edges.length <= releases.edges.length) {
+        console.log(green, 'Hay un release por cada PR a master');
+      } else {
+        console.log(
+          red,
+          `Hay mas PRs a master que releases: ${pullRequests.edges.length - releases.edges.length}`
+        );
+      }
     })
     .catch(() => console.log(red, `Error de git: ${ERROR.REPO_NOT_FOUND}`));
 };

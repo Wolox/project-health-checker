@@ -42,7 +42,11 @@ if (args.org) {
   organization = args.o;
 }
 
-runEnvChecks(testPath);
-runGeneralChecks(testPath);
-runGitChecks(repoName, organization);
-techs[techChecks](testPath);
+if (args.onlyGit) {
+  runGitChecks(repoName, organization);
+} else {
+  runEnvChecks(testPath);
+  runGeneralChecks(testPath);
+  runGitChecks(repoName, organization);
+  techs[techChecks](testPath);
+}
