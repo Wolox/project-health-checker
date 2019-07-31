@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 const { find, findSync } = require('find-in-files');
+const read = require('read-file');
 
 const runReactLinter = require('./linter');
-const { resolveColor, calculatePercentage } = require('../utils');
+const { resolveColor, calculatePercentage, sameVersion } = require('../utils');
 const limits = require('../constants/limits');
 const { red } = require('../constants/colors');
 
@@ -18,6 +19,14 @@ module.exports = testPath => {
       `Porcentaje de actions con redux-recompose: ${result}%`
     );
   });
+
+  read(`${testPath}/package.json`, 'utf8', (err, data) => {
+    const { dependencies } = JSON.parse(data);
+    if (!sameVersion(dependencies.react, process.env.REACT_VERSION)) {
+      console.log(red, 'La version de React es muy antigua');
+    }
+  });
+
   try {
     runReactLinter(testPath);
   } catch (error) {
