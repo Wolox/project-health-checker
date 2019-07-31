@@ -19,7 +19,7 @@ const repositoryInfoQuery = (repository, organization) => ({
             }
           }
         }
-         branchProtectionRules(first: 10) {
+        branchProtectionRules(first: 10) {
           edges {
             node {
               requiresApprovingReviews,
@@ -43,5 +43,29 @@ const repositoryInfoQuery = (repository, organization) => ({
       }}`
 });
 
-module.exports = (repository, organization) =>
+const prToMasterQuery = (repository, organization) => ({
+  query: `{
+      repository(owner:"${organization}", name:"${repository}") {
+        pullRequests(baseRefName: "master", first: 100) {
+          edges {
+            node {
+              baseRefName
+            }
+          }
+        }
+        releases(first: 100) {
+          edges {
+            node {
+              tagName
+            }
+          }
+        }
+      }
+    }`
+});
+
+exports.getRepositoryInfo = (repository, organization) =>
   axios.post(API, repositoryInfoQuery(repository, organization), config);
+
+exports.getReleaseInfo = (repository, organization) =>
+  axios.post(API, prToMasterQuery(repository, organization), config);
