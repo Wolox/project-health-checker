@@ -21,10 +21,9 @@ exports.averageRequestChanges = gitResponse => {
   const findReviews = pullRequest => pullRequest.node.reviews.edges.map(edge => edge.node);
   const pullRequests = gitResponse.data.data.repository.pullRequests.edges;
   const reviews = pullRequests.map(pullRequest => findReviews(pullRequest));
-  const totalReviews = flattenDeep(reviews).length;
   const totalChangesRequested = flattenDeep(reviews).filter(pr => pr.state === REVIEW_STATE.CHANGES_REQUESTED)
     .length;
-  return (totalChangesRequested / totalReviews).toFixed(2);
+  return (totalChangesRequested / pullRequests.length).toFixed(2);
 };
 
 exports.countBranches = gitResponse =>

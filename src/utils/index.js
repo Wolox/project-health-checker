@@ -4,11 +4,15 @@ const percentage = 100;
 
 const removeComments = match => match.line.filter(line => line.substring(0, 2) !== '//');
 
-module.exports.analyzeMatches = matches =>
-  Object.keys(matches).filter(key => removeComments(matches[key]).length);
+const getMajor = version => version.split('.')[0].replace('^', '');
 
-module.exports.resolveColor = (value, expected) => (value >= expected ? green : red);
+exports.analyzeMatches = matches => Object.keys(matches).filter(key => removeComments(matches[key]).length);
 
-module.exports.calculatePercentage = (results, total) =>
+exports.resolveColor = (value, expected) => (value >= expected ? green : red);
+
+exports.calculatePercentage = (results, total) =>
   // eslint-disable-next-line prettier/prettier
   (this.analyzeMatches(results).length / total * percentage).toFixed(2);
+
+exports.sameVersion = (currentVersion, expectedVersion) =>
+  getMajor(currentVersion) === getMajor(expectedVersion);
