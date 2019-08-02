@@ -23,7 +23,8 @@ const repositoryInfoQuery = (repository, organization) => ({
           edges {
             node {
               requiresApprovingReviews,
-              pattern
+              pattern,
+              dismissesStaleReviews
             }
           }
         }
