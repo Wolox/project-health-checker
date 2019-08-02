@@ -89,8 +89,8 @@ module.exports = testPath => {
         aliasPathRegex(alias).test(aliases[alias]) ||
         console.log(red, `El import absoluto de "${alias}" no está configurado correctamente`);
       if (
-        BASE_ALIASES.map(alias => isBaseAlias(alias) && validPath(alias)).reduce(
-          (accumulator, current) => accumulator && current
+        BASE_ALIASES.reduce(
+          (accumulator, currentAlias) => isBaseAlias(currentAlias) && validPath(currentAlias) && accumulator
         )
       ) {
         console.log(green, 'Imports absolutos configurados');
