@@ -8,5 +8,6 @@ module.exports = {
   indexFiles: 10,
   layoutFiles: 5,
   prRebound: 0.9,
-  branches: 15
+  branches: 15,
+  absoluteImports: 80
 };
