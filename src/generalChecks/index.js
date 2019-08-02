@@ -9,11 +9,14 @@ const limits = require('../constants/limits');
 const { BASE_ALIASES, aliasPathRegex } = require('./constants');
 
 let amountOfJsAppFolder = 0;
+let amountOfJs = 0;
 
 module.exports = testPath => {
   findSync('', `${testPath}/src/app`, '.js$').then(
     results => (amountOfJsAppFolder = Object.keys(results).length)
   );
+
+  findSync('', `${testPath}/src`, '.js$').then(results => (amountOfJs = Object.keys(results).length));
 
   find("from 'i18next*';", `${testPath}/src/app`, '.js$').then(results => {
     const result = calculatePercentage(results, amountOfJsAppFolder);
@@ -96,8 +99,8 @@ module.exports = testPath => {
         console.log(green, 'Imports absolutos configurados');
       }
 
-      find("from '@.+';", `${testPath}/src/app`, '.js$').then(results => {
-        const result = calculatePercentage(results, amountOfJsAppFolder);
+      find("from '@.+';", `${testPath}/src`, '.js$').then(results => {
+        const result = calculatePercentage(results, amountOfJs);
         console.log(
           resolveColor(result, limits.absoluteImports),
           `Porcentaje de imports absolutos del total: ${result}%`
