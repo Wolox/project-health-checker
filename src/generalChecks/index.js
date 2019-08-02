@@ -6,6 +6,7 @@ const read = require('read-file');
 const { resolveColor, calculatePercentage } = require('../utils');
 const { red, green } = require('../constants/colors');
 const limits = require('../constants/limits');
+const { BASE_ALIASES, aliasPathRegex } = require('./constants');
 
 let amountOfJsAppFolder = 0;
 
@@ -19,6 +20,14 @@ module.exports = testPath => {
     console.log(
       resolveColor(result, limits.i18n),
       `Porcentaje de internacionalización del total: ${result}%`
+    );
+  });
+
+  find("from '@.+';", `${testPath}/src/app`, '.js$').then(results => {
+    const result = calculatePercentage(results, amountOfJsAppFolder);
+    console.log(
+      resolveColor(result, limits.absoluteImports),
+      `Porcentaje de imports absolutos del total: ${result}%`
     );
   });
 
@@ -72,5 +81,23 @@ module.exports = testPath => {
       return;
     }
     console.error(green, 'Existe un archivo .babelrc');
+
+    read(`${testPath}/.babelrc`, 'utf8', (err, data) => {
+      const aliases = JSON.parse(data).plugins.filter(
+        plugin => Array.isArray(plugin) && plugin[0] === 'module-resolver'
+      )[0][1].alias;
+      const isBaseAlias = alias =>
+        Object.keys(aliases).includes(alias) || console.log(red, `Falta absolute import para: ${alias}`);
+      const validPath = alias =>
+        aliasPathRegex(alias).test(aliases[alias]) ||
+        console.log(red, `El import absoluto de "${alias}" no está configurado correctamente`);
+      if (
+        BASE_ALIASES.map(alias => isBaseAlias(alias) && validPath(alias)).reduce(
+          (accumulator, current) => accumulator && current
+        )
+      ) {
+        console.log(green, 'Imports absolutos configurados');
+      }
+    });
   });
 };
