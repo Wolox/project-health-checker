@@ -7,7 +7,7 @@ module.exports = {
   lines: 150,
   indexFiles: 10,
   layoutFiles: 5,
-  prRebound: 0.25,
+  prRebound: 0.9,
   branches: 15,
   absoluteImports: 80
 };
