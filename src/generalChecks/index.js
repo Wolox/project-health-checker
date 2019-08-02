@@ -23,14 +23,6 @@ module.exports = testPath => {
     );
   });
 
-  find("from '@.+';", `${testPath}/src/app`, '.js$').then(results => {
-    const result = calculatePercentage(results, amountOfJsAppFolder);
-    console.log(
-      resolveColor(result, limits.absoluteImports),
-      `Porcentaje de imports absolutos del total: ${result}%`
-    );
-  });
-
   find(/\n/, testPath, 'layout.js$').then(results => {
     const filtered = Object.keys(results).filter(elem => results[elem].count > limits.lines);
     console.log(
@@ -83,9 +75,14 @@ module.exports = testPath => {
     console.error(green, 'Existe un archivo .babelrc');
 
     read(`${testPath}/.babelrc`, 'utf8', (err, data) => {
-      const aliases = JSON.parse(data).plugins.filter(
+      const moduleResolver = JSON.parse(data).plugins.filter(
         plugin => Array.isArray(plugin) && plugin[0] === 'module-resolver'
-      )[0][1].alias;
+      );
+      if (!moduleResolver.length) {
+        console.log(red, 'El archivo .babelrc no contiene el plugin "module-resolver"');
+        return;
+      }
+      const aliases = moduleResolver[0][1].alias;
       const isBaseAlias = alias =>
         Object.keys(aliases).includes(alias) || console.log(red, `Falta absolute import para: ${alias}`);
       const validPath = alias =>
@@ -98,6 +95,14 @@ module.exports = testPath => {
       ) {
         console.log(green, 'Imports absolutos configurados');
       }
+
+      find("from '@.+';", `${testPath}/src/app`, '.js$').then(results => {
+        const result = calculatePercentage(results, amountOfJsAppFolder);
+        console.log(
+          resolveColor(result, limits.absoluteImports),
+          `Porcentaje de imports absolutos del total: ${result}%`
+        );
+      });
     });
   });
 };
