@@ -108,4 +108,28 @@ module.exports = testPath => {
       });
     });
   });
+
+  read(`${testPath}/Jenkinsfile`, 'utf8', err => {
+    if (err) {
+      console.log(red, 'No existe un Jenkinsfile');
+      return;
+    }
+    console.error(green, 'Existe un Jenkinsfile');
+  });
+
+  read(`${testPath}/.woloxci/config.yml`, 'utf8', err => {
+    if (err) {
+      console.log(red, 'No existe un config.yml en .woloxci');
+      return;
+    }
+    console.error(green, 'Existe un config.yml en .woloxci');
+  });
+
+  read(`${testPath}/.woloxci/Dockerfile`, 'utf8', err => {
+    if (err) {
+      console.log(red, 'No existe un Dockerfile');
+      return;
+    }
+    console.error(green, 'Existe un Dockerfile');
+  });
 };
