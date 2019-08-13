@@ -2,6 +2,10 @@ const lighthouse = require('lighthouse');
 const chromeLauncher = require('chrome-launcher');
 const fs = require('fs');
 const open = require('open');
+const moment = require('moment');
+const { red } = require('../constants/colors');
+
+const reportPath = `./ceoReports/ceoReport-${moment().format()}.html`;
 
 function launchChromeAndRunLighthouse(url, opts, config = null) {
   return chromeLauncher.launch({ chromeFlags: opts.chromeFlags }).then(chrome => {
@@ -10,7 +14,7 @@ function launchChromeAndRunLighthouse(url, opts, config = null) {
       const res = results.report;
 
       // workaround to save the report
-      fs.writeFile('ceoReport.html', res, err => {
+      fs.writeFile(reportPath, res, err => {
         if (err) {
           console.log(err);
         }
@@ -25,9 +29,14 @@ const opts = {
   chromeFlags: ['--headless'],
   view: true
 };
-module.exports = seoLink =>
-  launchChromeAndRunLighthouse(seoLink, opts).then(() => {
-    (async () => {
-      await open('./ceoReport.html');
-    })();
-  });
+
+module.exports = seoLink => {
+  if (typeof seoLink === 'string') {
+    return launchChromeAndRunLighthouse(seoLink, opts).then(() => {
+      (async () => {
+        await open(reportPath);
+      })();
+    });
+  }
+  return console.log(red, 'No se paso una url para checkear el ceo');
+};

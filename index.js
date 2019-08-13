@@ -17,7 +17,7 @@ const args = parseArgs(process.argv);
 let testPath = 'test';
 let techChecks = 'react';
 let organization = 'Wolox';
-let seoLink = 'https://www.wolox.com.ar/';
+let seoLink = '';
 
 if (args.path) {
   testPath = args.path;

@@ -17,6 +17,7 @@
     "lighthouse": "^5.2.0",
     "lodash.flattendeep": "^4.4.0",
     "minimist": "^1.2.0",
+    "moment": "^2.24.0",
     "read-file": "^0.2.0",
     "stylelint": "^10.0.1"
   },
