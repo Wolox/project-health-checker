@@ -8,6 +8,10 @@
   },
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">= 10.15.3",
+    "npm": ">= 6.9.0"
+  },
   "dependencies": {
     "axios": "^0.18.0",
     "count-files": "^2.6.2",
