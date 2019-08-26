@@ -3,11 +3,12 @@ const { find, findSync } = require('find-in-files');
 const fs = require('fs');
 const read = require('read-file');
 const yaml = require('js-yaml');
+const parser = require('docker-file-parser');
 
 const { resolveColor, calculatePercentage } = require('../utils');
 const { red, green } = require('../constants/colors');
 const limits = require('../constants/limits');
-const { BASE_ALIASES, aliasPathRegex } = require('./constants');
+const { BASE_ALIASES, DOCKERFILE_ATTRIBUTES, aliasPathRegex } = require('./constants');
 
 let amountOfJsAppFolder = 0;
 let amountOfJs = 0;
@@ -143,31 +144,36 @@ module.exports = testPath => {
       const { GIT_COMMITTER_NAME, GIT_COMMITTER_EMAIL, LANG } = environment;
       GIT_COMMITTER_NAME
         ? console.error(
-          green,
-          'Hay una variable de GIT_COMMITTER_NAME en environment de config.yml en .woloxci'
-        )
+            green,
+            'Hay una variable de GIT_COMMITTER_NAME en environment de config.yml en .woloxci'
+          )
         : console.log(red, 'No existe la variable de dockerfile en config de un environment.yml en .woloxci');
       GIT_COMMITTER_EMAIL
         ? console.error(
-          green,
-          'Hay una variable de GIT_COMMITTER_EMAIL en environment de config.yml en .woloxci'
-          )
+            green,
+            'Hay una variable de GIT_COMMITTER_EMAIL en environment de config.yml en .woloxci'
+        )
         : console.log(
-          red,
-          'No existe la variable de GIT_COMMITTER_EMAIL en environment de un config.yml en .woloxci'
-        );
+            red,
+            'No existe la variable de GIT_COMMITTER_EMAIL en environment de un config.yml en .woloxci'
+          );
       LANG
         ? console.error(green, 'Hay una variable de LANG en environment de config.yml en .woloxci')
         : console.log(red, 'No existe la variable de LANG en environment de un config.yml en .woloxci');
     }
-    console.error(green, 'Existe un config.yml en .woloxci');
   });
 
-  read(`${testPath}/.woloxci/Dockerfile`, 'utf8', err => {
+  read(`${testPath}/.woloxci/Dockerfile`, 'utf8', (err, data) => {
     if (err) {
       console.log(red, 'No existe un Dockerfile');
       return;
     }
-    console.error(green, 'Existe un Dockerfile');
+    const file = parser.parse(data);
+    DOCKERFILE_ATTRIBUTES.map(value => {
+      const response = file.find(attr => value === attr.name);
+      response
+        ? console.error(green, `Hay una variable ${value} en Dockerfile en .woloxci`)
+        : console.log(red, `No existe la variable ${value} en Dockerfile en .woloxci`);
+    });
   });
 };
