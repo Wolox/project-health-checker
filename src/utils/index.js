@@ -16,3 +16,11 @@ exports.calculatePercentage = (results, total) =>
 
 exports.sameVersion = (currentVersion, expectedVersion) =>
   getMajor(currentVersion) === getMajor(expectedVersion);
+
+exports.assertExists = (exists, name) => {
+  if (exists) {
+    console.log(green, `Existe ${name}`);
+  } else {
+    console.error(red, 'Existe un readme');
+  }
+};
