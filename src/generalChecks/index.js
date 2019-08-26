@@ -2,6 +2,7 @@
 const { find, findSync } = require('find-in-files');
 const fs = require('fs');
 const read = require('read-file');
+const yaml = require('js-yaml');
 
 const { resolveColor, calculatePercentage } = require('../utils');
 const { red, green } = require('../constants/colors');
@@ -117,10 +118,47 @@ module.exports = testPath => {
     console.error(green, 'Existe un Jenkinsfile');
   });
 
-  read(`${testPath}/.woloxci/config.yml`, 'utf8', err => {
+  read(`${testPath}/.woloxci/config.yml`, 'utf8', (err, data) => {
     if (err) {
       console.log(red, 'No existe un config.yml en .woloxci');
       return;
+    }
+    const { config, steps, environment } = yaml.load(data);
+    if (config) {
+      const { dockerfile, project_name } = config;
+      dockerfile
+        ? console.error(green, 'Hay una variable de dockerfile en config de config.yml en .woloxci')
+        : console.log(red, 'No existe la variable de dockerfile en config de un config.yml en .woloxci');
+      project_name
+        ? console.error(green, 'Hay una variable de proyect_name en config de config.yml en .woloxci')
+        : console.log(red, 'No existe la variable de proyect_name en config de un config.yml en .woloxci');
+    }
+    if (steps) {
+      const { lint } = steps;
+      lint
+        ? console.error(green, 'Hay una variable de dockerfile en steps de config.yml en .woloxci')
+        : console.log(red, 'No existe la variable de dockerfile en steps de un config.yml en .woloxci');
+    }
+    if (environment) {
+      const { GIT_COMMITTER_NAME, GIT_COMMITTER_EMAIL, LANG } = environment;
+      GIT_COMMITTER_NAME
+        ? console.error(
+          green,
+          'Hay una variable de GIT_COMMITTER_NAME en environment de config.yml en .woloxci'
+        )
+        : console.log(red, 'No existe la variable de dockerfile en config de un environment.yml en .woloxci');
+      GIT_COMMITTER_EMAIL
+        ? console.error(
+          green,
+          'Hay una variable de GIT_COMMITTER_EMAIL en environment de config.yml en .woloxci'
+          )
+        : console.log(
+          red,
+          'No existe la variable de GIT_COMMITTER_EMAIL en environment de un config.yml en .woloxci'
+        );
+      LANG
+        ? console.error(green, 'Hay una variable de LANG en environment de config.yml en .woloxci')
+        : console.log(red, 'No existe la variable de LANG en environment de un config.yml en .woloxci');
     }
     console.error(green, 'Existe un config.yml en .woloxci');
   });
