@@ -38,7 +38,7 @@ const opts = {
 };
 
 module.exports = seoLink => {
-  if (typeof seoLink === 'string') {
+  if (seoLink) {
     return launchChromeAndRunLighthouse(seoLink, opts).then(() => {
       (async () => {
         await open(reportHtmlPath);
