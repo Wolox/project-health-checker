@@ -15,9 +15,11 @@
   "dependencies": {
     "axios": "^0.18.0",
     "count-files": "^2.6.2",
+    "docker-file-parser": "^1.0.4",
     "dotenv": "^7.0.0",
     "eslint": "^5.16.0",
     "find-in-files": "^0.5.0",
+    "js-yaml": "^3.13.1",
     "lighthouse": "^5.2.0",
     "lodash.flattendeep": "^4.4.0",
     "minimist": "^1.2.0",

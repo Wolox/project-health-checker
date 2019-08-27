@@ -2,11 +2,13 @@
 const { find, findSync } = require('find-in-files');
 const fs = require('fs');
 const read = require('read-file');
+const yaml = require('js-yaml');
+const parser = require('docker-file-parser');
 
-const { resolveColor, calculatePercentage } = require('../utils');
+const { resolveColor, calculatePercentage, assertExists } = require('../utils');
 const { red, green } = require('../constants/colors');
 const limits = require('../constants/limits');
-const { BASE_ALIASES, aliasPathRegex } = require('./constants');
+const { BASE_ALIASES, DOCKERFILE_ATTRIBUTES, aliasPathRegex } = require('./constants');
 
 let amountOfJsAppFolder = 0;
 let amountOfJs = 0;
@@ -106,6 +108,55 @@ module.exports = testPath => {
           `Porcentaje de imports absolutos del total: ${result}%`
         );
       });
+    });
+  });
+
+  read(`${testPath}/Jenkinsfile`, 'utf8', err => {
+    if (err) {
+      console.log(red, 'No existe un Jenkinsfile');
+      return;
+    }
+    console.error(green, 'Existe un Jenkinsfile');
+  });
+
+  read(`${testPath}/.woloxci/config.yml`, 'utf8', (err, data) => {
+    if (err) {
+      console.log(red, 'No existe un config.yml en .woloxci');
+      return;
+    }
+    const { config, steps, environment } = yaml.load(data);
+    if (config) {
+      const { dockerfile, project_name } = config;
+      assertExists(dockerfile, 'la variable dockerfile en config de config.yml en .woloxci');
+      assertExists(project_name, 'la variable project_name en config de config.yml en .woloxci');
+    }
+    if (steps) {
+      const { lint } = steps;
+      assertExists(lint, 'la variable dockerfile en steps de config.yml en .woloxci');
+    }
+    if (environment) {
+      const { GIT_COMMITTER_NAME, GIT_COMMITTER_EMAIL, LANG } = environment;
+      assertExists(
+        GIT_COMMITTER_NAME,
+        'la variable GIT_COMMITTER_NAME en environment de config.yml en .woloxci'
+      );
+      assertExists(
+        GIT_COMMITTER_EMAIL,
+        'la variable GIT_COMMITTER_EMAIL en environment de config.yml en .woloxci'
+      );
+      assertExists(LANG, 'la variable LANG en environment de config.yml en .woloxci');
+    }
+  });
+
+  read(`${testPath}/.woloxci/Dockerfile`, 'utf8', (err, data) => {
+    if (err) {
+      console.log(red, 'No existe un Dockerfile');
+      return;
+    }
+    const file = parser.parse(data);
+    DOCKERFILE_ATTRIBUTES.map(value => {
+      const response = file.find(attr => value === attr.name);
+      return assertExists(response, `la variable ${value} en Dockerfile en .woloxci`);
     });
   });
 };
