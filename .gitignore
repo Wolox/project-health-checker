@@ -62,4 +62,5 @@ typings/
 .next
 
 # Seo Reports
-seoReports/*
+seoReports/*.html
+seoReports/*.csv
