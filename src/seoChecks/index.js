@@ -39,11 +39,7 @@ const opts = {
 
 module.exports = seoLink => {
   if (seoLink) {
-    return launchChromeAndRunLighthouse(seoLink, opts).then(() => {
-      (async () => {
-        await open(reportHtmlPath);
-      })();
-    });
+    return launchChromeAndRunLighthouse(seoLink, opts).then(() => open(reportHtmlPath));
   }
   return console.log(red, 'No se paso una url para checkear el seo');
 };
