@@ -159,4 +159,12 @@ module.exports = testPath => {
       return assertExists(response, `la variable ${value} en Dockerfile en .woloxci`);
     });
   });
+
+  fs.access(`${testPath}/.nvmrc`, fs.F_OK, err => {
+    if (err) {
+      console.log(red, 'No existe un archivo .nvmrc');
+      return;
+    }
+    console.error(green, 'Existe un archivo .nvmrc');
+  });
 };
