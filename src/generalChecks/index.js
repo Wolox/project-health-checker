@@ -4,6 +4,7 @@ const fs = require('fs');
 const read = require('read-file');
 const yaml = require('js-yaml');
 const parser = require('docker-file-parser');
+const npmCheck = require('npm-check');
 
 const { resolveColor, calculatePercentage, assertExists } = require('../utils');
 const { red, green } = require('../constants/colors');
@@ -53,15 +54,19 @@ module.exports = testPath => {
     console.log(codeOwners > limits.codeOwners ? green : red, `Cantidad de code owners: ${codeOwners}`);
   });
 
-  read(`${testPath}/package.json`, 'utf8', (err, data) => {
-    const { dependencies } = JSON.parse(data);
-    Object.keys(dependencies).forEach(dependency =>
-      find(dependency, `${testPath}/src`, '.js$').then(results => {
-        if (!Object.keys(results).length) {
-          console.log(red, `Dependencia no usada: ${dependency}`);
-        }
-      })
-    );
+  npmCheck({ cwd: testPath }).then(currentState => {
+    const packages = currentState.get('packages');
+    packages.forEach(dependency => {
+      const { moduleName, latest, packageJson, unused, bump } = dependency;
+      if (unused) {
+        console.log(red, `Dependencia no usada: ${moduleName}`);
+      } else if (bump && bump !== 'patch') {
+        console.log(
+          red,
+          `Dependencia no actualizada: ${moduleName}, Version: packageJson: ${packageJson} -> ultima ${latest} `
+        );
+      }
+    });
   });
 
   fs.access(`${testPath}/README.md`, fs.F_OK, err => {
