@@ -27,6 +27,28 @@ module.exports = testPath => {
     }
   });
 
+  read(`${testPath}/src`, 'utf8', err => {
+    const pathsOnSrc = ['app', 'config', 'constants', 'propTypes', 'redux', 'scss', 'services', 'utils', 'index'];
+    
+    if (err) {
+      console.log(red, 'No existe un archivo de src en el root de su proyecto');
+      return;
+    }
+    console.error(green, 'Existe un archivo de src');
+
+    if(!err) {
+      pathsOnSrc.forEach(element => {
+        read(`${testPath}/src/${element}`, 'utf8', err => {
+          if (err) {
+            console.log(red, `No existe un archivo de ${element} dentro de src`);
+            return;
+          }
+          console.error(green, `Existe un archivo de ${element} dentro de src`);
+        });
+      });
+    }
+  });
+
   try {
     runReactLinter(testPath);
   } catch (error) {
