@@ -9,6 +9,7 @@ const { resolveColor, calculatePercentage, assertExists } = require('../utils');
 const { red, green } = require('../constants/colors');
 const limits = require('../constants/limits');
 const { BASE_ALIASES, DOCKERFILE_ATTRIBUTES, aliasPathRegex } = require('./constants');
+const { validateJenkinsFileContent } = require('../utils/jenkinsFilesUtils');
 
 let amountOfJsAppFolder = 0;
 let amountOfJs = 0;
@@ -111,12 +112,16 @@ module.exports = testPath => {
     });
   });
 
-  read(`${testPath}/Jenkinsfile`, 'utf8', err => {
+  read(`${testPath}/Jenkinsfile`, 'utf8', (err, data) => {
     if (err) {
       console.log(red, 'No existe un Jenkinsfile');
       return;
     }
     console.error(green, 'Existe un Jenkinsfile');
+    const { woloxCiImport, checkoutConfig, woloxCiValidPath } = validateJenkinsFileContent(data, testPath);
+    assertExists(woloxCiImport, 'la importación de wolox-ci en el archivo Jenkinsfile');
+    assertExists(checkoutConfig, 'la configuración de checkout en el archivo Jenkinsfile');
+    assertExists(woloxCiValidPath, 'el archivo de configuración woloxCi en el archivo Jenkinsfile');
   });
 
   read(`${testPath}/.woloxci/config.yml`, 'utf8', (err, data) => {
