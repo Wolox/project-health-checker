@@ -86,6 +86,10 @@ module.exports = testPath => {
     console.error(green, 'Existe un archivo .babelrc');
 
     read(`${testPath}/.babelrc`, 'utf8', (err, data) => {
+      if(!JSON.parse(data).plugins){
+        console.log(red, 'El archivo .babelrc no contiene plugins');
+        return;   
+      }
       const moduleResolver = JSON.parse(data).plugins.filter(
         plugin => Array.isArray(plugin) && plugin[0] === 'module-resolver'
       );
