@@ -24,3 +24,11 @@ exports.assertExists = (exists, name) => {
     console.error(red, 'Existe un readme');
   }
 };
+
+exports.filenameExists = filename => fs.access(`${testPath}/${filename}`, fs.F_OK, err => {
+  if (err) {
+    console.log(red, `No existe un archivo ${filename}`);
+    return;
+  }
+  console.error(green, `Existe un archivo ${filename}`);
+});

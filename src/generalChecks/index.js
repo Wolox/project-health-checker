@@ -6,7 +6,7 @@ const yaml = require('js-yaml');
 const parser = require('docker-file-parser');
 const npmCheck = require('npm-check');
 
-const { resolveColor, calculatePercentage, assertExists } = require('../utils');
+const { resolveColor, calculatePercentage, assertExists, filenameExists } = require('../utils');
 const { red, green } = require('../constants/colors');
 const limits = require('../constants/limits');
 const { BASE_ALIASES, DOCKERFILE_ATTRIBUTES, aliasPathRegex } = require('./constants');
@@ -169,12 +169,6 @@ module.exports = testPath => {
       return assertExists(response, `la variable ${value} en Dockerfile en .woloxci`);
     });
   });
-
-  fs.access(`${testPath}/.nvmrc`, fs.F_OK, err => {
-    if (err) {
-      console.log(red, 'No existe un archivo .nvmrc');
-      return;
-    }
-    console.error(green, 'Existe un archivo .nvmrc');
-  });
+  
+  filenameExists('.nvmrc');
 };
