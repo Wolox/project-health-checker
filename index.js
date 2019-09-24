@@ -5,6 +5,7 @@ const runEnvChecks = require('./src/envChecks');
 const runGeneralChecks = require('./src/generalChecks');
 const runGitChecks = require('./src/gitChecks');
 const runSeoChecks = require('./src/seoChecks');
+const runUnitTests = require('./src/unitTests');
 
 const techs = {
   react: require('./src/reactChecks'),
@@ -59,4 +60,5 @@ if (args.onlyGit) {
   runGitChecks(repoName, organization);
   runSeoChecks(seoLink);
   techs[techChecks](testPath);
+  runUnitTests(testPath);
 }
