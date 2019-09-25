@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const { find, findSync } = require('find-in-files');
+const { findSync } = require('find-in-files');
 const read = require('read-file');
 
 const runReactLinter = require('./linter');
@@ -9,27 +9,33 @@ const { red } = require('../constants/colors');
 
 let amountOfActionJs = 0;
 
-module.exports = testPath => {
-  findSync('', testPath, 'actions.js$').then(results => (amountOfActionJs = Object.keys(results).length));
+module.exports = async testPath => {
+  const techResult = [];
+  const actionResults = await findSync('', testPath, 'actions.js$');
+  amountOfActionJs = Object.keys(actionResults).length;
 
-  find("from 'redux-recompose';", testPath, 'actions.js$').then(results => {
-    const result = calculatePercentage(results, amountOfActionJs);
-    console.log(
-      resolveColor(result, limits.actions),
-      `Porcentaje de actions con redux-recompose: ${result}%`
-    );
+  const results = await findSync("from 'redux-recompose';", testPath, 'actions.js$');
+  const result = calculatePercentage(results, amountOfActionJs);
+  console.log(resolveColor(result, limits.actions), `Porcentaje de actions con redux-recompose: ${result}%`);
+  techResult.push({
+    metric: 'Redux Recompose',
+    description: 'Porcentaje de actions con redux-recompose',
+    value: result
   });
 
-  read(`${testPath}/package.json`, 'utf8', (err, data) => {
+  try {
+    const data = read.sync(`${testPath}/package.json`, 'utf8');
     const { dependencies } = JSON.parse(data);
     if (!sameVersion(dependencies.react, process.env.REACT_VERSION)) {
       console.log(red, 'La version de React es muy antigua');
     }
-  });
+  } catch {}
 
   try {
     runReactLinter(testPath);
   } catch (error) {
     console.log(red, `Eslint error: ${error}`);
   }
+
+  return techResult;
 };

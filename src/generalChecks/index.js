@@ -1,5 +1,6 @@
+/* eslint-disable max-statements, complexity */
 /* eslint-disable no-console */
-const { find, findSync } = require('find-in-files');
+const { findSync } = require('find-in-files');
 const fs = require('fs');
 const read = require('read-file');
 const yaml = require('js-yaml');
@@ -15,45 +16,60 @@ const { validateJenkinsFileContent } = require('../utils/jenkinsFilesUtils');
 let amountOfJsAppFolder = 0;
 let amountOfJs = 0;
 
-module.exports = testPath => {
-  findSync('', `${testPath}/src/app`, '.js$').then(
-    results => (amountOfJsAppFolder = Object.keys(results).length)
+module.exports = async testPath => {
+  const generalResult = [];
+  const appResults = await findSync('', `${testPath}/src/app`, '.js$');
+  amountOfJsAppFolder = Object.keys(appResults).length;
+
+  const allResults = await findSync('', `${testPath}/src`, '.js$');
+  amountOfJs = Object.keys(allResults).length;
+
+  const i18nResults = await findSync("from 'i18next*';", `${testPath}/src/app`, '.js$');
+  const result = calculatePercentage(i18nResults, amountOfJsAppFolder);
+  console.log(resolveColor(result, limits.i18n), `Porcentaje de internacionalización del total: ${result}%`);
+  generalResult.push({ metric: 'i18n', description: 'Porcentaje de internacionalización', value: result });
+
+  const layoutResults = await findSync(/\n/, testPath, 'layout.js$');
+  const filteredLayout = Object.keys(layoutResults).filter(elem => layoutResults[elem].count > limits.lines);
+  console.log(
+    filteredLayout.length > limits.layoutFiles ? red : green,
+    `Cantidad de layouts con mas de 150 lineas: ${filteredLayout.length}`
   );
-
-  findSync('', `${testPath}/src`, '.js$').then(results => (amountOfJs = Object.keys(results).length));
-
-  find("from 'i18next*';", `${testPath}/src/app`, '.js$').then(results => {
-    const result = calculatePercentage(results, amountOfJsAppFolder);
-    console.log(
-      resolveColor(result, limits.i18n),
-      `Porcentaje de internacionalización del total: ${result}%`
-    );
+  generalResult.push({
+    metric: 'Layout lines',
+    description: 'Cantidad de layouts con mas de 150 lineas',
+    value: filteredLayout.length
   });
 
-  find(/\n/, testPath, 'layout.js$').then(results => {
-    const filtered = Object.keys(results).filter(elem => results[elem].count > limits.lines);
-    console.log(
-      filtered.length > limits.layoutFiles ? red : green,
-      `Cantidad de layouts con mas de 150 lineas: ${filtered.length}`
-    );
+  const indexResults = await findSync(/\n/, testPath, 'index.js$');
+  const filteredIndex = Object.keys(indexResults).filter(elem => indexResults[elem].count > limits.lines);
+  console.log(
+    filteredIndex.length > limits.indexFiles ? red : green,
+    `Cantidad de index con mas de 150 lineas: ${filteredIndex.length}`
+  );
+  generalResult.push({
+    metric: 'Lineas de Index',
+    description: 'Cantidad de index con mas de 150 lineas',
+    value: filteredIndex.length
   });
 
-  find(/\n/, testPath, 'index.js$').then(results => {
-    const filtered = Object.keys(results).filter(elem => results[elem].count > limits.lines);
-    console.log(
-      filtered.length > limits.indexFiles ? red : green,
-      `Cantidad de index con mas de 150 lineas: ${filtered.length}`
-    );
-  });
-
-  read(`${testPath}/.github/CODEOWNERS`, 'utf8', (err, data) => {
-    if (err) {
-      console.log(red, 'No existe un archivo con code owners');
-      return;
-    }
+  try {
+    const data = read.sync(`${testPath}/.github/CODEOWNERS`, 'utf8');
     const codeOwners = data.split('@').length - 1;
     console.log(codeOwners > limits.codeOwners ? green : red, `Cantidad de code owners: ${codeOwners}`);
-  });
+    generalResult.push({
+      metric: 'Code Owners',
+      description: 'Cantidad de code owners',
+      value: codeOwners
+    });
+  } catch {
+    console.log(red, 'No existe un archivo con code owners');
+    generalResult.push({
+      metric: 'ERROR: Code Owners',
+      description: 'Existe un archivo con code owners',
+      value: 'NO'
+    });
+  }
 
   npmCheck({ cwd: testPath }).then(currentState => {
     const packages = currentState.get('packages');
@@ -70,70 +86,84 @@ module.exports = testPath => {
     });
   });
 
-  fs.access(`${testPath}/README.md`, fs.F_OK, err => {
-    if (err) {
-      console.log(red, 'No existe un readme');
-      return;
-    }
+  try {
+    fs.accessSync(`${testPath}/README.md`, fs.F_OK);
     console.error(green, 'Existe un readme');
-  });
-
-  fs.access(`${testPath}/.babelrc`, fs.F_OK, err => {
-    if (err) {
-      console.log(red, 'No existe un archivo .babelrc');
-      return;
-    }
-    console.error(green, 'Existe un archivo .babelrc');
-
-    read(`${testPath}/.babelrc`, 'utf8', (err, data) => {
-      const moduleResolver = JSON.parse(data).plugins.filter(
-        plugin => Array.isArray(plugin) && plugin[0] === 'module-resolver'
-      );
-      if (!moduleResolver.length) {
-        console.log(red, 'El archivo .babelrc no contiene el plugin "module-resolver"');
-        return;
-      }
-      const aliases = moduleResolver[0][1].alias;
-      const isBaseAlias = alias =>
-        Object.keys(aliases).includes(alias) || console.log(red, `Falta absolute import para: ${alias}`);
-      const validPath = alias =>
-        aliasPathRegex(alias).test(aliases[alias]) ||
-        console.log(red, `El import absoluto de "${alias}" no está configurado correctamente`);
-      if (
-        BASE_ALIASES.reduce(
-          (accumulator, currentAlias) => isBaseAlias(currentAlias) && validPath(currentAlias) && accumulator
-        )
-      ) {
-        console.log(green, 'Imports absolutos configurados');
-      }
-
-      find("from '@.+';", `${testPath}/src`, '.js$').then(results => {
-        const result = calculatePercentage(results, amountOfJs);
-        console.log(
-          resolveColor(result, limits.absoluteImports),
-          `Porcentaje de imports absolutos del total: ${result}%`
-        );
-      });
+    generalResult.push({
+      metric: 'Readme',
+      description: 'Existe un readme',
+      value: 'SI'
     });
-  });
+  } catch {
+    console.log(red, 'No existe un readme');
+    generalResult.push({
+      metric: 'Readme',
+      description: 'Existe un readme',
+      value: 'NO'
+    });
+  }
 
-  read(`${testPath}/Jenkinsfile`, 'utf8', (err, data) => {
-    if (err) {
-      console.log(red, 'No existe un Jenkinsfile');
+  try {
+    fs.accessSync(`${testPath}/.babelrc`, fs.F_OK);
+    console.error(green, 'Existe un archivo .babelrc');
+    generalResult.push({
+      metric: 'Babel',
+      description: 'Existe un archivo .babelrc',
+      value: 'SI'
+    });
+  } catch {
+    console.log(red, 'No existe un archivo .babelrc');
+    generalResult.push({
+      metric: 'Babel',
+      description: 'Existe un archivo .babelrc',
+      value: 'NO'
+    });
+  }
+
+  try {
+    const data = read.sync(`${testPath}/.babelrc`, 'utf8');
+    const moduleResolver = JSON.parse(data).plugins.filter(
+      plugin => Array.isArray(plugin) && plugin[0] === 'module-resolver'
+    );
+    if (!moduleResolver.length) {
+      console.log(red, 'El archivo .babelrc no contiene el plugin "module-resolver"');
       return;
     }
+    const aliases = moduleResolver[0][1].alias;
+    const isBaseAlias = alias =>
+      Object.keys(aliases).includes(alias) || console.log(red, `Falta absolute import para: ${alias}`);
+    const validPath = alias =>
+      aliasPathRegex(alias).test(aliases[alias]) ||
+      console.log(red, `El import absoluto de "${alias}" no está configurado correctamente`);
+    if (
+      BASE_ALIASES.reduce(
+        (accumulator, currentAlias) => isBaseAlias(currentAlias) && validPath(currentAlias) && accumulator
+      )
+    ) {
+      console.log(green, 'Imports absolutos configurados');
+    }
+
+    const importsResult = await findSync("from '@.+';", `${testPath}/src`, '.js$');
+    const importCalculationResult = calculatePercentage(importsResult, amountOfJs);
+    console.log(
+      resolveColor(importCalculationResult, limits.absoluteImports),
+      `Porcentaje de imports absolutos del total: ${importCalculationResult}%`
+    );
+  } catch {}
+
+  try {
+    const data = read.sync(`${testPath}/Jenkinsfile`, 'utf8');
     console.error(green, 'Existe un Jenkinsfile');
     const { woloxCiImport, checkoutConfig, woloxCiValidPath } = validateJenkinsFileContent(data, testPath);
     assertExists(woloxCiImport, 'la importación de wolox-ci en el archivo Jenkinsfile');
     assertExists(checkoutConfig, 'la configuración de checkout en el archivo Jenkinsfile');
     assertExists(woloxCiValidPath, 'el archivo de configuración woloxCi en el archivo Jenkinsfile');
-  });
+  } catch {
+    console.log(red, 'No existe un Jenkinsfile');
+  }
 
-  read(`${testPath}/.woloxci/config.yml`, 'utf8', (err, data) => {
-    if (err) {
-      console.log(red, 'No existe un config.yml en .woloxci');
-      return;
-    }
+  try {
+    const data = read.sync(`${testPath}/.woloxci/config.yml`, 'utf8');
     const { config, steps, environment } = yaml.load(data);
     if (config) {
       const { dockerfile, project_name } = config;
@@ -156,17 +186,20 @@ module.exports = testPath => {
       );
       assertExists(LANG, 'la variable LANG en environment de config.yml en .woloxci');
     }
-  });
+  } catch {
+    console.log(red, 'No existe un config.yml en .woloxci');
+  }
 
-  read(`${testPath}/.woloxci/Dockerfile`, 'utf8', (err, data) => {
-    if (err) {
-      console.log(red, 'No existe un Dockerfile');
-      return;
-    }
+  try {
+    const data = read.sync(`${testPath}/.woloxci/Dockerfile`, 'utf8');
     const file = parser.parse(data);
     DOCKERFILE_ATTRIBUTES.map(value => {
       const response = file.find(attr => value === attr.name);
       return assertExists(response, `la variable ${value} en Dockerfile en .woloxci`);
     });
-  });
+  } catch {
+    console.log(red, 'No existe un Dockerfile');
+  }
+
+  return generalResult;
 };
