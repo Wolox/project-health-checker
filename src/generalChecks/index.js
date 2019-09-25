@@ -38,7 +38,7 @@ module.exports = async testPath => {
   generalResult.push({
     metric: 'Layout lines',
     description: 'Cantidad de layouts con mas de 150 lineas',
-    value: filteredLayout.length
+    value: `${filteredLayout.length}`
   });
 
   const indexResults = await findSync(/\n/, testPath, 'index.js$');
@@ -50,7 +50,7 @@ module.exports = async testPath => {
   generalResult.push({
     metric: 'Lineas de Index',
     description: 'Cantidad de index con mas de 150 lineas',
-    value: filteredIndex.length
+    value: `${filteredIndex.length}`
   });
 
   try {
@@ -71,19 +71,28 @@ module.exports = async testPath => {
     });
   }
 
-  npmCheck({ cwd: testPath }).then(currentState => {
-    const packages = currentState.get('packages');
-    packages.forEach(dependency => {
-      const { moduleName, latest, packageJson, unused, bump } = dependency;
-      if (unused) {
-        console.log(red, `Dependencia no usada: ${moduleName}`);
-      } else if (bump && bump !== 'patch') {
-        console.log(
-          red,
-          `Dependencia no actualizada: ${moduleName}, Version: packageJson: ${packageJson} -> ultima ${latest} `
-        );
-      }
-    });
+  const currentState = await npmCheck({ cwd: testPath });
+  const packages = currentState.get('packages');
+  packages.forEach(dependency => {
+    const { moduleName, latest, packageJson, unused, bump } = dependency;
+    if (unused) {
+      console.log(red, `Dependencia no usada: ${moduleName}`);
+      generalResult.push({
+        metric: 'DEPENDENCIAS',
+        description: 'Dependencia no usada',
+        value: moduleName
+      });
+    } else if (bump && bump !== 'patch') {
+      console.log(
+        red,
+        `Dependencia no actualizada: ${moduleName}, Version: packageJson: ${packageJson} -> ultima ${latest} `
+      );
+      generalResult.push({
+        metric: 'DEPENDENCIAS',
+        description: 'Dependencia no actualizada',
+        value: `${moduleName} Version: packageJson: ${packageJson} -> ultima ${latest}`
+      });
+    }
   });
 
   try {
@@ -104,7 +113,7 @@ module.exports = async testPath => {
   }
 
   try {
-    fs.accessSync(`${testPath}/.babelrc`, fs.F_OK);
+    fs.accessSync(`${testPath}/.babelrc.js`, fs.F_OK);
     console.error(green, 'Existe un archivo .babelrc');
     generalResult.push({
       metric: 'Babel',
@@ -121,20 +130,23 @@ module.exports = async testPath => {
   }
 
   try {
-    const data = read.sync(`${testPath}/.babelrc`, 'utf8');
-    const moduleResolver = JSON.parse(data).plugins.filter(
+    const data = require(`../../${testPath}/.babelrc.js`);
+    const moduleResolver = data.plugins.filter(
       plugin => Array.isArray(plugin) && plugin[0] === 'module-resolver'
     );
-    if (!moduleResolver.length) {
-      console.log(red, 'El archivo .babelrc no contiene el plugin "module-resolver"');
-      return;
-    }
     const aliases = moduleResolver[0][1].alias;
     const isBaseAlias = alias =>
       Object.keys(aliases).includes(alias) || console.log(red, `Falta absolute import para: ${alias}`);
-    const validPath = alias =>
-      aliasPathRegex(alias).test(aliases[alias]) ||
-      console.log(red, `El import absoluto de "${alias}" no está configurado correctamente`);
+    const validPath = alias => {
+      if (!aliasPathRegex(alias).test(aliases[alias])) {
+        console.log(red, `El import absoluto de "${alias}" no está configurado correctamente`);
+        generalResult.push({
+          metric: 'Import',
+          description: 'El import absoluto no está configurado correctamente',
+          value: alias
+        });
+      }
+    };
     if (
       BASE_ALIASES.reduce(
         (accumulator, currentAlias) => isBaseAlias(currentAlias) && validPath(currentAlias) && accumulator
@@ -149,30 +161,83 @@ module.exports = async testPath => {
       resolveColor(importCalculationResult, limits.absoluteImports),
       `Porcentaje de imports absolutos del total: ${importCalculationResult}%`
     );
-  } catch {}
+    generalResult.push({
+      metric: 'Import',
+      description: 'Porcentaje de imports absolutos del total',
+      value: importCalculationResult
+    });
+  } catch (error) {
+    console.log(red, 'El archivo .babelrc no contiene el plugin "module-resolver"');
+    generalResult.push({
+      metric: 'Babel',
+      description: 'El archivo .babelrc contiene el plugin "module-resolver',
+      value: 'NO'
+    });
+    console.log(red, error);
+  }
 
   try {
     const data = read.sync(`${testPath}/Jenkinsfile`, 'utf8');
     console.error(green, 'Existe un Jenkinsfile');
+    generalResult.push({
+      metric: 'Jenkinsfile',
+      description: 'Existe un Jenkinsfile',
+      value: 'SI'
+    });
     const { woloxCiImport, checkoutConfig, woloxCiValidPath } = validateJenkinsFileContent(data, testPath);
     assertExists(woloxCiImport, 'la importación de wolox-ci en el archivo Jenkinsfile');
+    generalResult.push({
+      metric: 'Jenkinsfile',
+      description: 'Existe la importación de wolox-ci en el archivo Jenkinsfile',
+      value: woloxCiImport
+    });
     assertExists(checkoutConfig, 'la configuración de checkout en el archivo Jenkinsfile');
+    generalResult.push({
+      metric: 'Jenkinsfile',
+      description: 'Existe la configuración de checkout en el archivo Jenkinsfile',
+      value: checkoutConfig
+    });
     assertExists(woloxCiValidPath, 'el archivo de configuración woloxCi en el archivo Jenkinsfile');
+    generalResult.push({
+      metric: 'Jenkinsfile',
+      description: 'Existe el archivo de configuración woloxCi en el archivo Jenkinsfile',
+      value: woloxCiValidPath
+    });
   } catch {
     console.log(red, 'No existe un Jenkinsfile');
+    generalResult.push({
+      metric: 'Jenkinsfile',
+      description: 'Existe un Jenkinsfile',
+      value: 'NO'
+    });
   }
 
   try {
     const data = read.sync(`${testPath}/.woloxci/config.yml`, 'utf8');
     const { config, steps, environment } = yaml.load(data);
     if (config) {
-      const { dockerfile, project_name } = config;
+      const { dockerfile, project_name: projectName } = config;
       assertExists(dockerfile, 'la variable dockerfile en config de config.yml en .woloxci');
-      assertExists(project_name, 'la variable project_name en config de config.yml en .woloxci');
+      generalResult.push({
+        metric: 'Woloxci',
+        description: 'Existe la variable dockerfile en config de config.yml en .woloxci',
+        value: dockerfile
+      });
+      assertExists(projectName, 'la variable project_name en config de config.yml en .woloxci');
+      generalResult.push({
+        metric: 'Woloxci',
+        description: 'Existe la variable project_name en config de config.yml en .woloxci',
+        value: projectName
+      });
     }
     if (steps) {
       const { lint } = steps;
       assertExists(lint, 'la variable dockerfile en steps de config.yml en .woloxci');
+      generalResult.push({
+        metric: 'Woloxci',
+        description: 'Existe la variable dockerfile en steps de config.yml en .woloxci',
+        value: lint
+      });
     }
     if (environment) {
       const { GIT_COMMITTER_NAME, GIT_COMMITTER_EMAIL, LANG } = environment;
@@ -180,14 +245,34 @@ module.exports = async testPath => {
         GIT_COMMITTER_NAME,
         'la variable GIT_COMMITTER_NAME en environment de config.yml en .woloxci'
       );
+      generalResult.push({
+        metric: 'Config.yml',
+        description: 'Existe la variable GIT_COMMITTER_NAME en environment de config.yml en .woloxci',
+        value: GIT_COMMITTER_NAME
+      });
       assertExists(
         GIT_COMMITTER_EMAIL,
         'la variable GIT_COMMITTER_EMAIL en environment de config.yml en .woloxci'
       );
+      generalResult.push({
+        metric: 'Config.yml',
+        description: 'Existe la variable GIT_COMMITTER_EMAIL en environment de config.yml en .woloxci',
+        value: GIT_COMMITTER_EMAIL
+      });
       assertExists(LANG, 'la variable LANG en environment de config.yml en .woloxci');
+      generalResult.push({
+        metric: 'Config.yml',
+        description: 'Existe la variable LANG en environment de config.yml en .woloxci',
+        value: LANG
+      });
     }
   } catch {
     console.log(red, 'No existe un config.yml en .woloxci');
+    generalResult.push({
+      metric: 'Config.yml',
+      description: 'Existe existe un config.yml en .woloxci',
+      value: 'NO'
+    });
   }
 
   try {
@@ -195,6 +280,11 @@ module.exports = async testPath => {
     const file = parser.parse(data);
     DOCKERFILE_ATTRIBUTES.map(value => {
       const response = file.find(attr => value === attr.name);
+      generalResult.push({
+        metric: 'Dockerfile',
+        description: `Existe la variable ${value} en Dockerfile en .woloxci`,
+        value: !!response
+      });
       return assertExists(response, `la variable ${value} en Dockerfile en .woloxci`);
     });
   } catch {

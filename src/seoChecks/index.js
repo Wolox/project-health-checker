@@ -6,8 +6,8 @@ const moment = require('moment');
 const { red } = require('../constants/colors');
 const ReportGenerator = require('lighthouse/lighthouse-core/report/report-generator');
 
-const reportHtmlPath = `./seoReports/seoReport-${moment().format()}.html`;
-const reportCsvPath = `./seoReports/seoReport-${moment().format()}.csv`;
+const reportHtmlPath = `./reports/seoReports/seoReport-${moment().format()}.html`;
+const reportCsvPath = `./reports/seoReports/seoReport-${moment().format()}.csv`;
 
 function launchChromeAndRunLighthouse(url, opts, config = null) {
   return chromeLauncher.launch({ chromeFlags: opts.chromeFlags }).then(chrome => {

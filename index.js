@@ -6,6 +6,7 @@ const runEnvChecks = require('./src/envChecks');
 const runGeneralChecks = require('./src/generalChecks');
 const runGitChecks = require('./src/gitChecks');
 const runSeoChecks = require('./src/seoChecks');
+const runEslintChecks = require('./src/linterChecks');
 const { green } = require('./src/constants/colors');
 
 const shell = require('shelljs');
@@ -66,42 +67,50 @@ if (args.org) {
   organization = args.o;
 }
 
+function runBuild() {
+  const seconds = 1000;
+  console.log(green, 'Empezando instalacion de dependencias para el build');
+  shell.exec(`npm i --prefix ./${testPath}`);
+  const eslintData = runEslintChecks(testPath);
+  console.log(green, 'Chequeos de eslint terminados con exito');
+  console.log(green, 'Empezando con el build');
+  const start = new Date();
+  shell.exec(`npm run build development --prefix ./${testPath}`);
+  const buildTime = (new Date().getTime() - start.getTime()) / seconds;
+  console.log(green, 'Build terminado con exito');
+  console.log(green, `Tiempo de build: ${buildTime}`);
+  rimraf.sync(`./${testPath}/node_modules`);
+  rimraf.sync(`./${testPath}/build`);
+  return [...eslintData, { metric: 'Build', description: 'Build Time', value: `${buildTime}` }];
+}
+
 async function executeChecks() {
   let gitData = [];
   let envData = [];
   let generalData = [];
-  const seoData = [];
   let techData = [];
+  let buildData = [];
+  const eslintData = [];
   if (args.onlyGit) {
     gitData = await runGitChecks(repoName, organization);
   } else {
-    envData = await runEnvChecks(testPath);
-    generalData = await runGeneralChecks(testPath);
-    gitData = await runGitChecks(repoName, organization);
     runSeoChecks(seoLink);
+    envData = await runEnvChecks(testPath);
+    console.log(green, 'Chequeos de .env terminados con exito');
+    generalData = await runGeneralChecks(testPath);
+    console.log(green, 'Chequeos generales terminados con exito');
+    gitData = await runGitChecks(repoName, organization);
+    console.log(green, 'Chequeos de github terminados con exito');
     techData = await techs[techChecks](testPath);
+    buildData = runBuild(testPath);
   }
-  return { envData, generalData, gitData, techData, seoData };
+  return [...envData, ...generalData, ...gitData, ...techData, ...buildData, ...eslintData];
 }
 
 async function executeAudit() {
-  const { envData, generalData, gitData, techData, seoData } = await executeChecks();
-  const seconds = 1000;
-  shell.exec(`npm i --prefix ./${testPath}`);
-  const start = new Date();
-  shell.exec(`npm run build development --prefix ./${testPath}`);
-  const buildTime = (new Date().getTime() - start.getTime()) / seconds;
-  console.log(green, `Tiempo de build: ${buildTime}`);
-  csvWriter.writeRecords([
-    { metric: 'Build', description: 'Build Time', value: buildTime },
-    ...gitData,
-    ...envData,
-    ...generalData,
-    ...seoData,
-    ...techData
-  ]);
-  rimraf.sync(`./${testPath}/node_modules`);
-  rimraf.sync(`./${testPath}/build`);
+  const reports = await executeChecks();
+  csvWriter.writeRecords(reports);
+  console.log(green, 'Chequeos terminados con exito');
 }
 
 executeAudit();

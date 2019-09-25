@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 /* eslint-disable no-console */
 const { red, green } = require('../constants/colors');
 const { getRepositoryInfo, getReleaseInfo } = require('./services/gitService');
@@ -7,10 +8,13 @@ const limits = require('../constants/limits');
 
 const { hasBaseBranches, hasBranchProtection, averageRequestChanges, countBranches } = require('./utils');
 
+const parseRepository = url => url.split('/').filter(elem => elem !== '..' && elem !== '.')[0];
+
 module.exports = async (repository, organization) => {
   const gitData = [];
+  const repositoryUrl = parseRepository(repository);
   try {
-    const repositoryInfo = await getRepositoryInfo(repository, organization);
+    const repositoryInfo = await getRepositoryInfo(repositoryUrl, organization);
     if (hasBaseBranches(repositoryInfo)) {
       console.log(green, 'Existen las branches development, stage y master');
       gitData.push({
@@ -59,7 +63,7 @@ module.exports = async (repository, organization) => {
       value: average
     });
 
-    const pullRequestInfo = await getReleaseInfo(repository, organization);
+    const pullRequestInfo = await getReleaseInfo(repositoryUrl, organization);
     const { pullRequests, releases } = pullRequestInfo.data.data.repository;
     if (pullRequests.edges.length <= releases.edges.length) {
       console.log(green, 'Hay un release por cada PR a master');
