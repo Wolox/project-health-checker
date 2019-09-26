@@ -1,30 +1,26 @@
-/* eslint-disable no-console */
 const fs = require('fs');
-const { find } = require('find-in-files');
-const { red, green } = require('../constants/colors');
+const { findSync } = require('find-in-files');
 
 const { analyzeMatches } = require('../utils');
 
 const VALID_ENVS = ['.development', '.stage', '.master'];
 
-module.exports = testPath => {
-  VALID_ENVS.forEach(elem =>
-    fs.access(`${testPath}/.env${elem}`, fs.F_OK, err => {
-      if (err) {
-        console.log(red, `No existe un archivo .env${elem}`);
-      } else {
-        console.log(green, `Existe un archivo .env${elem}`);
-      }
-    })
-  );
-  find('process.env.', testPath, '.js$').then(results => {
-    if (analyzeMatches(results).length) {
-      console.log(green, 'Se utiliza un .env en el proyecto');
-    } else {
-      console.log(red, 'No se esta utilizando ningun .env en el proyecto');
-    }
+module.exports = async testPath => {
+  const envresult = [];
+  VALID_ENVS.forEach(elem => {
+    envresult.push({
+      metric: 'ENV',
+      description: `Existe un archivo.env ${elem}`,
+      value: fs.existsSync(`${testPath}/.env${elem}`)
+    });
   });
-  if (!fs.existsSync(`${testPath}/aws.js`)) {
-    console.log(red, 'No existe aws.js en el root del proyecto');
-  }
+  const results = await findSync('process.env.', testPath, '.js$');
+  envresult.push({
+    metric: 'ENV',
+    description: 'Se utiliza un .env en el proyecto',
+    value: !!analyzeMatches(results).length
+  });
+  envresult.push({ metric: 'AWS', description: 'Existe aws.js', value: fs.existsSync(`${testPath}/aws.js`) });
+
+  return envresult;
 };
