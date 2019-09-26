@@ -1,4 +1,4 @@
-/* eslint-disable max-statements, complexity */
+/* eslint-disable max-statements */
 const { findSync } = require('find-in-files');
 const fs = require('fs');
 const read = require('read-file');
