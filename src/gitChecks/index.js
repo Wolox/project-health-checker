@@ -1,6 +1,3 @@
-/* eslint-disable max-statements */
-/* eslint-disable no-console */
-const { red, green } = require('../constants/colors');
 const { getRepositoryInfo, getReleaseInfo } = require('./services/gitService');
 const { ERROR } = require('./constants');
 
@@ -15,39 +12,18 @@ module.exports = async (repository, organization) => {
   const repositoryUrl = parseRepository(repository);
   try {
     const repositoryInfo = await getRepositoryInfo(repositoryUrl, organization);
-    if (hasBaseBranches(repositoryInfo)) {
-      console.log(green, 'Existen las branches development, stage y master');
-      gitData.push({
-        metric: 'GITHUB',
-        description: 'Existen las branches development, stage y master',
-        value: 'SI'
-      });
-    } else {
-      console.log(red, 'No existen las branches development, stage y master');
-      gitData.push({
-        metric: 'GITHUB',
-        description: 'Existen las branches development, stage y master',
-        value: 'NO'
-      });
-    }
-    if (hasBranchProtection(repositoryInfo)) {
-      console.log(green, 'Las branches estan protegidas');
-      gitData.push({
-        metric: 'GITHUB',
-        description: 'Las branches estan protegidas',
-        value: 'SI'
-      });
-    } else {
-      console.log(red, 'Las branches no estan protegidas');
-      gitData.push({
-        metric: 'GITHUB',
-        description: 'Las branches estan protegidas',
-        value: 'NO'
-      });
-    }
+    gitData.push({
+      metric: 'GITHUB',
+      description: 'Existen las branches development, stage y master',
+      value: hasBaseBranches(repositoryInfo)
+    });
+    gitData.push({
+      metric: 'GITHUB',
+      description: 'Las branches estan protegidas',
+      value: hasBranchProtection(repositoryInfo)
+    });
     const amountOfBranches = countBranches(repositoryInfo);
     if (amountOfBranches > limits.branches) {
-      console.log(red, `Demasiadas branches: ${amountOfBranches}`);
       gitData.push({
         metric: 'GITHUB',
         description: 'Demasiadas branches abiertas',
@@ -56,7 +32,6 @@ module.exports = async (repository, organization) => {
     }
 
     const average = averageRequestChanges(repositoryInfo);
-    console.log(average < limits.prRebound ? green : red, `Promedio de cambios pedidos por PR: ${average}`);
     gitData.push({
       metric: 'GITHUB',
       description: 'Promedio de cambios pedidos por PR',
@@ -65,26 +40,12 @@ module.exports = async (repository, organization) => {
 
     const pullRequestInfo = await getReleaseInfo(repositoryUrl, organization);
     const { pullRequests, releases } = pullRequestInfo.data.data.repository;
-    if (pullRequests.edges.length <= releases.edges.length) {
-      console.log(green, 'Hay un release por cada PR a master');
-      gitData.push({
-        metric: 'GITHUB',
-        description: 'Hay un release por cada PR a master',
-        value: 'SI'
-      });
-    } else {
-      console.log(
-        red,
-        `Hay mas PRs a master que releases: ${pullRequests.edges.length - releases.edges.length}`
-      );
-      gitData.push({
-        metric: 'GITHUB',
-        description: 'Hay mas PRs a master que releases',
-        value: pullRequests.edges.length - releases.edges.length
-      });
-    }
+    gitData.push({
+      metric: 'GITHUB',
+      description: 'Hay un release por cada PR a master',
+      value: pullRequests.edges.length <= releases.edges.length
+    });
   } catch {
-    console.log(red, `Error de git: ${ERROR.REPO_NOT_FOUND}`);
     gitData.push({
       metric: 'GITHUB',
       description: 'Error de git',
