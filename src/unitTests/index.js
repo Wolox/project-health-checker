@@ -6,7 +6,8 @@ module.exports = testPath => {
   const options = {
     projects: [testPath],
     silent: true,
-    passWithNoTests: true
+    passWithNoTests: true,
+    testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/src/**/?(*.)[jt]s?(x)']
   };
 
   jest
