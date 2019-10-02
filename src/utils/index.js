@@ -4,7 +4,7 @@ const percentage = 100;
 
 const removeComments = match => match.line.filter(line => line.substring(0, 2) !== '//');
 
-const getMajor = version => version.split('.')[0].replace('^', '');
+const getMajor = version => version ? version.split('.')[0].replace('^', '') : null;
 
 exports.analyzeMatches = matches => Object.keys(matches).filter(key => removeComments(matches[key]).length);
 
