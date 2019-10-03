@@ -62,6 +62,7 @@ async function executeChecks() {
   let generalData = [];
   let techData = [];
   let buildData = [];
+  console.log(green, 'Comenzando auditoria...');
   if (seoLink) {
     seoData = await runSeoChecks(seoLink);
     console.log(green, 'Chequeos de SEO terminados con exito ✓');
