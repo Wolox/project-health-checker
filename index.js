@@ -1,6 +1,9 @@
 require('dotenv').config();
-const parseArgs = require('minimist');
 const rimraf = require('rimraf');
+const shell = require('shelljs');
+const inquirer = require('inquirer');
+const fuzzyPath = require('inquirer-fuzzy-path');
+const { userInfo } = require('os');
 
 const runEnvChecks = require('./src/envChecks');
 const runGeneralChecks = require('./src/generalChecks');
@@ -9,13 +12,15 @@ const runSeoChecks = require('./src/seoChecks');
 const runEslintChecks = require('./src/linterChecks');
 const { green } = require('./src/constants/colors');
 
-const shell = require('shelljs');
 const techs = {
   react: require('./src/reactChecks'),
   angular: require('./src/angularChecks'),
   vue: require('./src/vueChecks')
 };
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+
+shell.config.silent = true;
+shell.mkdir('./reports');
 
 const csvWriter = createCsvWriter({
   path: './reports/test.csv',
@@ -26,48 +31,7 @@ const csvWriter = createCsvWriter({
   ]
 });
 
-shell.config.silent = true;
-
-const args = parseArgs(process.argv);
-
-let testPath = 'test';
-let techChecks = 'react';
-let organization = 'Wolox';
-let seoLink = undefined;
-
-if (args.path) {
-  testPath = args.path;
-} else if (args.p) {
-  testPath = args.p;
-}
-
-if (args.link) {
-  seoLink = args.link;
-} else if (args.l) {
-  seoLink = args.l;
-}
-
-if (args.tech) {
-  techChecks = args.tech;
-} else if (args.t) {
-  techChecks = args.t;
-}
-
-let repoName = testPath;
-
-if (args.repository) {
-  repoName = args.repository;
-} else if (args.r) {
-  repoName = args.r;
-}
-
-if (args.org) {
-  organization = args.org;
-} else if (args.o) {
-  organization = args.o;
-}
-
-function runBuild() {
+function runBuild(testPath) {
   const seconds = 1000;
   console.log(green, 'Empezando instalacion de dependencias para el build...');
   shell.exec(`npm i --prefix ./${testPath}`);
@@ -83,6 +47,61 @@ function runBuild() {
   return [...eslintData, { metric: 'Build', description: 'Build Time', value: `${buildTime}` }];
 }
 
+inquirer.registerPrompt('fuzzypath', fuzzyPath);
+
+const firstChecks = () => {
+  const questions = [
+    {
+      name: 'PROJECT_PATH',
+      type: 'fuzzypath',
+      excludePath: nodePath => /(\/\.+)|(\/node_modules)|(\/src)|(\/build)/.test(nodePath),
+      itemType: 'directory',
+      rootPath: `/home/${userInfo().username}`,
+      message: 'Path de proyecto a analizar',
+      default: './test',
+      suggestOnly: false,
+      depthLimit: 3
+    },
+    {
+      name: 'REPOSITORY',
+      type: 'input',
+      message: 'Nombre de repositorio en Github',
+      default: answers => answers.PROJECT_PATH.split('/').pop()
+    },
+    {
+      name: 'ORGANIZATION',
+      type: 'input',
+      message: 'Nombre de organizacion en Github',
+      default: 'Wolox'
+    },
+    {
+      name: 'ONLY_GIT',
+      type: 'confirm',
+      message: 'Ejecutar sólo chequeos de Git?',
+      default: false
+    }
+  ];
+  return inquirer.prompt(questions);
+};
+
+const secondChecks = () => {
+  const questions = [
+    {
+      type: 'list',
+      name: 'TECHNOLOGY',
+      message: 'Framework usado',
+      choices: ['Angular', 'React', 'Vue'],
+      filter: val => val.toLowerCase()
+    },
+    {
+      type: 'input',
+      name: 'SEO_URL',
+      message: 'URL para realizar chequeo de SEO'
+    }
+  ];
+  return inquirer.prompt(questions);
+};
+
 async function executeChecks() {
   let gitData = [];
   let envData = [];
@@ -90,16 +109,37 @@ async function executeChecks() {
   let techData = [];
   let buildData = [];
   const eslintData = [];
-  if (args.onlyGit) {
-    gitData = await runGitChecks(repoName, organization);
-  } else {
+
+  console.log(
+    green,
+    `
+     ███████████ ██████████   █████████  
+    ░░███░░░░░░█░░███░░░░░█  ███░░░░░███ 
+     ░███   █ ░  ░███  █ ░  ░███    ░███ 
+     ░███████    ░██████    ░███████████ 
+     ░███░░░█    ░███░░█    ░███░░░░░███ 
+     ░███  ░     ░███ ░   █ ░███    ░███ 
+     █████       ██████████ █████   █████
+    ░░░░░       ░░░░░░░░░░ ░░░░░   ░░░░░ `
+  );
+
+  const { PROJECT_PATH, REPOSITORY, ORGANIZATION, ONLY_GIT } = await firstChecks();
+  const testPath = PROJECT_PATH;
+  const repoName = REPOSITORY || testPath.split('/').pop();
+  const organization = ORGANIZATION;
+
+  gitData = await runGitChecks(repoName, organization);
+  console.log(green, 'Chequeos de github terminados con exito ✓');
+
+  if (!ONLY_GIT) {
+    const { TECHNOLOGY, SEO_URL } = await secondChecks();
+    const techChecks = TECHNOLOGY || 'react';
+    const seoLink = SEO_URL;
     runSeoChecks(seoLink);
     envData = await runEnvChecks(testPath);
     console.log(green, 'Chequeos de env terminados con exito ✓');
     generalData = await runGeneralChecks(testPath);
     console.log(green, 'Chequeos generales terminados con exito ✓');
-    gitData = await runGitChecks(repoName, organization);
-    console.log(green, 'Chequeos de github terminados con exito ✓');
     techData = await techs[techChecks](testPath);
     console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
     buildData = await runBuild(testPath);
