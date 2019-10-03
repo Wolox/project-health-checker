@@ -51,24 +51,17 @@ Note: Once the project becomes a npm package this command will change
 |`-t --tech [angular/react/vue]`|Choose which technology checks applies to your project|Will use react as default technology|
 |`-r --repository [repository name]`|Specify the repository name on Github||
 |`-o --organization [organization name]`|Specify the organization which owns the repository|The default value will be 'Wolox'|
-|`--onlyGit`|If this argument is passed it will only run the checks regarding the Github repository|Will run all the checks|
 |`-l --link [github.com]`|This argument is necessary if you want to run a lighthouse audit against the project's site in any environment|Won't run the check|
 
 ### Examples
 
-1. Run only the github's repo configuration checks.
-    - Default path: ./test
-    - Default organization: Wolox
-
-  `node index.js --onlyGit`
-
-2. Run every check except SEO checks:
+1. Run every check except SEO checks:
     - Default technology: React
     - Default organization: Wolox
     
   `node index.js -p ../../test/`
 
-3. Run every check with a project using VueJS
+2. Run every check with a project using VueJS
 
   `node index.js -p ../../vueProject/ -t vue -l vueproject-stage.com`
 
