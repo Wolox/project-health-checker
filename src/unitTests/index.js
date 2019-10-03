@@ -7,7 +7,10 @@ module.exports = testPath => {
     projects: [testPath],
     silent: true,
     passWithNoTests: true,
-    testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/src/**/?(*.)[jt]s?(x)']
+    collectCoverage: true,
+    collectCoverageFrom: ["**/src/**/?(*.)[jt]s?(x)"],
+    coverageDirectory: './assets'
+    
   };
 
   jest
@@ -20,7 +23,6 @@ module.exports = testPath => {
       console.log(red, "No se encontraron tests")
       return
     }
-
     const averageCoverageTests = Math.round((response.results.numPassedTests / response.results.numTotalTests) * 100)
     if(averageCoverageTests>=70){
       console.log(green, "El porcentaje de tests unitarios pasados con éxito es de: " + averageCoverageTests + "%");
