@@ -70,22 +70,11 @@ async function executeChecks() {
   return [...envData, ...generalData, ...gitData, ...techData, ...buildData];
 }
 
-const addSummary = reports => {
-  const summary = [];
-  summary.push({
-    metric: 'Summary',
-    description: 'Description',
-    value: 'SI'
-  });
-  return [...reports, ...summary];
-};
-
 async function executeAudit() {
   const reports = await executeChecks();
   console.log(green, 'Chequeos terminados con exito ✓');
-  const reportWithSummary = addSummary(reports);
   console.log(green, 'Cargando Spreadsheet...');
-  writeSpreadSheet(reportWithSummary, testPath);
+  writeSpreadSheet(reports, testPath);
 }
 
 executeAudit();
