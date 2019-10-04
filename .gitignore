@@ -58,6 +58,7 @@ typings/
 
 # dotenv environment variables file
 .env
+.client_secret.json
 
 # next.js build output
 .next

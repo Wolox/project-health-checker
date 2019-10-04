@@ -90,7 +90,7 @@ module.exports = async testPath => {
   });
 
   try {
-    const data = require(`../../${testPath}/.babelrc.js`);
+    const data = require(`${testPath}/.babelrc.js`);
     const moduleResolver = data.plugins.filter(
       plugin => Array.isArray(plugin) && plugin[0] === 'module-resolver'
     );
