@@ -7,40 +7,17 @@ const parser = require('docker-file-parser');
 const npmCheck = require('npm-check');
 
 const { calculatePercentage } = require('../utils');
-const limits = require('../constants/limits');
+
 const { BASE_ALIASES, DOCKERFILE_ATTRIBUTES, aliasPathRegex } = require('./constants');
 const { validateJenkinsFileContent } = require('../utils/jenkinsFilesUtils');
 
-let amountOfJsAppFolder = 0;
 let amountOfJs = 0;
 
 module.exports = async testPath => {
   const generalResult = [];
-  const appResults = await findSync('', `${testPath}/src/app`, '.js$');
-  amountOfJsAppFolder = Object.keys(appResults).length;
 
   const allResults = await findSync('', `${testPath}/src`, '.js$');
   amountOfJs = Object.keys(allResults).length;
-
-  const i18nResults = await findSync("from 'i18next*';", `${testPath}/src/app`, '.js$');
-  const result = calculatePercentage(i18nResults, amountOfJsAppFolder);
-  generalResult.push({ metric: 'i18n', description: 'Porcentaje de internacionalización', value: result });
-
-  const layoutResults = await findSync(/\n/, testPath, 'layout.js$');
-  const filteredLayout = Object.keys(layoutResults).filter(elem => layoutResults[elem].count > limits.lines);
-  generalResult.push({
-    metric: 'Layout lines',
-    description: 'Cantidad de layouts con mas de 150 lineas',
-    value: filteredLayout.length
-  });
-
-  const indexResults = await findSync(/\n/, testPath, 'index.js$');
-  const filteredIndex = Object.keys(indexResults).filter(elem => indexResults[elem].count > limits.lines);
-  generalResult.push({
-    metric: 'Lineas de Index',
-    description: 'Cantidad de index con mas de 150 lineas',
-    value: filteredIndex.length
-  });
 
   try {
     const data = read.sync(`${testPath}/.github/CODEOWNERS`, 'utf8');
