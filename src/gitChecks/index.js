@@ -3,7 +3,13 @@ const { ERROR } = require('./constants');
 
 const limits = require('../constants/limits');
 
-const { hasBaseBranches, hasBranchProtection, averageRequestChanges, countBranches } = require('./utils');
+const {
+  hasBaseBranches,
+  hasBranchProtection,
+  averageRequestChanges,
+  countBranches,
+  pullRequestLifeSpan
+} = require('./utils');
 
 const parseRepository = url => url.split('/').filter(elem => elem !== '..' && elem !== '.')[0];
 
@@ -44,6 +50,11 @@ module.exports = async (repository, organization) => {
       metric: 'GITHUB',
       description: 'Hay un release por cada PR a master',
       value: pullRequests.edges.length <= releases.edges.length
+    });
+    gitData.push({
+      metric: 'GITHUB',
+      description: 'Promedio de existencia de PR hasta merge (horas)',
+      value: pullRequestLifeSpan(repositoryInfo)
     });
   } catch {
     gitData.push({
