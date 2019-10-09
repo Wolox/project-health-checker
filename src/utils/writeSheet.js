@@ -1,6 +1,6 @@
 const GoogleSpreadsheet = require('google-spreadsheet');
 const { promisify } = require('util');
-const credentials = require('./../../client_secret.json');
+const credentials = require('./sheetConfig');
 const { green } = require('../constants/colors');
 
 const ten = 10;
