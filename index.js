@@ -4,21 +4,23 @@ const parseArgs = require('minimist');
 const runEnvChecks = require('./src/envChecks');
 const runGeneralChecks = require('./src/generalChecks');
 const runGitChecks = require('./src/gitChecks');
-const runSeoChecks = require('./src/seoChecks');
+
 const runBuildChecks = require('./src/buildChecks');
 
-const { green, red } = require('./src/constants/colors');
+const { green } = require('./src/constants/colors');
 const writeSpreadSheet = require('./src/utils/writeSheet');
+const frontendChecks = require('./src/frontEnd');
 
 const techs = {
-  react: require('./src/reactChecks'),
-  angular: require('./src/angularChecks'),
-  vue: require('./src/vueChecks')
+  react: frontendChecks,
+  angular: frontendChecks,
+  vue: frontendChecks,
+  node: require('./src/backEnd/nodeChecks')
 };
 
 const args = parseArgs(process.argv);
 
-let testPath = 'test';
+let testPath = '';
 let techChecks = 'react';
 let organization = 'Wolox';
 let seoLink = undefined;
@@ -41,13 +43,7 @@ if (args.tech) {
   techChecks = args.t;
 }
 
-let repoName = testPath;
-
-if (args.repository) {
-  repoName = args.repository;
-} else if (args.r) {
-  repoName = args.r;
-}
+const repoName = testPath;
 
 if (args.org) {
   organization = args.org;
@@ -56,29 +52,22 @@ if (args.org) {
 }
 
 async function executeChecks() {
-  let seoData = [];
   let gitData = [];
   let envData = [];
   let generalData = [];
   let techData = [];
   let buildData = [];
   console.log(green, 'Comenzando auditoria...');
-  if (seoLink) {
-    seoData = await runSeoChecks(seoLink);
-    console.log(green, 'Chequeos de SEO terminados con exito ✓');
-  } else {
-    console.log(red, 'No se paso una url para revisar el SEO ✓');
-  }
   envData = await runEnvChecks(testPath);
   console.log(green, 'Chequeos de env terminados con exito ✓');
   generalData = await runGeneralChecks(testPath);
   console.log(green, 'Chequeos generales terminados con exito ✓');
   gitData = await runGitChecks(repoName, organization);
   console.log(green, 'Chequeos de github terminados con exito ✓');
-  techData = await techs[techChecks](testPath);
+  techData = await techs[techChecks](testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
-  buildData = runBuildChecks(testPath);
-  return [...seoData, ...envData, ...generalData, ...gitData, ...techData, ...buildData];
+  buildData = await runBuildChecks(testPath);
+  return [...envData, ...generalData, ...gitData, ...techData, ...buildData];
 }
 
 async function executeAudit() {
