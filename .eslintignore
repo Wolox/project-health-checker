@@ -4,5 +4,3 @@
 test.js
 !.eslintrc.js
 node_modules/
-
-client_secret.json
