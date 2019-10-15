@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 /* eslint-disable max-statements */
 const { findSync } = require('find-in-files');
 const fs = require('fs');
@@ -8,12 +9,12 @@ const npmCheck = require('npm-check');
 
 const { calculatePercentage } = require('../utils');
 
-const { BASE_ALIASES, DOCKERFILE_ATTRIBUTES, aliasPathRegex } = require('./constants');
+const { BASE_ALIASES, DOCKERFILE_ATTRIBUTES, aliasPathRegex, folderStructure } = require('./constants');
 const { validateJenkinsFileContent } = require('../utils/jenkinsFilesUtils');
 
 let amountOfJs = 0;
 
-module.exports = async testPath => {
+module.exports = async (testPath, tech) => {
   const generalResult = [];
 
   const allResults = await findSync('', `${testPath}/src`, '.js$');
@@ -65,6 +66,22 @@ module.exports = async testPath => {
     description: 'Existe un archivo .babelrc',
     value: fs.existsSync(`${testPath}/.babelrc.js`)
   });
+
+  if (fs.existsSync(`${testPath}/src`)) {
+    folderStructure[tech].forEach(element =>
+      generalResult.push({
+        metric: 'Folder Structure',
+        description: `Existe un archivo ${element} dentro de src`,
+        value: fs.existsSync(`${testPath}/src/${element}`)
+      })
+    );
+  } else {
+    generalResult.push({
+      metric: 'Folder Structure',
+      description: 'Existe un archivo de src en el root de su proyecto',
+      value: false
+    });
+  }
 
   try {
     const data = require(`${testPath}/.babelrc.js`);
