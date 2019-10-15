@@ -61,7 +61,7 @@ async function executeChecks() {
   console.log(green, 'Comenzando auditoria...');
   envData = await runEnvChecks(testPath);
   console.log(green, 'Chequeos de env terminados con exito ✓');
-  generalData = await runGeneralChecks(testPath);
+  generalData = await runGeneralChecks(testPath, techChecks);
   console.log(green, 'Chequeos generales terminados con exito ✓');
   gitData = await runGitChecks(repoName, organization);
   console.log(green, 'Chequeos de github terminados con exito ✓');
