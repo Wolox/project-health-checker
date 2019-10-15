@@ -1,44 +1,68 @@
-/* eslint-disable no-console */
-const { red, green } = require('../constants/colors');
 const { getRepositoryInfo, getReleaseInfo } = require('./services/gitService');
 const { ERROR } = require('./constants');
 
 const limits = require('../constants/limits');
 
-const { hasBaseBranches, hasBranchProtection, averageRequestChanges, countBranches } = require('./utils');
+const {
+  hasBaseBranches,
+  hasBranchProtection,
+  averageRequestChanges,
+  countBranches,
+  pullRequestLifeSpan
+} = require('./utils');
 
-module.exports = (repository, organization) => {
-  getRepositoryInfo(repository, organization)
-    .then(response => {
-      if (hasBaseBranches(response)) {
-        console.log(green, 'Existen las branches development, stage y master');
-      } else {
-        console.log(red, 'No existen las branches development, stage y master');
-      }
-      if (hasBranchProtection(response)) {
-        console.log(green, 'Las branches estan protegidas');
-      } else {
-        console.log(red, 'Las branches no estan protegidas');
-      }
-      const amountOfBranches = countBranches(response);
-      if (amountOfBranches > limits.branches) {
-        console.log(red, `Demasiadas branches: ${amountOfBranches}`);
-      }
-      const average = averageRequestChanges(response);
-      console.log(average < limits.prRebound ? green : red, `Promedio de cambios pedidos por PR: ${average}`);
-    })
-    .catch(() => console.log(red, `Error de git: ${ERROR.REPO_NOT_FOUND}`));
-  getReleaseInfo(repository, organization)
-    .then(response => {
-      const { pullRequests, releases } = response.data.data.repository;
-      if (pullRequests.edges.length <= releases.edges.length) {
-        console.log(green, 'Hay un release por cada PR a master');
-      } else {
-        console.log(
-          red,
-          `Hay mas PRs a master que releases: ${pullRequests.edges.length - releases.edges.length}`
-        );
-      }
-    })
-    .catch(() => console.log(red, `Error de git: ${ERROR.REPO_NOT_FOUND}`));
+const parseRepository = url => url.split('/').filter(elem => elem !== '..' && elem !== '.')[0];
+
+module.exports = async (repository, organization) => {
+  const gitData = [];
+  const repositoryUrl = parseRepository(repository);
+  try {
+    const repositoryInfo = await getRepositoryInfo(repositoryUrl, organization);
+    gitData.push({
+      metric: 'GITHUB',
+      description: 'Existen las branches development, stage y master',
+      value: hasBaseBranches(repositoryInfo)
+    });
+    gitData.push({
+      metric: 'GITHUB',
+      description: 'Las branches estan protegidas',
+      value: hasBranchProtection(repositoryInfo)
+    });
+    const amountOfBranches = countBranches(repositoryInfo);
+    if (amountOfBranches > limits.branches) {
+      gitData.push({
+        metric: 'GITHUB',
+        description: 'Demasiadas branches abiertas',
+        value: amountOfBranches
+      });
+    }
+
+    const average = averageRequestChanges(repositoryInfo);
+    gitData.push({
+      metric: 'GITHUB',
+      description: 'Promedio de cambios pedidos por PR',
+      value: average
+    });
+
+    const pullRequestInfo = await getReleaseInfo(repositoryUrl, organization);
+    const { pullRequests, releases } = pullRequestInfo.data.data.repository;
+    gitData.push({
+      metric: 'GITHUB',
+      description: 'Hay un release por cada PR a master',
+      value: pullRequests.edges.length <= releases.edges.length
+    });
+    gitData.push({
+      metric: 'GITHUB',
+      description: 'Promedio de existencia de PR hasta merge (horas)',
+      value: pullRequestLifeSpan(repositoryInfo)
+    });
+  } catch {
+    gitData.push({
+      metric: 'GITHUB',
+      description: 'Error de git',
+      value: ERROR.REPO_NOT_FOUND
+    });
+  }
+
+  return gitData;
 };

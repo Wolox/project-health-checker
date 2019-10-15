@@ -1,3 +1,6 @@
 {
-  "extends": "eslint-config-wolox"
+  "extends": "eslint-config-wolox",
+  "rules": {
+    "no-console": "off"
+}
 }

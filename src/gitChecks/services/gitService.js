@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const axios = require('axios');
 const { API } = require('../constants');
 
@@ -31,6 +30,9 @@ const repositoryInfoQuery = (repository, organization) => ({
         pullRequests(first: 100) {
           edges {
             node {
+              closedAt,
+              createdAt,
+              merged,
               reviews(first: 30) {
                 edges {
                   node {
