@@ -2,6 +2,8 @@ const { findSync } = require('find-in-files');
 
 const { calculatePercentage } = require('../../utils');
 
+const reactMetrics = require('./constants');
+
 let amountOfActionJs = 0;
 
 module.exports = async testPath => {
@@ -12,7 +14,7 @@ module.exports = async testPath => {
   const results = await findSync("from 'redux-recompose';", testPath, 'actions.js$');
   const result = calculatePercentage(results, amountOfActionJs);
   techResult.push({
-    metric: 'Redux Recompose',
+    metric: reactMetrics.REDUX_RECOMPOSE,
     description: 'Porcentaje de actions con redux-recompose',
     value: result
   });
