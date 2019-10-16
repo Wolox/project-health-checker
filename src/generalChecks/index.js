@@ -103,7 +103,7 @@ module.exports = async (testPath, tech) => {
       description: 'Porcentaje de imports absolutos del total',
       value: importCalculationResult
     });
-  } catch (e) {
+  } catch {
     generalResult.push({
       metric: generalMetrics.BABEL_IMPORTS,
       description: 'El archivo .babelrc contiene el plugin "module-resolver',
