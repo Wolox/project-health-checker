@@ -1,6 +1,6 @@
 const { findSync } = require('find-in-files');
 
-const { calculatePercentage } = require('../../utils');
+const { calculatePercentage } = require('../../../utils/common');
 
 let amountOfActionJs = 0;
 

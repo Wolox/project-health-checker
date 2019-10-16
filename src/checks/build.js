@@ -1,10 +1,10 @@
 const rimraf = require('rimraf');
-const runEslintChecks = require('../linterChecks');
 const { promisify } = require('util');
 const getSize = require('get-folder-size');
+const shell = require('shelljs');
 
 const { green } = require('../constants/colors');
-const shell = require('shelljs');
+const runEslintChecks = require('./linter');
 
 shell.config.silent = true;
 const seconds = 1000;

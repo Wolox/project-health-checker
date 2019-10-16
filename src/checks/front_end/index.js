@@ -1,14 +1,14 @@
 const { findSync } = require('find-in-files');
 
-const { green, red } = require('../constants/colors');
-const limits = require('../constants/limits');
-const { calculatePercentage } = require('../utils');
-const runSeoChecks = require('./seoChecks');
+const { green, red } = require('../../constants/colors');
+const limits = require('../../constants/limits');
+const { calculatePercentage } = require('../../utils/common');
+const runSeoChecks = require('./seo');
 
 const techs = {
-  react: require('./reactChecks'),
-  angular: require('./angularChecks'),
-  vue: require('./vueChecks')
+  react: require('./techs/react'),
+  angular: require('./techs/angular'),
+  vue: require('./techs/vue')
 };
 
 let amountOfJsAppFolder = 0;

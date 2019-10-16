@@ -1,6 +1,5 @@
-const { getRepositoryInfo, getReleaseInfo } = require('./services/gitService');
-const { ERROR } = require('./constants');
-
+const { getRepositoryInfo, getReleaseInfo } = require('../services/git');
+const { ERROR } = require('../constants/git');
 const limits = require('../constants/limits');
 
 const {
@@ -9,7 +8,7 @@ const {
   averageRequestChanges,
   countBranches,
   pullRequestLifeSpan
-} = require('./utils');
+} = require('../utils/git');
 
 const parseRepository = url => url.split('/').filter(elem => elem !== '..' && elem !== '.')[0];
 

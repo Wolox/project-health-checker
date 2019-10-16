@@ -1,7 +1,7 @@
 const fs = require('fs');
 const { findSync } = require('find-in-files');
 
-const { analyzeMatches } = require('../utils');
+const { analyzeMatches } = require('../utils/common');
 
 const VALID_ENVS = ['.development', '.stage', '.master'];
 

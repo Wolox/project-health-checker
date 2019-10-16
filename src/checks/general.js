@@ -7,10 +7,14 @@ const yaml = require('js-yaml');
 const parser = require('docker-file-parser');
 const npmCheck = require('npm-check');
 
-const { calculatePercentage } = require('../utils');
-
-const { BASE_ALIASES, DOCKERFILE_ATTRIBUTES, aliasPathRegex, folderStructure } = require('./constants');
+const { calculatePercentage } = require('../utils/common');
 const { validateJenkinsFileContent } = require('../utils/jenkinsFilesUtils');
+const {
+  BASE_ALIASES,
+  DOCKERFILE_ATTRIBUTES,
+  aliasPathRegex,
+  folderStructure
+} = require('../constants/general');
 
 let amountOfJs = 0;
 

@@ -1,6 +1,4 @@
-const { hasBaseBranches } = require('./index');
-const { hasLowPRRebound } = require('./index');
-const { hasBranchProtectionRules } = require('./index');
+const { hasBaseBranches, hasLowPRRebound, hasBranchProtectionRules } = require('../checks/git');
 
 test('Expect to have required branches', () =>
   hasBaseBranches('Wolox', 'carvi-wolox').then(resp => {
@@ -9,6 +7,7 @@ test('Expect to have required branches', () =>
 
 test('Has low amount of rebounds', () =>
   hasLowPRRebound().then(rebounds => {
+    // eslint-disable-next-line no-magic-numbers
     expect(Number(rebounds)).toBe(14.61);
   }));
 

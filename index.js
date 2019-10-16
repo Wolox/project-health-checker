@@ -1,21 +1,19 @@
 require('dotenv').config();
 const parseArgs = require('minimist');
 
-const runEnvChecks = require('./src/envChecks');
-const runGeneralChecks = require('./src/generalChecks');
-const runGitChecks = require('./src/gitChecks');
-
-const runBuildChecks = require('./src/buildChecks');
-
+const runEnvChecks = require('./src/checks/env');
+const runGeneralChecks = require('./src/checks/general');
+const runGitChecks = require('./src/checks/git');
+const runBuildChecks = require('./src/checks/build');
+const frontendChecks = require('./src/checks/front_end');
 const { green } = require('./src/constants/colors');
 const writeSpreadSheet = require('./src/utils/writeSheet');
-const frontendChecks = require('./src/frontEnd');
 
 const techs = {
   react: frontendChecks,
   angular: frontendChecks,
   vue: frontendChecks,
-  node: require('./src/backEnd/nodeChecks')
+  node: require('./src/checks/back_end/node')
 };
 
 const args = parseArgs(process.argv);

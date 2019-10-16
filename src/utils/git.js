@@ -1,5 +1,6 @@
-const { REVIEW_STATE } = require('./constants');
 const flattenDeep = require('lodash.flattendeep');
+
+const { REVIEW_STATE } = require('../constants/git');
 
 const milisecondsInHour = 3600000;
 

@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { API } = require('../constants');
+const { API } = require('../constants/git');
 
 const config = {
   headers: {
