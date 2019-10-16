@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch --setupFiles dotenv/config"
+    "test": "jest --watch --setupFiles dotenv/config",
+    "lint": "eslint \"**/*.js\" --ignore-pattern ./.eslintrc.js",
+    "lint-diff": "git diff --name-only --cached --relative | grep \\\\.js$ | xargs eslint",
+    "lint-fix": "eslint \"**/*.js\" --fix --ignore-pattern ./.eslintrc.js"
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +22,7 @@
     "docker-file-parser": "^1.0.4",
     "dotenv": "^7.0.0",
     "eslint": "^5.16.0",
+    "eslint-config-wolox-node": "^2.2.0",
     "find-in-files": "^0.5.0",
     "get-folder-size": "^2.0.1",
     "google-spreadsheet": "^2.0.8",
