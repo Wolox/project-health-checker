@@ -11,7 +11,13 @@ module.exports.BASE_ALIASES = [
   '@screens'
 ];
 
-module.exports.generalMetrics = createObject(['FOLDER_STRUCTURE', 'BABEL_IMPORTS']);
+module.exports.generalMetrics = createObject([
+  'FOLDER_STRUCTURE',
+  'BABEL_IMPORTS',
+  'UNUSED_DEPENDENCIES',
+  'OUTDATED_DEPENDENCIES',
+  'DIRECT_DEPENDENCIES'
+]);
 
 module.exports.DOCKERFILE_ATTRIBUTES = ['FROM', 'WORKDIR', 'COPY', 'RUN', 'ENV', 'WORKDIR'];
 

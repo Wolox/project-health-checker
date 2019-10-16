@@ -42,17 +42,22 @@ module.exports = async (testPath, tech) => {
     const { moduleName, latest, packageJson, unused, bump } = dependency;
     if (unused) {
       generalResult.push({
-        metric: 'DEPENDENCIAS',
+        metric: generalMetrics.UNUSED_DEPENDENCIES,
         description: 'Dependencia no usada',
         value: moduleName
       });
     } else if (bump && bump !== 'patch') {
       generalResult.push({
-        metric: 'DEPENDENCIAS',
+        metric: generalMetrics.OUTDATED_DEPENDENCIES,
         description: 'Dependencia no actualizada',
         value: `${moduleName} Version: packageJson: ${packageJson} -> ultima ${latest}`
       });
     }
+    generalResult.push({
+      metric: generalMetrics.DIRECT_DEPENDENCIES,
+      description: 'Cantidad de dependencias directas',
+      value: packages.length
+    });
   });
 
   generalResult.push({
