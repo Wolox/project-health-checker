@@ -9,7 +9,8 @@ const reactMetrics = require('./constants');
 const limits = {
   i18nPercentage: 40,
   reduxRecomposePercentage: 70,
-  maxFiles: 2
+  maxFiles: 2,
+  maxUnusedDependencies: 10
 };
 
 const testSummary = summary => {
@@ -33,9 +34,44 @@ const securitySummary = (summary, reports) => {
     description: 'Existe un .env con variables de entorno en el proyecto',
     value: reports.some(elem => elem.metric === envMetrics.ENV_IS_USED && elem.value)
   });
+  summary.push({
+    metric: 'SUMMARY-SECURITY-2',
+    description:
+      'Las credenciales para firmar a producción se encuentran en un lugar seguro y disponible para el equipo de desarrollo y el TM',
+    value: 'Manual'
+  });
+  summary.push({
+    metric: 'SUMMARY-SECURITY-3',
+    description: 'No se guardan claves secretas en texto plano o en constantes dentro de la aplicación',
+    value: 'Manual'
+  });
+  summary.push({
+    metric: 'SUMMARY-SECURITY-5',
+    description: 'Las contraseñas no son nunca visibles para el usuario despues del login',
+    value: 'Manual'
+  });
 };
 
 const buildingSummary = (summary, reports) => {
+  summary.push({
+    metric: 'SUMMARY-BUILDING-1',
+    description: 'El proyecto utiliza la ultima o anteultima versión del framework',
+    value: !reports.some(
+      elem => elem.metric === generalMetrics.OUTDATED_DEPENDENCIES && elem.value.includes('react')
+    )
+  });
+  summary.push({
+    metric: 'SUMMARY-BUILDING-2',
+    description: 'Las dependencias del proyecto están actualizadas',
+    value:
+      reports.filter(elem => elem.metric === generalMetrics.UNUSED_DEPENDENCIES).length <=
+      limits.maxUnusedDependencies
+  });
+  summary.push({
+    metric: 'SUMMARY-BUILDING-3',
+    description: 'Se utiliza el package de deploy para la gestión de releases',
+    value: 'Manual'
+  });
   summary.push({
     metric: 'SUMMARY-BUILDING-6',
     description:
