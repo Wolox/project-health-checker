@@ -19,6 +19,10 @@ const techs = {
   node: require('./src/backEnd/nodeChecks')
 };
 
+const createSummary = {
+  react: require('./src/frontEnd/reactChecks/createSummary')
+};
+
 const args = parseArgs(process.argv);
 
 let testPath = '';
@@ -76,7 +80,8 @@ async function executeAudit() {
   console.log(green, 'Chequeos terminados con exito ✓');
   if (args.audit) {
     console.log(green, 'Cargando Spreadsheet...');
-    writeSpreadSheet(reports, testPath);
+    const reportWithSummary = createSummary[techChecks](reports);
+    writeSpreadSheet(reportWithSummary, testPath);
   } else {
     console.log(green, 'Persistiendo Metricas...');
     persistMetrics(reports);

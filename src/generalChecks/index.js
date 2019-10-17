@@ -9,7 +9,7 @@ const npmCheck = require('npm-check');
 
 const { calculatePercentage } = require('../utils');
 
-const { BASE_ALIASES, DOCKERFILE_ATTRIBUTES, aliasPathRegex, folderStructure } = require('./constants');
+const { BASE_ALIASES, DOCKERFILE_ATTRIBUTES, folderStructure, generalMetrics } = require('./constants');
 const { validateJenkinsFileContent } = require('../utils/jenkinsFilesUtils');
 
 let amountOfJs = 0;
@@ -42,17 +42,22 @@ module.exports = async (testPath, tech) => {
     const { moduleName, latest, packageJson, unused, bump } = dependency;
     if (unused) {
       generalResult.push({
-        metric: 'DEPENDENCIAS',
+        metric: generalMetrics.UNUSED_DEPENDENCIES,
         description: 'Dependencia no usada',
         value: moduleName
       });
     } else if (bump && bump !== 'patch') {
       generalResult.push({
-        metric: 'DEPENDENCIAS',
+        metric: generalMetrics.OUTDATED_DEPENDENCIES,
         description: 'Dependencia no actualizada',
         value: `${moduleName} Version: packageJson: ${packageJson} -> ultima ${latest}`
       });
     }
+    generalResult.push({
+      metric: generalMetrics.DIRECT_DEPENDENCIES,
+      description: 'Cantidad de dependencias directas',
+      value: packages.length
+    });
   });
 
   generalResult.push({
@@ -70,55 +75,31 @@ module.exports = async (testPath, tech) => {
   if (fs.existsSync(`${testPath}/src`)) {
     folderStructure[tech].forEach(element =>
       generalResult.push({
-        metric: 'Folder Structure',
+        metric: generalMetrics.FOLDER_STRUCTURE,
         description: `Existe un archivo ${element} dentro de src`,
         value: fs.existsSync(`${testPath}/src/${element}`)
       })
     );
   } else {
     generalResult.push({
-      metric: 'Folder Structure',
+      metric: generalMetrics.FOLDER_STRUCTURE,
       description: 'Existe un archivo de src en el root de su proyecto',
       value: false
     });
   }
 
   try {
-    const data = require(`${testPath}/.babelrc.js`);
-    const moduleResolver = data.plugins.filter(
+    const data = require(`../../${testPath}/.babelrc.js`);
+    const aliases = data.plugins.filter(
       plugin => Array.isArray(plugin) && plugin[0] === 'module-resolver'
-    );
-    const aliases = moduleResolver[0][1].alias;
-    const isBaseAlias = alias => {
-      if (!Object.keys(aliases).includes(alias)) {
-        generalResult.push({
-          metric: 'Import',
-          description: 'Falta absolute import para',
-          value: alias
-        });
-      }
-    };
-    const validPath = alias => {
-      if (!aliasPathRegex(alias).test(aliases[alias])) {
-        generalResult.push({
-          metric: 'Import',
-          description: 'El import absoluto no está configurado correctamente',
-          value: alias
-        });
-      }
-    };
-
-    if (
-      BASE_ALIASES.reduce(
-        (accumulator, currentAlias) => isBaseAlias(currentAlias) && validPath(currentAlias) && accumulator
-      )
-    ) {
+    )[0][1].alias;
+    BASE_ALIASES.forEach(alias =>
       generalResult.push({
-        metric: 'Import',
-        description: 'Todos los imports absolutos estan configurados correctamente',
-        value: true
-      });
-    }
+        metric: generalMetrics.BABEL_IMPORTS,
+        description: `Existe import con alias para ${alias}`,
+        value: Object.keys(aliases).includes(alias)
+      })
+    );
 
     const importsResult = await findSync("from '@.+';", `${testPath}/src`, '.js$');
     const importCalculationResult = calculatePercentage(importsResult, amountOfJs);
@@ -129,7 +110,7 @@ module.exports = async (testPath, tech) => {
     });
   } catch {
     generalResult.push({
-      metric: 'Babel',
+      metric: generalMetrics.BABEL_IMPORTS,
       description: 'El archivo .babelrc contiene el plugin "module-resolver',
       value: false
     });
