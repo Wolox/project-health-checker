@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch --setupFiles dotenv/config"
+    "test": "react-scripts test"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +13,7 @@
     "npm": ">= 6.9.0"
   },
   "dependencies": {
+    "await-spawn": "^3.0.0",
     "axios": "^0.18.0",
     "count-files": "^2.6.2",
     "docker-file-parser": "^1.0.4",
@@ -30,6 +31,7 @@
     "stylelint": "^10.0.1"
   },
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.6.0",
     "@types/jest": "^24.0.18",
     "@types/jest-cli": "^23.6.0",
     "babel-eslint": "^10.0.1",
