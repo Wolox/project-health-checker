@@ -1,6 +1,7 @@
 const envMetrics = require('../../envChecks/constants');
 
 const frontendMetrics = require('../constants');
+const eslintMetrics = require('../../linterChecks/constants');
 
 const { generalMetrics } = require('../../generalChecks/constants');
 
@@ -82,6 +83,11 @@ const buildingSummary = (summary, reports) => {
 
 const uiUxSummary = (summary, reports) => {
   summary.push({
+    metric: 'SUMMARY-UI-UX-2',
+    description: 'El proyecto usa Sass respetando el linter correspondiente',
+    value: reports.some(elem => elem.metric === eslintMetrics.ESLINT_CONFIG && elem.value)
+  });
+  summary.push({
     metric: 'SUMMARY-UI-UX-3',
     description: 'El proyecto posee internacionalización',
     value: reports.some(elem => elem.metric === frontendMetrics.I18N && elem.value >= limits.i18nPercentage)
@@ -94,6 +100,30 @@ const uiUxSummary = (summary, reports) => {
 };
 
 const clientServerSummary = (summary, reports) => {
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-1',
+    description: 'El proyecto posee services dedicados a los distintos recurso que posee',
+    value: reports.some(
+      elem =>
+        elem.metric === reactMetrics.FOLDER_STRUCTURE && elem.description.contains('services') && elem.value
+    )
+  });
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-2',
+    description: 'Se utiliza una configuración de apisauce / axios para cada API que se comunique',
+    value:
+      reports.some(
+        elem => elem.metric === reactMetrics.OUTDATED_DEPENDENCIES && elem.description.contains('axios')
+      ) ||
+      reports.some(
+        elem => elem.metric === reactMetrics.OUTDATED_DEPENDENCIES && elem.description.contains('apisauce')
+      )
+  });
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-3',
+    description: 'Existe un reducer para mantener el estado global de la aplicación',
+    value: 'Manual'
+  });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-4',
     description: 'El proyecto utiliza redux recompose para el manejo óptimo de estados',

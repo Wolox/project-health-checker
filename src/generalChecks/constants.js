@@ -12,6 +12,9 @@ module.exports.BASE_ALIASES = [
 ];
 
 module.exports.generalMetrics = createObject([
+  'README',
+  'BABEL',
+  'CODE_OWNERS',
   'FOLDER_STRUCTURE',
   'BABEL_IMPORTS',
   'UNUSED_DEPENDENCIES',

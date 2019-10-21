@@ -24,7 +24,7 @@ module.exports = async (testPath, tech) => {
     const data = read.sync(`${testPath}/.github/CODEOWNERS`, 'utf8');
     const codeOwners = data.split('@').length - 1;
     generalResult.push({
-      metric: 'Code Owners',
+      metric: generalMetrics.CODE_OWNERS,
       description: 'Cantidad de code owners',
       value: codeOwners
     });
@@ -53,21 +53,21 @@ module.exports = async (testPath, tech) => {
         value: `${moduleName} Version: packageJson: ${packageJson} -> ultima ${latest}`
       });
     }
-    generalResult.push({
-      metric: generalMetrics.DIRECT_DEPENDENCIES,
-      description: 'Cantidad de dependencias directas',
-      value: packages.length
-    });
+  });
+  generalResult.push({
+    metric: generalMetrics.DIRECT_DEPENDENCIES,
+    description: 'Cantidad de dependencias directas',
+    value: packages.length
   });
 
   generalResult.push({
-    metric: 'Readme',
+    metric: generalMetrics.README,
     description: 'Existe un readme',
     value: fs.existsSync(`${testPath}/README.md`)
   });
 
   generalResult.push({
-    metric: 'Babel',
+    metric: generalMetrics.BABEL,
     description: 'Existe un archivo .babelrc',
     value: fs.existsSync(`${testPath}/.babelrc.js`)
   });
