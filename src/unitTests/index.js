@@ -24,20 +24,27 @@ module.exports = testPath => {
   
   const options = {
     projects: [testPath],
-    silent: true,
-    passWithNoTests: true,
-    collectCoverage: true,
-    collectCoverageFrom: ["**/src/**/?(*.)[jt]s?(x)"],
-    coverageDirectory: './report',
-    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node']
+    stdio: 'pipe',
+    coverageThreshold: {
+      global: {
+        branches: 100,
+        functions: 100,
+        lines: 100,
+        statements: -10
+      }
+    },
+    cwd: testPath
   };
   
-  var ls = spawn(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['test', '-- --coverage'], { stdio: 'inherit', cwd: testPath} );
+
+try {
+  var ls = spawn(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['test'], options);
+  console.log(ls);
+} catch (e) {
+  console.error("I got error: " + e.stderr ) ;
+}
 
   
-  ls.on('exit', function (code) {
-    console.log('child process exited with code ' + code.toString());
-  });
   /* jest
   .runCLI(options, options.projects)
   .then(success)
