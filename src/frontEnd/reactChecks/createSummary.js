@@ -1,6 +1,7 @@
 const envMetrics = require('../../envChecks/constants');
 
 const frontendMetrics = require('../constants');
+const eslintMetrics = require('../../linterChecks/constants');
 
 const { generalMetrics } = require('../../generalChecks/constants');
 
@@ -9,7 +10,8 @@ const reactMetrics = require('./constants');
 const limits = {
   i18nPercentage: 40,
   reduxRecomposePercentage: 70,
-  maxFiles: 2
+  maxFiles: 2,
+  maxUnusedDependencies: 10
 };
 
 const testSummary = summary => {
@@ -33,9 +35,44 @@ const securitySummary = (summary, reports) => {
     description: 'Existe un .env con variables de entorno en el proyecto',
     value: reports.some(elem => elem.metric === envMetrics.ENV_IS_USED && elem.value)
   });
+  summary.push({
+    metric: 'SUMMARY-SECURITY-2',
+    description:
+      'Las credenciales para firmar a producción se encuentran en un lugar seguro y disponible para el equipo de desarrollo y el TM',
+    value: 'Manual'
+  });
+  summary.push({
+    metric: 'SUMMARY-SECURITY-3',
+    description: 'No se guardan claves secretas en texto plano o en constantes dentro de la aplicación',
+    value: 'Manual'
+  });
+  summary.push({
+    metric: 'SUMMARY-SECURITY-5',
+    description: 'Las contraseñas no son nunca visibles para el usuario despues del login',
+    value: 'Manual'
+  });
 };
 
 const buildingSummary = (summary, reports) => {
+  summary.push({
+    metric: 'SUMMARY-BUILDING-1',
+    description: 'El proyecto utiliza la ultima o anteultima versión del framework',
+    value: !reports.some(
+      elem => elem.metric === generalMetrics.OUTDATED_DEPENDENCIES && elem.value.includes('react')
+    )
+  });
+  summary.push({
+    metric: 'SUMMARY-BUILDING-2',
+    description: 'Las dependencias del proyecto están actualizadas',
+    value:
+      reports.filter(elem => elem.metric === generalMetrics.UNUSED_DEPENDENCIES).length <=
+      limits.maxUnusedDependencies
+  });
+  summary.push({
+    metric: 'SUMMARY-BUILDING-3',
+    description: 'Se utiliza el package de deploy para la gestión de releases',
+    value: 'Manual'
+  });
   summary.push({
     metric: 'SUMMARY-BUILDING-6',
     description:
@@ -45,6 +82,11 @@ const buildingSummary = (summary, reports) => {
 };
 
 const uiUxSummary = (summary, reports) => {
+  summary.push({
+    metric: 'SUMMARY-UI-UX-2',
+    description: 'El proyecto usa Sass respetando el linter correspondiente',
+    value: reports.some(elem => elem.metric === eslintMetrics.ESLINT_CONFIG && elem.value)
+  });
   summary.push({
     metric: 'SUMMARY-UI-UX-3',
     description: 'El proyecto posee internacionalización',
@@ -58,6 +100,30 @@ const uiUxSummary = (summary, reports) => {
 };
 
 const clientServerSummary = (summary, reports) => {
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-1',
+    description: 'El proyecto posee services dedicados a los distintos recurso que posee',
+    value: reports.some(
+      elem =>
+        elem.metric === reactMetrics.FOLDER_STRUCTURE && elem.description.contains('services') && elem.value
+    )
+  });
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-2',
+    description: 'Se utiliza una configuración de apisauce / axios para cada API que se comunique',
+    value:
+      reports.some(
+        elem => elem.metric === reactMetrics.OUTDATED_DEPENDENCIES && elem.description.contains('axios')
+      ) ||
+      reports.some(
+        elem => elem.metric === reactMetrics.OUTDATED_DEPENDENCIES && elem.description.contains('apisauce')
+      )
+  });
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-3',
+    description: 'Existe un reducer para mantener el estado global de la aplicación',
+    value: 'Manual'
+  });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-4',
     description: 'El proyecto utiliza redux recompose para el manejo óptimo de estados',
