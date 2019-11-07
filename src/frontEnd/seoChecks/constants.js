@@ -1,0 +1,10 @@
+const { createObject } = require('../../utils');
+
+module.exports = createObject([
+  'LIGHTHOUSE',
+  'LIGHTHOUSE_ACCESIBILITY_OVERALL',
+  'LIGHTHOUSE_SEO_OVERALL',
+  'LIGHTHOUSE_PWA_OVERALL',
+  'LIGHTHOUSE_PERFORMANCE_OVERALL',
+  'LIGHTHOUSE_BEST_PRACTICES_OVERALL'
+]);

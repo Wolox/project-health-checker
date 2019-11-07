@@ -2,6 +2,7 @@ const envMetrics = require('../../envChecks/constants');
 
 const frontendMetrics = require('../constants');
 const eslintMetrics = require('../../linterChecks/constants');
+const seoMetrics = require('../seoChecks/constants');
 
 const { generalMetrics } = require('../../generalChecks/constants');
 
@@ -11,7 +12,12 @@ const limits = {
   i18nPercentage: 40,
   reduxRecomposePercentage: 70,
   maxFiles: 2,
-  maxUnusedDependencies: 10
+  maxUnusedDependencies: 10,
+  minPerformance: 70,
+  minBestPractices: 70,
+  minSeo: 90,
+  minFirstPaint: 50,
+  pwaMin: 30
 };
 
 const testSummary = summary => {
@@ -83,6 +89,13 @@ const buildingSummary = (summary, reports) => {
 
 const uiUxSummary = (summary, reports) => {
   summary.push({
+    metric: 'SUMMARY-UI-UX-1',
+    description: 'El proyecto es mobile friendly según lighthouse',
+    value: reports.some(
+      elem => elem.metric === seoMetrics.LIGHTHOUSE_PWA_OVERALL && elem.value >= limits.pwaMin
+    )
+  });
+  summary.push({
     metric: 'SUMMARY-UI-UX-2',
     description: 'El proyecto usa Sass respetando el linter correspondiente',
     value: reports.some(elem => elem.metric === eslintMetrics.ESLINT_CONFIG && elem.value)
@@ -105,7 +118,7 @@ const clientServerSummary = (summary, reports) => {
     description: 'El proyecto posee services dedicados a los distintos recurso que posee',
     value: reports.some(
       elem =>
-        elem.metric === reactMetrics.FOLDER_STRUCTURE && elem.description.contains('services') && elem.value
+        elem.metric === reactMetrics.FOLDER_STRUCTURE && elem.description.includes('services') && elem.value
     )
   });
   summary.push({
@@ -113,10 +126,10 @@ const clientServerSummary = (summary, reports) => {
     description: 'Se utiliza una configuración de apisauce / axios para cada API que se comunique',
     value:
       reports.some(
-        elem => elem.metric === reactMetrics.OUTDATED_DEPENDENCIES && elem.description.contains('axios')
+        elem => elem.metric === reactMetrics.OUTDATED_DEPENDENCIES && elem.description.includes('axios')
       ) ||
       reports.some(
-        elem => elem.metric === reactMetrics.OUTDATED_DEPENDENCIES && elem.description.contains('apisauce')
+        elem => elem.metric === reactMetrics.OUTDATED_DEPENDENCIES && elem.description.includes('apisauce')
       )
   });
   summary.push({
@@ -141,11 +154,41 @@ const clientServerSummary = (summary, reports) => {
   });
 };
 
-const performanceSummary = summary => {
+const performanceSummary = (summary, reports) => {
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-1',
+    description: 'No hay render blocking js',
+    value: reports.some(
+      elem =>
+        elem.metric === seoMetrics.LIGHTHOUSE_BEST_PRACTICES_OVERALL && elem.value >= limits.minBestPractices
+    )
+  });
+
   summary.push({
     metric: 'SUMMARY-PERFORMANCE-2',
     description: 'El proyecto posee métricas de SEO (según lighthouse) mayor al 90%',
-    value: 'Lighthouse'
+    value: reports.some(
+      elem => elem.metric === seoMetrics.LIGHTHOUSE_PERFORMANCE_OVERALL && elem.value >= limits.minSeo
+    )
+  });
+
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-3',
+    description: 'El proyecto posee un First Contentful Paint menor a 4 segundos',
+    value: reports.some(
+      elem =>
+        elem.metric === `${seoMetrics.LIGHTHOUSE}-Performance` &&
+        elem.description.includes('First Contentful Paint') &&
+        elem.value >= limits.minFirstPaint
+    )
+  });
+
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-4',
+    description: 'No hay llamadas a funciones dentro del JSX donde generan renders extra',
+    value: reports.some(
+      elem => elem.metric === seoMetrics.LIGHTHOUSE_PERFORMANCE_OVERALL && elem.value >= limits.minPerformance
+    )
   });
 };
 
