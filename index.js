@@ -10,6 +10,7 @@ const runBuildChecks = require('./src/buildChecks');
 const { green } = require('./src/constants/colors');
 const writeSpreadSheet = require('./src/utils/writeSheet');
 const persistMetrics = require('./src/utils/persistMetrics');
+const codeQuality = require('./src/utils/codeQuality');
 const frontendChecks = require('./src/frontEnd');
 
 const techs = {
@@ -77,14 +78,15 @@ async function executeChecks() {
 
 async function executeAudit() {
   const reports = await executeChecks();
+  const reportWithSummary = createSummary[techChecks](reports);
+  const reportCodeQuality = codeQuality(reportWithSummary);
   console.log(green, 'Chequeos terminados con exito ✓');
   if (args.audit) {
     console.log(green, 'Cargando Spreadsheet...');
-    const reportWithSummary = createSummary[techChecks](reports);
-    writeSpreadSheet(reportWithSummary, testPath);
+    writeSpreadSheet(reportCodeQuality, testPath);
   } else {
     console.log(green, 'Persistiendo Metricas...');
-    persistMetrics(reports);
+    persistMetrics(reportCodeQuality);
   }
 }
 
