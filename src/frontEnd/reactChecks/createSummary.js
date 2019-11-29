@@ -20,12 +20,18 @@ const limits = {
   pwaMin: 30
 };
 
-const testSummary = summary => {
+const testSummary = (summary, summary) => {
   summary.push({
     metric: 'SUMMARY-TESTING-2',
     description:
       'La arquitectura de la aplicación se encuentra preparada para implementar test de instrumentación (UI)',
     value: 'N/A'
+  });
+  summary.push({
+    metric: 'SUMMARY-TESTING-3',
+    description:
+      'Hay una cobertura del 70% o más en los test unitarios',
+    value: reports.some(elem => elem.metric === envMetrics.ENV_IS_USED && elem.value > "70%")
   });
   summary.push({
     metric: 'SUMMARY-TESTING-4',
