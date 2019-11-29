@@ -23,23 +23,37 @@ module.exports = testPath => {
   }); */
   
   const options = {
-    projects: [testPath],
     stdio: 'pipe',
-    coverageThreshold: {
-      global: {
-        branches: 100,
-        functions: 100,
-        lines: 100,
-        statements: -10
-      }
-    },
     cwd: testPath
   };
   
 
 try {
-  var ls = spawn(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['test'], options);
-  console.log(ls);
+  var child = spawn(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['test','--','--collectCoverage', '--collectCoverageFrom=**/*.{js,jsx}'], options);
+  process.stdin.pipe(child.stdin)
+
+  child.stdout.on('data', (data) => {
+    var arrayLines = data.toString().split(/\|/);
+    
+    if(arrayLines[0].trim().localeCompare("All files") == 0 ){
+      console.log('entro');
+      console.log(green, `Porcentaje de covertura de tests: ${parseFloat(arrayLines[4])}%`);
+    };
+    /* const arrayAllFiles = arrayLines.find(element => element[0].trim().localeCompare("All files") == 0); 
+      console.log(parseFloat(arrayAllFiles[4])); */
+  });
+
+  child.on('close', (data) => {
+    if(data){
+
+      console.log(red, 'No se encontraron tests');
+    }
+  });
+
+  /* ls.stdout.on('data', (data) => {
+    console.log(data.toString().split("\n"));
+  }); */
+  
 } catch (e) {
   console.error("I got error: " + e.stderr ) ;
 }
