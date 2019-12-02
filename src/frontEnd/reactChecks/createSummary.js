@@ -20,7 +20,7 @@ const limits = {
   pwaMin: 30
 };
 
-const testSummary = (summary, summary) => {
+const testSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-TESTING-2',
     description:

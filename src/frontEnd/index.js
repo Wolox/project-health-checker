@@ -12,11 +12,6 @@ const techs = {
   vue: require('./vueChecks')
 };
 
-const options = {
-  stdio: 'pipe',
-  cwd: testPath
-};
-
 let amountOfJsAppFolder = 0;
 
 const generalFrontChecks = async testPath => {
@@ -47,6 +42,11 @@ const generalFrontChecks = async testPath => {
     description: 'Cantidad de index con mas de 150 lineas',
     value: filteredIndex.length
   });
+  
+  const options = {
+    stdio: 'pipe',
+    cwd: testPath
+  };
   
   var child = spawn(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['test','--','--collectCoverage', '--collectCoverageFrom=**/*.{js,jsx}'], options);
   let percentageCoverage = 0;
