@@ -1,5 +1,5 @@
 const { findSync } = require('find-in-files');
-var spawn = require('child_process').spawn;
+var spawnSync = require('child_process').spawnSync;
 const { green, red } = require('../constants/colors');
 const limits = require('../constants/limits');
 const { calculatePercentage } = require('../utils');
@@ -48,14 +48,14 @@ const generalFrontChecks = async testPath => {
     cwd: testPath
   };
   
-  var child = spawn(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['test','--','--collectCoverage', '--collectCoverageFrom=**/*.{js,jsx}'], options);
   let percentageCoverage = 0;
-  child.stdout.on('data', (data) => {
-    var arrayLines = data.toString().split(/\|/);
-    if(arrayLines[0].trim().localeCompare("All files") == 0 ){
-      percentageCoverage =`${arrayLines[4]}%`;
-    };
-  });
+  var child = spawnSync(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['test','--','--collectCoverage', '--collectCoverageFrom=**/*.{js,jsx}'], options);
+  let outputByLine = child.stdout.toString().split("\n");
+  let allFilesLine = outputByLine.find(item => item.split(/\|/)[0].trim().localeCompare("All files") == 0)
+  if(allFilesLine) {
+    percentageCoverage = parseFloat(allFilesLine.split(/\|/)[4].trim());
+  }
+  
   frontEndData.push({
     metric: frontendMetrics.TEST_COVERAGE,
     description: 'Porcentaje de lineas de código testeado sobre total',
