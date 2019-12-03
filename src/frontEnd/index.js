@@ -49,7 +49,7 @@ const generalFrontChecks = async testPath => {
   };
   
   let percentageCoverage = 0;
-  var child = spawnSync(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['test','--','--collectCoverage', '--collectCoverageFrom=**/*.{js,jsx}'], options);
+  let child = spawnSync(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['test','--','--collectCoverage', '--collectCoverageFrom=**/*.{js,jsx}'], options);
   let outputByLine = child.stdout.toString().split("\n");
   let allFilesLine = outputByLine.find(item => item.split(/\|/)[0].trim().localeCompare("All files") == 0)
   if(allFilesLine) {
