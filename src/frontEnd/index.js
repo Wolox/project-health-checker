@@ -58,7 +58,7 @@ const generalFrontChecks = async testPath => {
   });
   frontEndData.push({
     metric: frontendMetrics.TEST_COVERAGE,
-    description: 'Cobertura de lineas de código testeado sobre el total',
+    description: 'Porcentaje de lineas de código testeado sobre total',
     value: percentageCoverage
   });
     
