@@ -1,5 +1,5 @@
 const { red, green } = require('../constants/colors');
-var spawn = require('child_process').spawn;
+var spawnSync = require('child_process').spawnSync;
 
 module.exports = testPath => {
 
@@ -29,26 +29,27 @@ module.exports = testPath => {
   
 
 try {
-  var child = spawn(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['test','--','--collectCoverage', '--collectCoverageFrom=**/*.{js,jsx}'], options);
-  process.stdin.pipe(child.stdin)
-
-  child.stdout.on('data', (data) => {
+  var child = spawnSync(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['test','--','--collectCoverage', '--collectCoverageFrom=**/*.{js,jsx}'], options);
+  let outputByLine = child.stdout.toString().split("\n");
+  let coverage = parseFloat(outputByLine
+    .find(item => item.split(/\|/)[0].trim().localeCompare("All files") == 0)
+    .split(/\|/)[4].trim());
+    
+console.log(coverage);
+  /* child.stdout.on('data', (data) => {
     var arrayLines = data.toString().split(/\|/);
     
     if(arrayLines[0].trim().localeCompare("All files") == 0 ){
-      console.log('entro');
       console.log(green, `Porcentaje de covertura de tests: ${parseFloat(arrayLines[4])}%`);
     };
-    /* const arrayAllFiles = arrayLines.find(element => element[0].trim().localeCompare("All files") == 0); 
-      console.log(parseFloat(arrayAllFiles[4])); */
   });
 
-  child.on('close', (data) => {
+  child.on('exit', (data) => {
     if(data){
 
       console.log(red, 'No se encontraron tests');
     }
-  });
+  }); */
 
   /* ls.stdout.on('data', (data) => {
     console.log(data.toString().split("\n"));
