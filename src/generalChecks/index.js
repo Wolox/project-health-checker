@@ -58,9 +58,7 @@ module.exports = async (testPath, tech) => {
   generalResult.push({
     metric: generalMetrics.AXIOS_APISAUCE,
     description: 'Esta instalado axios o apisauce en el proyecto',
-    value:
-      packages.some(({ moduleName }) => moduleName === 'axios') ||
-      packages.some(({ moduleName }) => moduleName === 'apisauce')
+    value: packages.some(({ moduleName }) => moduleName === 'axios' || moduleName === 'apisauce')
   });
 
   generalResult.push({
