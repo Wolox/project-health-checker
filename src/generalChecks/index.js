@@ -54,6 +54,19 @@ module.exports = async (testPath, tech) => {
       });
     }
   });
+
+  generalResult.push({
+    metric: generalMetrics.AXIOS_APISAUCE,
+    description: 'Esta instalado axios o apisauce en el proyecto',
+    value: packages.some(({ moduleName }) => moduleName === 'axios' || moduleName === 'apisauce')
+  });
+
+  generalResult.push({
+    metric: generalMetrics.JEST,
+    description: 'Esta instalado Jest en el proyecto',
+    value: packages.some(({ moduleName }) => moduleName === 'jest')
+  });
+
   generalResult.push({
     metric: generalMetrics.DIRECT_DEPENDENCIES,
     description: 'Cantidad de dependencias directas',

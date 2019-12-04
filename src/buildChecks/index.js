@@ -1,5 +1,6 @@
 const rimraf = require('rimraf');
 const runEslintChecks = require('../linterChecks');
+const runTestChecks = require('../testChecks');
 const { promisify } = require('util');
 const getSize = require('get-folder-size');
 
@@ -13,6 +14,8 @@ const mega = 1000000;
 module.exports = async testPath => {
   console.log(green, 'Empezando instalacion de dependencias para el build...');
   shell.exec(`npm i --prefix ${testPath}`);
+  const testData = runTestChecks(testPath);
+  console.log(green, 'Tests terminados con exito ✓');
   const eslintData = runEslintChecks(testPath);
   console.log(green, 'Chequeos de eslint terminados con exito ✓');
   console.log(green, 'Generando el build...');
@@ -26,6 +29,7 @@ module.exports = async testPath => {
   rimraf.sync(`${testPath}/build`);
   return [
     ...eslintData,
+    ...testData,
     { metric: 'Build', description: 'Build Time', value: buildTime },
     { metric: 'Build', description: 'Build Size', value: buildSize }
   ];

@@ -19,7 +19,9 @@ module.exports.generalMetrics = createObject([
   'BABEL_IMPORTS',
   'UNUSED_DEPENDENCIES',
   'OUTDATED_DEPENDENCIES',
-  'DIRECT_DEPENDENCIES'
+  'DIRECT_DEPENDENCIES',
+  'AXIOS_APISAUCE',
+  'JEST'
 ]);
 
 module.exports.DOCKERFILE_ATTRIBUTES = ['FROM', 'WORKDIR', 'COPY', 'RUN', 'ENV', 'WORKDIR'];

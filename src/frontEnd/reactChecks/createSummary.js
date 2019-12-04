@@ -2,6 +2,7 @@ const envMetrics = require('../../envChecks/constants');
 
 const frontendMetrics = require('../constants');
 const eslintMetrics = require('../../linterChecks/constants');
+const testMetrics = require('../../testChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
 
 const { generalMetrics } = require('../../generalChecks/constants');
@@ -17,15 +18,28 @@ const limits = {
   minBestPractices: 70,
   minSeo: 90,
   minFirstPaint: 50,
+  minTestCoverage: 70,
   pwaMin: 30
 };
 
-const testSummary = summary => {
+const testSummary = (summary, reports) => {
+  summary.push({
+    metric: 'SUMMARY-TESTING-1',
+    description: 'La arquitectura de la aplicación se encuentra preparada para implementar test unitarios',
+    value: reports.some(elem => elem.metric === generalMetrics.JEST && elem.value)
+  });
   summary.push({
     metric: 'SUMMARY-TESTING-2',
     description:
       'La arquitectura de la aplicación se encuentra preparada para implementar test de instrumentación (UI)',
     value: 'N/A'
+  });
+  summary.push({
+    metric: 'SUMMARY-TESTING-3',
+    description: 'Hay una cobertura del 70% o más en los test unitarios',
+    value: reports.some(
+      elem => elem.metric === testMetrics.TEST_COVERAGE && elem.value >= limits.minTestCoverage
+    )
   });
   summary.push({
     metric: 'SUMMARY-TESTING-4',
@@ -124,13 +138,7 @@ const clientServerSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-2',
     description: 'Se utiliza una configuración de apisauce / axios para cada API que se comunique',
-    value:
-      reports.some(
-        elem => elem.metric === reactMetrics.OUTDATED_DEPENDENCIES && elem.description.includes('axios')
-      ) ||
-      reports.some(
-        elem => elem.metric === reactMetrics.OUTDATED_DEPENDENCIES && elem.description.includes('apisauce')
-      )
+    value: reports.some(elem => elem.metric === generalMetrics.AXIOS_APISAUCE && elem.value)
   });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-3',

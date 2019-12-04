@@ -1,5 +1,4 @@
 const { findSync } = require('find-in-files');
-
 const { green, red } = require('../constants/colors');
 const limits = require('../constants/limits');
 const { calculatePercentage } = require('../utils');
