@@ -4,9 +4,6 @@ const limits = require('../constants/limits');
 const { calculatePercentage } = require('../utils');
 const runSeoChecks = require('./seoChecks');
 const frontendMetrics = require('./constants');
-const shell = require('shelljs');
-
-shell.config.silent = true;
 
 const techs = {
   react: require('./reactChecks'),
