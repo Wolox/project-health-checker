@@ -16,8 +16,7 @@ const frontendChecks = require('./src/frontEnd');
 const techs = {
   react: frontendChecks,
   angular: frontendChecks,
-  vue: frontendChecks,
-  node: require('./src/backEnd/nodeChecks')
+  vue: frontendChecks
 };
 
 const createSummary = {
@@ -30,6 +29,11 @@ let testPath = '';
 let techChecks = 'react';
 let organization = 'Wolox';
 let seoLink = undefined;
+let enviorment = 'development';
+
+if (args.env) {
+  enviorment = args.env;
+}
 
 if (args.path) {
   testPath = args.path;
@@ -49,7 +53,7 @@ if (args.tech) {
   techChecks = args.t;
 }
 
-const repoName = testPath;
+const repoName = testPath.split('/').filter(elem => elem !== '..' && elem !== '.')[0];
 
 if (args.org) {
   organization = args.org;
@@ -86,7 +90,7 @@ async function executeAudit() {
     writeSpreadSheet(reportCodeQuality, testPath);
   } else {
     console.log(green, 'Persistiendo Metricas...');
-    persistMetrics(reportCodeQuality);
+    persistMetrics(reportCodeQuality, techChecks, enviorment, repoName);
   }
 }
 

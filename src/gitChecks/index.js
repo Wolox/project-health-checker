@@ -11,13 +11,10 @@ const {
   pullRequestLifeSpan
 } = require('./utils');
 
-const parseRepository = url => url.split('/').filter(elem => elem !== '..' && elem !== '.')[0];
-
 module.exports = async (repository, organization) => {
   const gitData = [];
-  const repositoryUrl = parseRepository(repository);
   try {
-    const repositoryInfo = await getRepositoryInfo(repositoryUrl, organization);
+    const repositoryInfo = await getRepositoryInfo(repository, organization);
     gitData.push({
       metric: 'GITHUB',
       description: 'Existen las branches development, stage y master',
@@ -44,7 +41,7 @@ module.exports = async (repository, organization) => {
       value: average
     });
 
-    const pullRequestInfo = await getReleaseInfo(repositoryUrl, organization);
+    const pullRequestInfo = await getReleaseInfo(repository, organization);
     const { pullRequests, releases } = pullRequestInfo.data.data.repository;
     gitData.push({
       metric: 'GITHUB',

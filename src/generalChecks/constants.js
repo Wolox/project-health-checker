@@ -21,7 +21,8 @@ module.exports.generalMetrics = createObject([
   'OUTDATED_DEPENDENCIES',
   'DIRECT_DEPENDENCIES',
   'AXIOS_APISAUCE',
-  'JEST'
+  'JEST',
+  'CODE_QUALITY'
 ]);
 
 module.exports.DOCKERFILE_ATTRIBUTES = ['FROM', 'WORKDIR', 'COPY', 'RUN', 'ENV', 'WORKDIR'];

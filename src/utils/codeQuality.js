@@ -1,3 +1,4 @@
+const { generalMetrics } = require('../generalChecks/constants');
 const hundred = 100;
 
 module.exports = reports => {
@@ -7,7 +8,7 @@ module.exports = reports => {
   return [
     ...reports,
     {
-      metric: 'Code quality',
+      metric: generalMetrics.CODE_QUALITY,
       description: 'Calidad del proyecto',
       value: (
         (onlyBooleanSummary.filter(elem => elem.value).length / onlyBooleanSummary.length) * // eslint-disable-line no-extra-parens

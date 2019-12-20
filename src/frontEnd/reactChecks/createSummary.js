@@ -38,7 +38,7 @@ const testSummary = (summary, reports) => {
     metric: 'SUMMARY-TESTING-3',
     description: 'Hay una cobertura del 70% o más en los test unitarios',
     value: reports.some(
-      elem => elem.metric === testMetrics.TEST_COVERAGE && elem.value >= limits.minTestCoverage
+      elem => elem.metric === testMetrics.CODE_COVERAGE && elem.value >= limits.minTestCoverage
     )
   });
   summary.push({

@@ -21,6 +21,17 @@ const lighthouseSummary = [
   { metric: seoMetrics.LIGHTHOUSE_BEST_PRACTICES_OVERALL, id: 'pwa' }
 ];
 
+const getFcuValue = value => {
+  const x = value * 100;
+  if (x < 50) {
+    return '+4 seg';
+  }
+  if (x < 75) {
+    return '2 - 4 seg';
+  }
+  return '0 - 2 seg';
+};
+
 module.exports = async url => {
   const seoResults = [];
   if (url) {
@@ -29,13 +40,22 @@ module.exports = async url => {
     const results = await lighthouse(url, opts);
     const csv = ReportGenerator.generateReport(results.lhr, 'csv');
     const metrics = await csvtojson().fromString(csv);
-    metrics.forEach(({ category, title, type, score }) =>
-      seoResults.push({
-        metric: `${seoMetrics.LIGHTHOUSE}-${category}`,
-        description: `${title} - ${type}`,
-        value: score
-      })
+    const firstCP = metrics.find(
+      ({ category, title }) => category === 'Performance' && title.includes('First Contentful Paint')
     );
+    seoResults.push({
+      metric: seoMetrics.FIRST_CONTENTFUL_PAINT,
+      description: firstCP.title,
+      value: getFcuValue(firstCP.score)
+    });
+    const firstMP = metrics.find(
+      ({ category, title }) => category === 'Performance' && title.includes('First Meaningful Paint')
+    );
+    seoResults.push({
+      metric: seoMetrics.FIRST_MEANINGFUL_PAINT,
+      description: firstMP.title,
+      value: getFcuValue(firstMP.score)
+    });
     lighthouseSummary.forEach(({ metric, id }) =>
       seoResults.push({
         metric,
