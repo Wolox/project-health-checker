@@ -17,8 +17,8 @@ const limits = {
   minPerformance: 70,
   minBestPractices: 70,
   minSeo: 90,
-  minFirstPaint: 50,
   minTestCoverage: 70,
+  minFirstPaint: 70,
   pwaMin: 30
 };
 
@@ -184,10 +184,7 @@ const performanceSummary = (summary, reports) => {
     metric: 'SUMMARY-PERFORMANCE-3',
     description: 'El proyecto posee un First Contentful Paint menor a 4 segundos',
     value: reports.some(
-      elem =>
-        elem.metric === `${seoMetrics.LIGHTHOUSE}-Performance` &&
-        elem.description.includes('First Contentful Paint') &&
-        elem.value >= limits.minFirstPaint
+      elem => elem.metric === seoMetrics.FIRST_CONTENTFUL_PAINT && elem.value >= limits.minFirstPaint
     )
   });
 

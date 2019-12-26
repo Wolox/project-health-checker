@@ -1,5 +1,5 @@
 const { getRepositoryInfo, getReleaseInfo } = require('./services/gitService');
-const { ERROR } = require('./constants');
+const { ERROR, gitMetrics } = require('./constants');
 
 const limits = require('../constants/limits');
 
@@ -49,9 +49,9 @@ module.exports = async (repository, organization) => {
       value: pullRequests.edges.length <= releases.edges.length
     });
     gitData.push({
-      metric: 'GITHUB',
-      description: 'Promedio de existencia de PR hasta merge (horas)',
-      value: pullRequestLifeSpan(repositoryInfo)
+      metric: gitMetrics.CODE_REVIEW_AVG_TIME,
+      description: 'Promedio de existencia de PR hasta merge',
+      value: `${pullRequestLifeSpan(repositoryInfo)}hs`
     });
   } catch {
     gitData.push({

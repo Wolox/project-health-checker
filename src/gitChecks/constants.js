@@ -1,3 +1,5 @@
+const { createObject } = require('../utils');
+
 module.exports = {
   API: 'https://api.github.com/graphql',
   REVIEW_STATE: {
@@ -7,5 +9,6 @@ module.exports = {
   },
   ERROR: {
     REPO_NOT_FOUND: 'ERROR: Could not find repository'
-  }
+  },
+  gitMetrics: createObject(['CODE_REVIEW_AVG_TIME'])
 };

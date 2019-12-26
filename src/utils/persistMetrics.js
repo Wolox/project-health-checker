@@ -4,22 +4,27 @@ const kebabCase = require('lodash.kebabcase');
 const buildMetrics = require('../buildChecks/constants');
 
 const testMetrics = require('../testChecks/constants');
-// const seoMetrics = require('../frontEnd/seoChecks/constants');
+const seoMetrics = require('../frontEnd/seoChecks/constants');
 
 const { generalMetrics } = require('../generalChecks/constants');
+
+const { gitMetrics } = require('../gitChecks/constants');
 
 const engineeringMetrics = [
   testMetrics.CODE_COVERAGE,
   generalMetrics.CODE_QUALITY,
   generalMetrics.DIRECT_DEPENDENCIES,
   buildMetrics.BUILD_TIME,
-  buildMetrics.APP_SIZE
+  buildMetrics.APP_SIZE,
+  gitMetrics.CODE_REVIEW_AVG_TIME,
+  seoMetrics.LOAD_TIME
 ];
 
 const axiosApi = axios.create({
   baseURL: process.env.API_BASE_URL,
   timeout: 10000
 });
+
 module.exports = (reportCodeQuality, tech, env, repoName) => {
   const metrics = reportCodeQuality.filter(metric =>
     engineeringMetrics.some(engMetric => engMetric === metric.metric)
@@ -31,16 +36,12 @@ module.exports = (reportCodeQuality, tech, env, repoName) => {
     metrics: metrics.map(elem => ({ name: kebabCase(elem.metric), version: '1.0', value: `${elem.value}` }))
   };
   console.log(body);
-  axiosApi
-    .post('/metrics', body)
-    .then(response => console.log(response), error => console.log(`Error:${error}`));
+  axiosApi.post('/metrics', body).then(() => process.exit(), error => console.log(`Error:${error}`));
 };
 
 /*
-LOAD_TIME
+TODO: Add following metrics
 PICK_UP_TIME
-CODE_REVIEW_AVG_TIME
-
 PRODUCTION_CRASHES
 PRE_PRODUCTION_CRASHES
 */

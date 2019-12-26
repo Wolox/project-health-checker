@@ -2,7 +2,7 @@ const { createObject } = require('../../utils');
 
 module.exports = createObject([
   'FIRST_CONTENTFUL_PAINT',
-  'FIRST_MEANINGFUL_PAINT',
+  'LOAD_TIME',
   'LIGHTHOUSE_ACCESIBILITY_OVERALL',
   'LIGHTHOUSE_SEO_OVERALL',
   'LIGHTHOUSE_PWA_OVERALL',
