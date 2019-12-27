@@ -26,13 +26,13 @@ module.exports = async testPath => {
   const buildTime = (new Date().getTime() - start.getTime()) / seconds;
   console.log(green, 'Build terminado con exito ✓');
   const data = await promisify(getSize)(`${testPath}/build`);
-  const buildSize = `${(data / mega).toFixed(2)} Mb`;
+  const buildSize = (data / mega).toFixed(2);
   rimraf.sync(`${testPath}/node_modules`);
   rimraf.sync(`${testPath}/build`);
   return [
     ...eslintData,
     ...testData,
-    { metric: buildMetrics.BUILD_TIME, description: 'Build Time', value: `${buildTime} Seg` },
-    { metric: buildMetrics.APP_SIZE, description: 'Build Size', value: buildSize }
+    { metric: buildMetrics.BUILD_TIME, description: 'Build Time - Seg', value: buildTime },
+    { metric: buildMetrics.APP_SIZE, description: 'Build Size - Mb', value: buildSize }
   ];
 };

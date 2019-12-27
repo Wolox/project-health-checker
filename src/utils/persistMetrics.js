@@ -35,7 +35,6 @@ module.exports = (reportCodeQuality, tech, env, repoName) => {
     repo_name: repoName,
     metrics: metrics.map(elem => ({ name: kebabCase(elem.metric), version: '1.0', value: `${elem.value}` }))
   };
-  console.log(body);
   axiosApi.post('/metrics', body).then(() => process.exit(), error => console.log(`Error:${error}`));
 };
 
