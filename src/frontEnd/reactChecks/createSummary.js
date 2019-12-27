@@ -18,7 +18,7 @@ const limits = {
   minBestPractices: 70,
   minSeo: 90,
   minTestCoverage: 70,
-  minFirstPaint: 70,
+  minFirstPaint: 50,
   pwaMin: 30
 };
 
