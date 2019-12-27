@@ -50,8 +50,8 @@ module.exports = async (repository, organization) => {
     });
     gitData.push({
       metric: gitMetrics.CODE_REVIEW_AVG_TIME,
-      description: 'Promedio de existencia de PR hasta merge',
-      value: `${pullRequestLifeSpan(repositoryInfo)}hs`
+      description: 'Promedio de existencia de PR hasta merge - Hs',
+      value: pullRequestLifeSpan(repositoryInfo)
     });
   } catch {
     gitData.push({
