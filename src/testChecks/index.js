@@ -21,7 +21,7 @@ module.exports = testPath => {
     percentageCoverage = parseFloat(allFilesLine.split(/\|/)[columnNeeded].trim());
   }
   testResponse.push({
-    metric: testMetrics.TEST_COVERAGE,
+    metric: testMetrics.CODE_COVERAGE,
     description: 'Porcentaje de lineas de código testeado sobre total',
     value: percentageCoverage
   });

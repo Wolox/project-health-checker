@@ -17,8 +17,8 @@ const limits = {
   minPerformance: 70,
   minBestPractices: 70,
   minSeo: 90,
-  minFirstPaint: 50,
   minTestCoverage: 70,
+  minFirstPaint: 50,
   pwaMin: 30
 };
 
@@ -38,7 +38,7 @@ const testSummary = (summary, reports) => {
     metric: 'SUMMARY-TESTING-3',
     description: 'Hay una cobertura del 70% o más en los test unitarios',
     value: reports.some(
-      elem => elem.metric === testMetrics.TEST_COVERAGE && elem.value >= limits.minTestCoverage
+      elem => elem.metric === testMetrics.CODE_COVERAGE && elem.value >= limits.minTestCoverage
     )
   });
   summary.push({
@@ -184,10 +184,7 @@ const performanceSummary = (summary, reports) => {
     metric: 'SUMMARY-PERFORMANCE-3',
     description: 'El proyecto posee un First Contentful Paint menor a 4 segundos',
     value: reports.some(
-      elem =>
-        elem.metric === `${seoMetrics.LIGHTHOUSE}-Performance` &&
-        elem.description.includes('First Contentful Paint') &&
-        elem.value >= limits.minFirstPaint
+      elem => elem.metric === seoMetrics.FIRST_CONTENTFUL_PAINT && elem.value >= limits.minFirstPaint
     )
   });
 

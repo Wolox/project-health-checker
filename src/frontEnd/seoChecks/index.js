@@ -29,13 +29,22 @@ module.exports = async url => {
     const results = await lighthouse(url, opts);
     const csv = ReportGenerator.generateReport(results.lhr, 'csv');
     const metrics = await csvtojson().fromString(csv);
-    metrics.forEach(({ category, title, type, score }) =>
-      seoResults.push({
-        metric: `${seoMetrics.LIGHTHOUSE}-${category}`,
-        description: `${title} - ${type}`,
-        value: score
-      })
+    const firstCountfulPaint = metrics.find(
+      ({ category, title }) => category === 'Performance' && title.includes('First Contentful Paint')
     );
+    seoResults.push({
+      metric: seoMetrics.FIRST_CONTENTFUL_PAINT,
+      description: firstCountfulPaint.title,
+      value: firstCountfulPaint.score * hundred
+    });
+    const firstMeaningfulPaint = metrics.find(
+      ({ category, title }) => category === 'Performance' && title.includes('First Meaningful Paint')
+    );
+    seoResults.push({
+      metric: seoMetrics.LOAD_TIME,
+      description: firstMeaningfulPaint.title,
+      value: firstMeaningfulPaint.score * hundred
+    });
     lighthouseSummary.forEach(({ metric, id }) =>
       seoResults.push({
         metric,

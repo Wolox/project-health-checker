@@ -1,11 +1,13 @@
 const rimraf = require('rimraf');
-const runEslintChecks = require('../linterChecks');
-const runTestChecks = require('../testChecks');
 const { promisify } = require('util');
 const getSize = require('get-folder-size');
+const shell = require('shelljs');
 
 const { green } = require('../constants/colors');
-const shell = require('shelljs');
+const runEslintChecks = require('../linterChecks');
+const runTestChecks = require('../testChecks');
+
+const buildMetrics = require('./constants');
 
 shell.config.silent = true;
 const seconds = 1000;
@@ -24,13 +26,13 @@ module.exports = async testPath => {
   const buildTime = (new Date().getTime() - start.getTime()) / seconds;
   console.log(green, 'Build terminado con exito ✓');
   const data = await promisify(getSize)(`${testPath}/build`);
-  const buildSize = `${(data / mega).toFixed(2)}Mb`;
+  const buildSize = `${(data / mega).toFixed(2)} Mb`;
   rimraf.sync(`${testPath}/node_modules`);
   rimraf.sync(`${testPath}/build`);
   return [
     ...eslintData,
     ...testData,
-    { metric: 'Build', description: 'Build Time', value: buildTime },
-    { metric: 'Build', description: 'Build Size', value: buildSize }
+    { metric: buildMetrics.BUILD_TIME, description: 'Build Time', value: `${buildTime} Seg` },
+    { metric: buildMetrics.APP_SIZE, description: 'Build Size', value: buildSize }
   ];
 };

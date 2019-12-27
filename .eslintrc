@@ -1,6 +1,7 @@
 {
   "extends": "eslint-config-wolox",
   "rules": {
-    "no-console": "off"
+    "no-console": "off",
+    "camelcase": ["error", { "properties": "never" }]
 }
 }
