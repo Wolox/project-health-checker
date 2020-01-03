@@ -7,7 +7,7 @@ const seoMetrics = require('./constants');
 
 const opts = {
   output: ['html', 'csv'],
-  chromeFlags: ['--headless'],
+  chromeFlags: ['--headless', '--no-sandbox'],
   view: true
 };
 
@@ -52,6 +52,7 @@ module.exports = async url => {
         value: results.lhr.categories[id].score * hundred
       })
     );
+    chrome.kill();
   }
   return seoResults;
 };

@@ -1,11 +1,9 @@
-/* eslint-disable complexity */
 /* eslint-disable max-statements */
 const { findSync } = require('find-in-files');
 const fs = require('fs');
 const read = require('read-file');
 const yaml = require('js-yaml');
 const parser = require('docker-file-parser');
-const npmCheck = require('npm-check');
 
 const { calculatePercentage } = require('../utils');
 
@@ -35,43 +33,6 @@ module.exports = async (testPath, tech) => {
       value: false
     });
   }
-
-  const currentState = await npmCheck({ cwd: testPath });
-  const packages = currentState.get('packages');
-  packages.forEach(dependency => {
-    const { moduleName, latest, packageJson, unused, bump } = dependency;
-    if (unused) {
-      generalResult.push({
-        metric: generalMetrics.UNUSED_DEPENDENCIES,
-        description: 'Dependencia no usada',
-        value: moduleName
-      });
-    } else if (bump && bump !== 'patch') {
-      generalResult.push({
-        metric: generalMetrics.OUTDATED_DEPENDENCIES,
-        description: 'Dependencia no actualizada',
-        value: `${moduleName} Version: packageJson: ${packageJson} -> ultima ${latest}`
-      });
-    }
-  });
-
-  generalResult.push({
-    metric: generalMetrics.AXIOS_APISAUCE,
-    description: 'Esta instalado axios o apisauce en el proyecto',
-    value: packages.some(({ moduleName }) => moduleName === 'axios' || moduleName === 'apisauce')
-  });
-
-  generalResult.push({
-    metric: generalMetrics.JEST,
-    description: 'Esta instalado Jest en el proyecto',
-    value: packages.some(({ moduleName }) => moduleName === 'jest')
-  });
-
-  generalResult.push({
-    metric: generalMetrics.DIRECT_DEPENDENCIES,
-    description: 'Cantidad de dependencias directas',
-    value: packages.length
-  });
 
   generalResult.push({
     metric: generalMetrics.README,

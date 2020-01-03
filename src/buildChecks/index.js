@@ -6,6 +6,7 @@ const shell = require('shelljs');
 const { green } = require('../constants/colors');
 const runEslintChecks = require('../linterChecks');
 const runTestChecks = require('../testChecks');
+const runDependencyChecks = require('../dependenciesChecks');
 
 const buildMetrics = require('./constants');
 
@@ -14,9 +15,10 @@ const seconds = 1000;
 const mega = 1000000;
 
 module.exports = async testPath => {
-  console.log(green, 'Empezando instalacion de dependencias para el build...');
-  shell.exec(`npm i --prefix ${testPath}`);
+  console.log(green, 'Empezando instalacion de dependencias...');
+  const installInfo = shell.exec(`npm i --prefix ${testPath}`);
   const testData = runTestChecks(testPath);
+  const dependencyData = await runDependencyChecks(installInfo, testPath);
   console.log(green, 'Tests terminados con exito ✓');
   const eslintData = runEslintChecks(testPath);
   console.log(green, 'Chequeos de eslint terminados con exito ✓');
@@ -32,6 +34,7 @@ module.exports = async testPath => {
   return [
     ...eslintData,
     ...testData,
+    ...dependencyData,
     { metric: buildMetrics.BUILD_TIME, description: 'Build Time - Seg', value: buildTime },
     { metric: buildMetrics.APP_SIZE, description: 'Build Size - Mb', value: buildSize }
   ];
