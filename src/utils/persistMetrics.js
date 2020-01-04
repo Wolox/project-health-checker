@@ -19,6 +19,7 @@ const engineeringMetrics = [
   buildMetrics.BUILD_TIME,
   buildMetrics.APP_SIZE,
   gitMetrics.CODE_REVIEW_AVG_TIME,
+  gitMetrics.PICK_UP_TIME,
   seoMetrics.LOAD_TIME
 ];
 
@@ -42,7 +43,6 @@ module.exports = (reportCodeQuality, tech, env, repoName) => {
 
 /*
 TODO: Add following metrics
-PICK_UP_TIME
 PRODUCTION_CRASHES
 PRE_PRODUCTION_CRASHES
 */

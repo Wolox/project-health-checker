@@ -10,5 +10,5 @@ module.exports = {
   ERROR: {
     REPO_NOT_FOUND: 'ERROR: Could not find repository'
   },
-  gitMetrics: createObject(['CODE_REVIEW_AVG_TIME'])
+  gitMetrics: createObject(['CODE_REVIEW_AVG_TIME', 'PICK_UP_TIME'])
 };

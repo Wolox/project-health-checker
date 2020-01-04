@@ -1,15 +1,10 @@
 const { getRepositoryInfo, getReleaseInfo } = require('./services/gitService');
+const getPickUpTime = require('./services/gitModule');
 const { ERROR, gitMetrics } = require('./constants');
 
 const limits = require('../constants/limits');
 
-const {
-  hasBaseBranches,
-  hasBranchProtection,
-  averageRequestChanges,
-  countBranches,
-  pullRequestLifeSpan
-} = require('./utils');
+const { hasBaseBranches, hasBranchProtection, averageRequestChanges, countBranches } = require('./utils');
 
 module.exports = async (repository, organization) => {
   const gitData = [];
@@ -48,11 +43,6 @@ module.exports = async (repository, organization) => {
       description: 'Hay un release por cada PR a master',
       value: pullRequests.edges.length <= releases.edges.length
     });
-    gitData.push({
-      metric: gitMetrics.CODE_REVIEW_AVG_TIME,
-      description: 'Promedio de existencia de PR hasta merge - Hs',
-      value: pullRequestLifeSpan(repositoryInfo)
-    });
   } catch {
     gitData.push({
       metric: 'GITHUB',
@@ -60,6 +50,19 @@ module.exports = async (repository, organization) => {
       value: ERROR.REPO_NOT_FOUND
     });
   }
+  const { pickUpTime, reviewTime } = await getPickUpTime(repository);
+
+  gitData.push({
+    metric: gitMetrics.PICK_UP_TIME,
+    description: 'Pick up Time',
+    value: pickUpTime
+  });
+
+  gitData.push({
+    metric: gitMetrics.CODE_REVIEW_AVG_TIME,
+    description: 'Promedio de existencia de PR hasta merge - Hs',
+    value: reviewTime
+  });
 
   return gitData;
 };
