@@ -21,7 +21,7 @@ module.exports.validateJenkinsFileContent = (fileContent, testPath) => {
     woloxCiValidPath: false
   };
   validations.woloxCiImport = !!fileContent.match(/@Library\s*\('wolox-ci'\)/);
-  getNodeScripts(fileContent).map(script => {
+  getNodeScripts(fileContent).forEach(script => {
     if (script.includes('checkout')) {
       validations.checkoutConfig = true;
     }

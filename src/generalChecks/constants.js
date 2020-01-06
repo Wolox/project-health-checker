@@ -17,11 +17,6 @@ module.exports.generalMetrics = createObject([
   'CODE_OWNERS',
   'FOLDER_STRUCTURE',
   'BABEL_IMPORTS',
-  'UNUSED_DEPENDENCIES',
-  'OUTDATED_DEPENDENCIES',
-  'DIRECT_DEPENDENCIES',
-  'AXIOS_APISAUCE',
-  'JEST',
   'CODE_QUALITY'
 ]);
 

@@ -5,6 +5,7 @@ const buildMetrics = require('../buildChecks/constants');
 
 const testMetrics = require('../testChecks/constants');
 const seoMetrics = require('../frontEnd/seoChecks/constants');
+const dependenciesMetrics = require('../dependenciesChecks/constants');
 
 const { generalMetrics } = require('../generalChecks/constants');
 
@@ -13,10 +14,12 @@ const { gitMetrics } = require('../gitChecks/constants');
 const engineeringMetrics = [
   testMetrics.CODE_COVERAGE,
   generalMetrics.CODE_QUALITY,
-  generalMetrics.DIRECT_DEPENDENCIES,
+  dependenciesMetrics.DIRECT_DEPENDENCIES,
+  dependenciesMetrics.INDIRECT_DEPENDENCIES,
   buildMetrics.BUILD_TIME,
   buildMetrics.APP_SIZE,
   gitMetrics.CODE_REVIEW_AVG_TIME,
+  gitMetrics.PICK_UP_TIME,
   seoMetrics.LOAD_TIME
 ];
 
@@ -35,12 +38,11 @@ module.exports = (reportCodeQuality, tech, env, repoName) => {
     repo_name: repoName,
     metrics: metrics.map(elem => ({ name: kebabCase(elem.metric), version: '1.0', value: `${elem.value}` }))
   };
-  axiosApi.post('/metrics', body).then(() => process.exit(), error => console.log(`Error:${error}`));
+  axiosApi.post('/metrics', body).catch(error => console.log(`Error: ${error}`));
 };
 
 /*
 TODO: Add following metrics
-PICK_UP_TIME
 PRODUCTION_CRASHES
 PRE_PRODUCTION_CRASHES
 */
