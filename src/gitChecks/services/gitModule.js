@@ -35,8 +35,12 @@ module.exports = async repository => {
   }}`;
 
   const response = await request(api, query);
-  const pickUpTime = response.stats.pr_pick_up_time_avg[0].value;
-  const reviewTime = response.stats.pr_review_time_avg[0].value;
+  const pickUpTime = response.stats.pr_pick_up_time_avg.length
+    ? response.stats.pr_pick_up_time_avg[0].value
+    : NaN;
+  const reviewTime = response.stats.pr_review_time_avg.length
+    ? response.stats.pr_review_time_avg[0].value
+    : NaN;
 
   return { pickUpTime, reviewTime };
 };
