@@ -20,7 +20,8 @@ const techs = {
 };
 
 const createSummary = {
-  react: require('./src/frontEnd/reactChecks/createSummary')
+  react: require('./src/frontEnd/reactChecks/createSummary'),
+  vue: require('./src/frontEnd/vueChecks/createSummary')
 };
 
 const args = parseArgs(process.argv);
@@ -76,7 +77,7 @@ async function executeChecks() {
   console.log(green, 'Chequeos de github terminados con exito ✓');
   techData = await techs[techChecks](testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
-  buildData = await runBuildChecks(testPath);
+  buildData = await runBuildChecks(testPath, techChecks);
   return [...envData, ...generalData, ...gitData, ...techData, ...buildData];
 }
 

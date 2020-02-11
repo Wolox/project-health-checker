@@ -1,7 +1,7 @@
 const axios = require('axios');
 const kebabCase = require('lodash.kebabcase');
 
-const buildMetrics = require('../buildChecks/constants');
+const { buildMetrics } = require('../buildChecks/constants');
 
 const testMetrics = require('../testChecks/constants');
 const seoMetrics = require('../frontEnd/seoChecks/constants');
