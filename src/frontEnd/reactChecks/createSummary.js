@@ -1,13 +1,12 @@
 const envMetrics = require('../../envChecks/constants');
 
-const frontendMetrics = require('../constants');
-const eslintMetrics = require('../../linterChecks/constants');
+const { eslintMetrics } = require('../../linterChecks/constants');
 const testMetrics = require('../../testChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
 
 const { generalMetrics } = require('../../generalChecks/constants');
 
-const reactMetrics = require('./constants');
+const { reactMetrics } = require('./constants');
 
 const limits = {
   i18nPercentage: 40,
@@ -117,7 +116,7 @@ const uiUxSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-UI-UX-3',
     description: 'El proyecto posee internacionalización',
-    value: reports.some(elem => elem.metric === frontendMetrics.I18N && elem.value >= limits.i18nPercentage)
+    value: reports.some(elem => elem.metric === reactMetrics.I18N && elem.value >= limits.i18nPercentage)
   });
   summary.push({
     metric: 'SUMMARY-UI-UX-4',
@@ -157,8 +156,8 @@ const clientServerSummary = (summary, reports) => {
     description:
       'Está bien delimitada la responsabilidad de los smart vs dummies components, teniendo layouts menores a 150 líneas',
     value:
-      reports.some(elem => elem.metric === frontendMetrics.INDEX_LINES && elem.value <= limits.maxFiles) &&
-      reports.some(elem => elem.metric === frontendMetrics.LAYOUT_LINES && elem.value <= limits.maxFiles)
+      reports.some(elem => elem.metric === reactMetrics.INDEX_LINES && elem.value <= limits.maxFiles) &&
+      reports.some(elem => elem.metric === reactMetrics.LAYOUT_LINES && elem.value <= limits.maxFiles)
   });
 };
 
