@@ -33,10 +33,14 @@ module.exports = (reportCodeQuality, tech, env, repoName) => {
     engineeringMetrics.some(engMetric => engMetric === metric.metric)
   );
   const body = {
-    env,
+    env: 'dev',
     tech,
     repo_name: repoName,
-    metrics: metrics.map(elem => ({ name: kebabCase(elem.metric), version: '1.0', value: `${elem.value}` }))
+    metrics: metrics.map(elem => ({
+      name: kebabCase(elem.metric),
+      version: '1.0',
+      value: `${elem.value}`
+    }))
   };
   axiosApi.post('/metrics', body).catch(error => console.log(`Error: ${error}`));
 };
