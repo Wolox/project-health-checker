@@ -24,5 +24,6 @@ module.exports.DOCKERFILE_ATTRIBUTES = ['FROM', 'WORKDIR', 'COPY', 'RUN', 'ENV',
 
 module.exports.folderStructure = {
   react: ['app', 'config', 'constants', 'redux', 'scss', 'services', 'utils'],
-  vue: ['components', 'config', 'constants', 'scss', 'services', 'store', 'utils', 'views']
+  vue: ['components', 'config', 'constants', 'scss', 'services', 'store', 'utils', 'views'],
+  angular: ['app', 'scss', 'assets']
 };

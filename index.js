@@ -21,7 +21,8 @@ const techs = {
 
 const createSummary = {
   react: require('./src/frontEnd/reactChecks/createSummary'),
-  vue: require('./src/frontEnd/vueChecks/createSummary')
+  vue: require('./src/frontEnd/vueChecks/createSummary'),
+  angular: require('./src/frontEnd/angularChecks/createSummary')
 };
 
 const args = parseArgs(process.argv);

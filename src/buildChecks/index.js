@@ -19,10 +19,10 @@ module.exports = async (testPath, tech) => {
   const buildParams = extraBuildParams[tech];
   console.log(green, 'Empezando instalacion de dependencias...');
   const installInfo = shell.exec(`npm i --prefix ${testPath}`);
-  const testData = runTestChecks(testPath);
+  // const testData = runTestChecks(testPath);
   const dependencyData = await runDependencyChecks(installInfo, testPath);
   console.log(green, 'Tests terminados con exito ✓');
-  const eslintData = runEslintChecks(testPath, tech);
+  // const eslintData = runEslintChecks(testPath, tech);
   console.log(green, 'Chequeos de eslint terminados con exito ✓');
   console.log(green, 'Generando el build...');
   const start = new Date();
@@ -34,8 +34,8 @@ module.exports = async (testPath, tech) => {
   rimraf.sync(`${testPath}/node_modules`);
   rimraf.sync(`${testPath}/${techBuildPath}`);
   return [
-    ...eslintData,
-    ...testData,
+    // ...eslintData,
+    // ...testData,
     ...dependencyData,
     { metric: buildMetrics.BUILD_TIME, description: 'Build Time - Seg', value: buildTime },
     { metric: buildMetrics.APP_SIZE, description: 'Build Size - Mb', value: buildSize }
