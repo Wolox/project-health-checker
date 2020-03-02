@@ -31,6 +31,7 @@ let techChecks = 'react';
 let organization = 'Wolox';
 let seoLink = undefined;
 let enviorment = 'development';
+let buildScriptName = 'build';
 
 if (args.env) {
   enviorment = args.env;
@@ -62,6 +63,12 @@ if (args.org) {
   organization = args.o;
 }
 
+if (args.buildScript) {
+  buildScriptName = args.buildScript;
+} else if (args.b) {
+  buildScriptName = args.b;
+}
+
 async function executeChecks() {
   let gitData = [];
   let envData = [];
@@ -77,7 +84,7 @@ async function executeChecks() {
   console.log(green, 'Chequeos de github terminados con exito ✓');
   techData = await techs[techChecks](testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
-  buildData = await runBuildChecks(testPath, techChecks);
+  buildData = await runBuildChecks(testPath, techChecks, buildScriptName);
   return [...envData, ...generalData, ...gitData, ...techData, ...buildData];
 }
 

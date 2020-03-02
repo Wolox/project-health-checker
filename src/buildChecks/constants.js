@@ -6,8 +6,3 @@ module.exports.buildPath = {
   react: 'build',
   vue: 'dist'
 };
-
-module.exports.extraBuildParams = {
-  react: 'development',
-  vue: ''
-};
