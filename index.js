@@ -64,7 +64,7 @@ if (args.org) {
 }
 
 if (args.buildScript) {
-  buildScriptName = args.build;
+  buildScriptName = args.buildScript;
 } else if (args.b) {
   buildScriptName = args.b;
 }
