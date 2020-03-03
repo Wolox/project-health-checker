@@ -13,15 +13,10 @@ const persistMetrics = require('./src/utils/persistMetrics');
 const codeQuality = require('./src/utils/codeQuality');
 const frontendChecks = require('./src/frontEnd');
 
-const techs = {
-  react: frontendChecks,
-  angular: frontendChecks,
-  vue: frontendChecks
-};
-
 const createSummary = {
   react: require('./src/frontEnd/reactChecks/createSummary'),
-  vue: require('./src/frontEnd/vueChecks/createSummary')
+  vue: require('./src/frontEnd/vueChecks/createSummary'),
+  nuxt: require('./src/frontEnd/vueChecks/createSummary')
 };
 
 const args = parseArgs(process.argv);
@@ -82,7 +77,7 @@ async function executeChecks() {
   console.log(green, 'Chequeos generales terminados con exito ✓');
   gitData = await runGitChecks(repoName, organization);
   console.log(green, 'Chequeos de github terminados con exito ✓');
-  techData = await techs[techChecks](testPath, techChecks, seoLink);
+  techData = await frontendChecks(testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
   buildData = await runBuildChecks(testPath, techChecks, buildScriptName);
   return [...envData, ...generalData, ...gitData, ...techData, ...buildData];

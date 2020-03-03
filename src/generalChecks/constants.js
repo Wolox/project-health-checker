@@ -24,5 +24,24 @@ module.exports.DOCKERFILE_ATTRIBUTES = ['FROM', 'WORKDIR', 'COPY', 'RUN', 'ENV',
 
 module.exports.folderStructure = {
   react: ['app', 'config', 'constants', 'redux', 'scss', 'services', 'utils'],
-  vue: ['components', 'config', 'constants', 'scss', 'services', 'store', 'utils', 'views']
+  vue: ['components', 'config', 'constants', 'scss', 'services', 'store', 'utils', 'views'],
+  nuxt: [
+    'assets',
+    'components',
+    'config',
+    'constants',
+    'layouts',
+    'locales',
+    'middleware',
+    'pages',
+    'plugins',
+    'services',
+    'store'
+  ]
+};
+
+module.exports.rootPath = {
+  react: 'src',
+  vue: 'src',
+  nuxt: ''
 };

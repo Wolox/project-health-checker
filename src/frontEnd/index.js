@@ -4,7 +4,8 @@ const runSeoChecks = require('./seoChecks');
 const techs = {
   react: require('./reactChecks'),
   angular: require('./angularChecks'),
-  vue: require('./vueChecks')
+  vue: require('./vueChecks'),
+  nuxt: require('./vueChecks')
 };
 
 module.exports = async (testPath, tech, seoLink) => {

@@ -28,13 +28,15 @@ const axiosApi = axios.create({
   timeout: 10000
 });
 
+const getGeneralTech = tech => (tech === 'nuxt' ? 'vue' : tech);
+
 module.exports = (reportCodeQuality, tech, env, repoName) => {
   const metrics = reportCodeQuality.filter(metric =>
     engineeringMetrics.some(engMetric => engMetric === metric.metric)
   );
   const body = {
     env,
-    tech,
+    tech: getGeneralTech(tech),
     repo_name: repoName,
     metrics: metrics.map(elem => ({
       name: kebabCase(elem.metric),
