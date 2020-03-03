@@ -35,7 +35,7 @@ module.exports = (reportCodeQuality, tech, env, repoName) => {
     engineeringMetrics.some(engMetric => engMetric === metric.metric)
   );
   const body = {
-    env: 'Prueba zecat ecc',
+    env,
     tech: getGeneralTech(tech),
     repo_name: repoName,
     metrics: metrics.map(elem => ({
