@@ -4,14 +4,14 @@ const read = require('read-file');
 
 const { calculatePercentage } = require('../utils');
 
-const { BASE_ALIASES, folderStructure, generalMetrics } = require('./constants');
+const { BASE_ALIASES, folderStructure, generalMetrics, rootPath } = require('./constants');
 
 let amountOfJs = 0;
 
 module.exports = async (testPath, tech) => {
   const generalResult = [];
 
-  const allResults = await findSync('', `${testPath}/src`, '.js$');
+  const allResults = await findSync('', `${testPath}/${rootPath[tech]}`, '.js$');
   amountOfJs = Object.keys(allResults).length;
 
   try {
@@ -42,12 +42,12 @@ module.exports = async (testPath, tech) => {
     value: fs.existsSync(`${testPath}/.babelrc.js`)
   });
 
-  if (fs.existsSync(`${testPath}/src`)) {
+  if (fs.existsSync(`${testPath}/${rootPath[tech]}`)) {
     folderStructure[tech].forEach(element =>
       generalResult.push({
         metric: generalMetrics.FOLDER_STRUCTURE,
-        description: `Existe un archivo ${element} dentro de src`,
-        value: fs.existsSync(`${testPath}/src/${element}`)
+        description: `Existe un archivo ${element} dentro del root del proyecto`,
+        value: fs.existsSync(`${testPath}/${rootPath[tech]}/${element}`)
       })
     );
   } else {
@@ -71,7 +71,7 @@ module.exports = async (testPath, tech) => {
       })
     );
 
-    const importsResult = await findSync("from '@.+';", `${testPath}/src`, '.js$');
+    const importsResult = await findSync("from '@.+';", `${testPath}/${rootPath[tech]}`, '.js$');
     const importCalculationResult = calculatePercentage(importsResult, amountOfJs);
     generalResult.push({
       metric: 'Import',
