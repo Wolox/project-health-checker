@@ -7,9 +7,3 @@ module.exports.buildPath = {
   vue: 'dist',
   nuxt: '.nuxt'
 };
-
-module.exports.extraBuildParams = {
-  react: 'development',
-  vue: '',
-  nuxt: ''
-};
