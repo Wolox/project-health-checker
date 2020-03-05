@@ -30,11 +30,12 @@ let testPath = '';
 let techChecks = 'react';
 let organization = 'Wolox';
 let seoLink = undefined;
-let enviorment = 'development';
+let environment = 'development';
 let buildScriptName = 'build';
+let filesToCreate = undefined;
 
 if (args.env) {
-  enviorment = args.env;
+  environment = args.env;
 }
 
 if (args.path) {
@@ -69,6 +70,12 @@ if (args.buildScript) {
   buildScriptName = args.b;
 }
 
+if (args.requiredFiles) {
+  filesToCreate = args.requiredFiles;
+} else if (args.f) {
+  filesToCreate = args.f;
+}
+
 async function executeChecks() {
   let gitData = [];
   let envData = [];
@@ -84,7 +91,7 @@ async function executeChecks() {
   console.log(green, 'Chequeos de github terminados con exito ✓');
   techData = await techs[techChecks](testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
-  buildData = await runBuildChecks(testPath, techChecks, buildScriptName);
+  buildData = await runBuildChecks(testPath, techChecks, buildScriptName, filesToCreate);
   return [...envData, ...generalData, ...gitData, ...techData, ...buildData];
 }
 
@@ -98,7 +105,7 @@ async function executeAudit() {
     writeSpreadSheet(reportCodeQuality, testPath);
   } else {
     console.log(green, 'Persistiendo Metricas...');
-    persistMetrics(reportCodeQuality, techChecks, enviorment, repoName);
+    persistMetrics(reportCodeQuality, techChecks, environment, repoName);
   }
 }
 
