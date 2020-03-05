@@ -14,11 +14,8 @@ shell.config.silent = true;
 const seconds = 1000;
 const mega = 1000000;
 
-module.exports = async (testPath, tech, buildScriptName, filesToCreate) => {
+module.exports = async (testPath, tech, buildScriptName) => {
   const techBuildPath = buildPath[tech];
-  if (filesToCreate) {
-    filesToCreate.split(',').forEach(fileName => shell.exec(`touch ${testPath}/${fileName}`));
-  }
   console.log(green, 'Empezando instalacion de dependencias...');
   const installInfo = shell.exec(`npm i --prefix ${testPath}`);
   const testData = runTestChecks(testPath);

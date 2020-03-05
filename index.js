@@ -1,5 +1,6 @@
 require('dotenv').config();
 const parseArgs = require('minimist');
+const shell = require('shelljs');
 
 const runEnvChecks = require('./src/envChecks');
 const runGeneralChecks = require('./src/generalChecks');
@@ -91,11 +92,14 @@ async function executeChecks() {
   console.log(green, 'Chequeos de github terminados con exito ✓');
   techData = await techs[techChecks](testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
-  buildData = await runBuildChecks(testPath, techChecks, buildScriptName, filesToCreate);
+  buildData = await runBuildChecks(testPath, techChecks, buildScriptName);
   return [...envData, ...generalData, ...gitData, ...techData, ...buildData];
 }
 
 async function executeAudit() {
+  if (filesToCreate) {
+    filesToCreate.split(',').forEach(fileName => shell.exec(`touch ${testPath}/${fileName}`));
+  }
   const reports = await executeChecks();
   const reportWithSummary = createSummary[techChecks](reports);
   const reportCodeQuality = codeQuality(reportWithSummary);
