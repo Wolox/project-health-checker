@@ -1,5 +1,6 @@
 require('dotenv').config();
 const parseArgs = require('minimist');
+const shell = require('shelljs');
 
 const runEnvChecks = require('./src/envChecks');
 const runGeneralChecks = require('./src/generalChecks');
@@ -25,11 +26,12 @@ let testPath = '';
 let techChecks = 'react';
 let organization = 'Wolox';
 let seoLink = undefined;
-let enviorment = 'development';
+let environment = 'development';
 let buildScriptName = 'build';
+let filesToCreate = undefined;
 
 if (args.env) {
-  enviorment = args.env;
+  environment = args.env;
 }
 
 if (args.path) {
@@ -64,6 +66,12 @@ if (args.buildScript) {
   buildScriptName = args.b;
 }
 
+if (args.requiredFiles) {
+  filesToCreate = args.requiredFiles;
+} else if (args.f) {
+  filesToCreate = args.f;
+}
+
 async function executeChecks() {
   let gitData = [];
   let envData = [];
@@ -84,6 +92,9 @@ async function executeChecks() {
 }
 
 async function executeAudit() {
+  if (filesToCreate) {
+    filesToCreate.split(',').forEach(fileName => shell.exec(`touch ${testPath}/${fileName}`));
+  }
   const reports = await executeChecks();
   const reportWithSummary = createSummary[techChecks](reports);
   const reportCodeQuality = codeQuality(reportWithSummary);
@@ -93,7 +104,7 @@ async function executeAudit() {
     writeSpreadSheet(reportCodeQuality, testPath);
   } else {
     console.log(green, 'Persistiendo Metricas...');
-    persistMetrics(reportCodeQuality, techChecks, enviorment, repoName);
+    persistMetrics(reportCodeQuality, techChecks, environment, repoName);
   }
 }
 
