@@ -25,7 +25,10 @@ module.exports = async (testPath, tech, buildScriptName) => {
   console.log(green, 'Chequeos de eslint terminados con exito ✓');
   console.log(green, 'Generando el build...');
   const start = new Date();
-  shell.exec(`npm run ${buildScriptName} --prefix ${testPath}`);
+  const buildExec = shell.exec(`npm run ${buildScriptName} --prefix ${testPath}`);
+  if (buildExec.stderr) {
+    console.log(buildExec.stderr);
+  }
   const buildTime = (new Date().getTime() - start.getTime()) / seconds;
   console.log(green, 'Build terminado con exito ✓');
   const data = await promisify(getSize)(`${testPath}/${techBuildPath}`);
