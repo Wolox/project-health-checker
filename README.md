@@ -98,7 +98,8 @@ Note: Once the project becomes a npm package this command will change
 }
 ```
 
-- Add `CI=true` to package.json test script (so it doesn't run the test in interactive mode and the script can run the tests)
+- Add `CI=true` to package.json test script (so it doesn't run the test in interactive mode and the script can run the tests).
+
 
 - If it doesn't exist create a `jenkinsfile` on the root of the project with this content:
 
@@ -118,9 +119,9 @@ Note: Once the project becomes a npm package this command will change
 
   - `branch:` The checks will be executed on the specified.branch after merging a PR into it.
 
-  - `tech:` [angular|react|vue] [*Default if omitted: react].
+  - `tech:` [angular|react|vue] [*Default if omitted*: react].
 
-  - `buildScript:` Name and parameters used by the build script (without npm run) [*Default if omitted: build].
+  - `buildScript:` Name and parameters used by the build script (without npm run) [*Default if omitted*: build].
   
   - `requiredFiles:` Files needed to build the project that are not present on the remote repository.
 
@@ -165,15 +166,17 @@ WORKDIR /home/node/app
 
 - Add webhook to github in order to run the script after every PR merge, using the following configuration. Ask a TL for help with this.
 
-  - Payload URL: http://ci.wolox.com.ar:8080/generic-webhook-trigger/invoke?token=metrics
+```
+- Payload URL: http://ci.wolox.com.ar:8080/generic-webhook-trigger/invoke?token=metrics
 
-  - Content Type: application/json
+- Content Type: application/json
 
-  - Individual events: Pull requests
+- Individual events: Pull requests
 
-  With the required configuration set, activate the webhook!
+```
 
-- After activating the webhooks and merging a PR check with a TL if the metrics were persisted.
+- Activate the webhook, and after it merge a PR and check with a TL if the metrics were persisted.
+
 ---
 ## About
 [![Wolox](./assets/wolox_banner.png)](https://github.com/orgs/Wolox/teams/front-end-army/members)
