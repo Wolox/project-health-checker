@@ -50,7 +50,7 @@ Note: Once the project becomes a npm package this command will change
 |`-t --tech [angular/react/vue]`|Choose which technology checks applies to your project|Will use react as default technology|
 |`-l --link [github.com]`|This argument is necessary if you want to run a lighthouse audit against the project's site in any environment|Won't run the check|
 |`-b --buildScript ['build development']`| npm script name which is used to generate the project's build| The default value will be 'build'|
-|`-f --requiredFiles [file1,file2]`|Files that need to exist before building the project||
+|`-f --requiredFiles ['file1,file2']`|Files that need to exist before building the project||
 
 ### Examples
 
@@ -130,7 +130,7 @@ Example:
 {
   "link": "http://dev-project.com",
   "branch": "development",
-  "tech": "angular",
+  "tech": "vue",
   "buildScript": "build development",
   "requiredFiles": ".env.development,aws.js"
 }
@@ -167,7 +167,7 @@ WORKDIR /home/node/app
 - Add webhook to github in order to run the script after every PR merge, using the following configuration. Ask a TL for help with this.
 
 ```
-- Payload URL: http://ci.wolox.com.ar:8080/generic-webhook-trigger/invoke?token=metrics
+- Payload URL: **Ask a TL for this URL**
 
 - Content Type: application/json
 
