@@ -2,8 +2,9 @@ const rimraf = require('rimraf');
 const { promisify } = require('util');
 const getSize = require('get-folder-size');
 const shell = require('shelljs');
+const fs = require('fs');
 
-const { green } = require('../constants/colors');
+const { green, red } = require('../constants/colors');
 const runEslintChecks = require('../linterChecks');
 const runTestChecks = require('../testChecks');
 const runDependencyChecks = require('../dependenciesChecks');
@@ -15,6 +16,8 @@ const seconds = 1000;
 const mega = 1000000;
 
 module.exports = async (testPath, tech, buildScriptName) => {
+  let buildTime = 0;
+  let buildSize = 0;
   const techBuildPath = buildPath[tech];
   console.log(green, 'Empezando instalacion de dependencias...');
   const installInfo = shell.exec(`npm i --prefix ${testPath}`);
@@ -29,12 +32,19 @@ module.exports = async (testPath, tech, buildScriptName) => {
   if (buildExec.stderr) {
     console.log(buildExec.stderr);
   }
-  const buildTime = (new Date().getTime() - start.getTime()) / seconds;
-  console.log(green, 'Build terminado con exito ✓');
-  const data = await promisify(getSize)(`${testPath}/${techBuildPath}`);
-  const buildSize = (data / mega).toFixed(2);
-  rimraf.sync(`${testPath}/node_modules`);
-  rimraf.sync(`${testPath}/${techBuildPath}`);
+  if (fs.existsSync(`${testPath}/${techBuildPath}`)) {
+    buildTime = (new Date().getTime() - start.getTime()) / seconds;
+    console.log(green, 'Build terminado con exito ✓');
+    const data = await promisify(getSize)(`${testPath}/${techBuildPath}`);
+    buildSize = (data / mega).toFixed(2);
+    rimraf.sync(`${testPath}/node_modules`);
+    rimraf.sync(`${testPath}/${techBuildPath}`);
+  } else {
+    console.log(
+      red,
+      'El build no se pudo generar con exito. BUILD_TIME y APP_SIZE no se han podido sacar correctamente'
+    );
+  }
   return [
     ...eslintData,
     ...testData,
