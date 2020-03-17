@@ -11,7 +11,7 @@ module.exports = reports => {
       metric: generalMetrics.CODE_QUALITY,
       description: 'Calidad del proyecto',
       value: (
-        (onlyBooleanSummary.filter(elem => elem.value).length / onlyBooleanSummary.length) * hundred || 0).toFixed(2) // eslint-disable-line
+        (onlyBooleanSummary.filter(elem => elem.value).length / onlyBooleanSummary.length) * hundred).toFixed(2) // eslint-disable-line
     }
   ];
 };
