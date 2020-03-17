@@ -16,8 +16,8 @@ const seconds = 1000;
 const mega = 1000000;
 
 module.exports = async (testPath, tech, buildScriptName) => {
-  let buildTime = 0;
-  let buildSize = 0;
+  let buildTime = undefined;
+  let buildSize = undefined;
   const techBuildPath = buildPath[tech];
   console.log(green, 'Empezando instalacion de dependencias...');
   const installInfo = shell.exec(`npm i --prefix ${testPath}`);

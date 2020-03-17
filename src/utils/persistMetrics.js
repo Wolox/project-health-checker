@@ -38,11 +38,13 @@ module.exports = (reportCodeQuality, tech, env, repoName) => {
     env,
     tech: getGeneralTech(tech),
     repo_name: repoName,
-    metrics: metrics.map(elem => ({
-      name: kebabCase(elem.metric),
-      version: '1.0',
-      value: `${elem.value}`
-    }))
+    metrics: metrics
+      .filter(({ value }) => !isNaN(value))
+      .map(elem => ({
+        name: kebabCase(elem.metric),
+        version: '1.0',
+        value: `${elem.value}`
+      }))
   };
   axiosApi.post('/metrics', body).catch(error => console.log(`Error: ${error}`));
 };
