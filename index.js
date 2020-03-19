@@ -88,7 +88,6 @@ async function executeChecks() {
   let techData = [];
   let buildData = [];
   let crashesData = [];
-  /*
   console.log(green, 'Comenzando auditoria...');
   envData = await runEnvChecks(testPath);
   console.log(green, 'Chequeos de env terminados con exito ✓');
@@ -99,7 +98,6 @@ async function executeChecks() {
   techData = await frontendChecks(testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
   buildData = await runBuildChecks(testPath, techChecks, buildScriptName);
-  */
   crashesData = await runCrashesChecks(kibanaProjectName);
   return [...envData, ...generalData, ...gitData, ...techData, ...buildData, ...crashesData];
 }
@@ -108,9 +106,7 @@ async function executeAudit() {
   if (filesToCreate) {
     filesToCreate.split(',').forEach(fileName => shell.exec(`touch ${testPath}/${fileName}`));
   }
-  const asd = repoName;
   const reports = await executeChecks();
-  /*
   const reportWithSummary = createSummary[techChecks](reports);
   const reportCodeQuality = codeQuality(reportWithSummary);
   console.log(green, 'Chequeos terminados con exito ✓');
@@ -121,7 +117,6 @@ async function executeAudit() {
     console.log(green, 'Persistiendo Metricas...');
     persistMetrics(reportCodeQuality, techChecks, environment, repoName);
   }
-  */
 }
 
 executeAudit();

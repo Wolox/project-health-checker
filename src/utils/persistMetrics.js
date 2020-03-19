@@ -10,6 +10,7 @@ const dependenciesMetrics = require('../dependenciesChecks/constants');
 const { generalMetrics } = require('../generalChecks/constants');
 
 const { gitMetrics } = require('../gitChecks/constants');
+const { DEFAULT_ENVIRONMENTS_INFO } = require('../crashesChecks/constants');
 
 const engineeringMetrics = [
   testMetrics.CODE_COVERAGE,
@@ -20,7 +21,9 @@ const engineeringMetrics = [
   buildMetrics.APP_SIZE,
   gitMetrics.CODE_REVIEW_AVG_TIME,
   gitMetrics.PICK_UP_TIME,
-  seoMetrics.LOAD_TIME
+  seoMetrics.LOAD_TIME,
+  DEFAULT_ENVIRONMENTS_INFO.PRODUCTION.metricName,
+  DEFAULT_ENVIRONMENTS_INFO.PRE_PRODUCTION.metricName
 ];
 
 const axiosApi = axios.create({
@@ -46,9 +49,3 @@ module.exports = (reportCodeQuality, tech, env, repoName) => {
   };
   axiosApi.post('/metrics', body).catch(error => console.log(`Error: ${error}`));
 };
-
-/*
-TODO: Add following metrics
-PRODUCTION_CRASHES
-PRE_PRODUCTION_CRASHES
-*/
