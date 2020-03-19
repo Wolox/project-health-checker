@@ -73,10 +73,10 @@ if (args.requiredFiles) {
   filesToCreate = args.f;
 }
 
-if (args.kibana) {
-  kibanaProjectName = args.kibana;
-} else if (args.k) {
-  kibanaProjectName = args.k;
+if (args.apm) {
+  kibanaProjectName = args.apm;
+} else if (args.a) {
+  kibanaProjectName = args.a;
 } else {
   kibanaProjectName = repoName;
 }
