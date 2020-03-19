@@ -2,7 +2,7 @@ const api = require('../config/api');
 
 module.exports = {
   getProjectEnvironmentErrors: (projectName, environment) => {
-    api.get(`/${process.env.APM_VERSION}-error-*/_count`, {
+    const body = {
       query: {
         bool: {
           must: [
@@ -26,6 +26,8 @@ module.exports = {
           ]
         }
       }
-    });
+    };
+    const url = `/${process.env.APM_VERSION}-error-*/_count`;
+    return api.post(url, body);
   }
 };

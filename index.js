@@ -108,6 +108,7 @@ async function executeAudit() {
   if (filesToCreate) {
     filesToCreate.split(',').forEach(fileName => shell.exec(`touch ${testPath}/${fileName}`));
   }
+  const asd = repoName;
   const reports = await executeChecks();
   /*
   const reportWithSummary = createSummary[techChecks](reports);
