@@ -29,7 +29,7 @@ let seoLink = undefined;
 let environment = 'development';
 let buildScriptName = 'build';
 let filesToCreate = undefined;
-let kibanaProjectName = '';
+let apmProjectName = '';
 
 if (args.env) {
   environment = args.env;
@@ -74,11 +74,11 @@ if (args.requiredFiles) {
 }
 
 if (args.apm) {
-  kibanaProjectName = args.apm;
+  apmProjectName = args.apm;
 } else if (args.a) {
-  kibanaProjectName = args.a;
+  apmProjectName = args.a;
 } else {
-  kibanaProjectName = repoName;
+  apmProjectName = repoName;
 }
 
 async function executeChecks() {
@@ -98,7 +98,7 @@ async function executeChecks() {
   techData = await frontendChecks(testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
   buildData = await runBuildChecks(testPath, techChecks, buildScriptName);
-  crashesData = await runCrashesChecks(kibanaProjectName);
+  crashesData = await runCrashesChecks(apmProjectName);
   return [...envData, ...generalData, ...gitData, ...techData, ...buildData, ...crashesData];
 }
 
