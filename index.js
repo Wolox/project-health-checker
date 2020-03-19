@@ -5,8 +5,8 @@ const shell = require('shelljs');
 const runEnvChecks = require('./src/envChecks');
 const runGeneralChecks = require('./src/generalChecks');
 const runGitChecks = require('./src/gitChecks');
-
 const runBuildChecks = require('./src/buildChecks');
+const runCrashesChecks = require('./src/crashesChecks');
 
 const { green } = require('./src/constants/colors');
 const writeSpreadSheet = require('./src/utils/writeSheet');
@@ -29,6 +29,7 @@ let seoLink = undefined;
 let environment = 'development';
 let buildScriptName = 'build';
 let filesToCreate = undefined;
+let apmProjectName = '';
 
 if (args.env) {
   environment = args.env;
@@ -72,12 +73,21 @@ if (args.requiredFiles) {
   filesToCreate = args.f;
 }
 
+if (args.apm) {
+  apmProjectName = args.apm;
+} else if (args.a) {
+  apmProjectName = args.a;
+} else {
+  apmProjectName = repoName;
+}
+
 async function executeChecks() {
   let gitData = [];
   let envData = [];
   let generalData = [];
   let techData = [];
   let buildData = [];
+  let crashesData = [];
   console.log(green, 'Comenzando auditoria...');
   envData = await runEnvChecks(testPath);
   console.log(green, 'Chequeos de env terminados con exito ✓');
@@ -88,7 +98,8 @@ async function executeChecks() {
   techData = await frontendChecks(testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
   buildData = await runBuildChecks(testPath, techChecks, buildScriptName);
-  return [...envData, ...generalData, ...gitData, ...techData, ...buildData];
+  crashesData = await runCrashesChecks(apmProjectName);
+  return [...envData, ...generalData, ...gitData, ...techData, ...buildData, ...crashesData];
 }
 
 async function executeAudit() {
