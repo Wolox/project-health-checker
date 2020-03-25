@@ -8,4 +8,4 @@ exports.analyzeMatches = matches => Object.keys(matches).filter(key => removeCom
 
 exports.calculatePercentage = (results, total) =>
   // eslint-disable-next-line prettier/prettier
-  (this.analyzeMatches(results).length / total * percentage).toFixed(2);
+  this.analyzeMatches(results).length / total * percentage;

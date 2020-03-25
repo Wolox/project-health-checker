@@ -36,7 +36,7 @@ module.exports = async (testPath, tech, buildScriptName) => {
     buildTime = (new Date().getTime() - start.getTime()) / seconds;
     console.log(green, 'Build terminado con exito ✓');
     const data = await promisify(getSize)(`${testPath}/${techBuildPath}`);
-    buildSize = (data / mega).toFixed(2);
+    buildSize = data / mega;
     rimraf.sync(`${testPath}/node_modules`);
     rimraf.sync(`${testPath}/${techBuildPath}`);
   } else {
