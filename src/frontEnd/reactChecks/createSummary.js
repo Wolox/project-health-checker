@@ -2,6 +2,7 @@ const envMetrics = require('../../envChecks/constants');
 
 const { eslintMetrics } = require('../../linterChecks/constants');
 const testMetrics = require('../../testChecks/constants');
+const dependenciesMetrics = require('../../dependenciesChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
 
 const { generalMetrics } = require('../../generalChecks/constants');
@@ -25,7 +26,7 @@ const testSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-TESTING-1',
     description: 'La arquitectura de la aplicación se encuentra preparada para implementar test unitarios',
-    value: reports.some(elem => elem.metric === generalMetrics.JEST && elem.value)
+    value: reports.some(elem => elem.metric === dependenciesMetrics.JEST && elem.value)
   });
   summary.push({
     metric: 'SUMMARY-TESTING-2',
@@ -77,14 +78,14 @@ const buildingSummary = (summary, reports) => {
     metric: 'SUMMARY-BUILDING-1',
     description: 'El proyecto utiliza la ultima o anteultima versión del framework',
     value: !reports.some(
-      elem => elem.metric === generalMetrics.OUTDATED_DEPENDENCIES && elem.value.includes('react')
+      elem => elem.metric === dependenciesMetrics.OUTDATED_DEPENDENCIES && elem.value.includes('react')
     )
   });
   summary.push({
     metric: 'SUMMARY-BUILDING-2',
     description: 'Las dependencias del proyecto están actualizadas',
     value:
-      reports.filter(elem => elem.metric === generalMetrics.UNUSED_DEPENDENCIES).length <=
+      reports.filter(elem => elem.metric === dependenciesMetrics.UNUSED_DEPENDENCIES).length <=
       limits.maxUnusedDependencies
   });
   summary.push({
@@ -137,7 +138,7 @@ const clientServerSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-2',
     description: 'Se utiliza una configuración de apisauce / axios para cada API que se comunique',
-    value: reports.some(elem => elem.metric === generalMetrics.AXIOS_APISAUCE && elem.value)
+    value: reports.some(elem => elem.metric === dependenciesMetrics.AXIOS_APISAUCE && elem.value)
   });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-3',
@@ -175,7 +176,7 @@ const performanceSummary = (summary, reports) => {
     metric: 'SUMMARY-PERFORMANCE-2',
     description: 'El proyecto posee métricas de SEO (según lighthouse) mayor al 90%',
     value: reports.some(
-      elem => elem.metric === seoMetrics.LIGHTHOUSE_PERFORMANCE_OVERALL && elem.value >= limits.minSeo
+      elem => elem.metric === seoMetrics.LIGHTHOUSE_SEO_OVERALL && elem.value >= limits.minSeo
     )
   });
 
