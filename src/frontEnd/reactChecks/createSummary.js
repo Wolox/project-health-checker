@@ -131,7 +131,7 @@ const clientServerSummary = (summary, reports) => {
     description: 'El proyecto posee services dedicados a los distintos recurso que posee',
     value: reports.some(
       elem =>
-        elem.metric === reactMetrics.FOLDER_STRUCTURE && elem.description.includes('services') && elem.value
+        elem.metric === generalMetrics.FOLDER_STRUCTURE && elem.description.includes('services') && elem.value
     )
   });
   summary.push({
