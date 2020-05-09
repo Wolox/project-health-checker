@@ -1,13 +1,17 @@
 const dependenciesChecks = require('../../dependenciesChecks/constants');
 const testMetrics = require('../../testChecks/constants');
 const envMetrics = require('../../envChecks/constants');
+const { generalMetrics } = require('../../generalChecks/constants');
+const { vueMetrics } = require('../../vueChecks/constants');
+const { eslintMetrics } = require('../../linterChecks/constants');
+const seoMetrics = require('../seoChecks/constants');
 
 const limits = {
   reduxRecomposePercentage: 70
 };
 
 const testSummary = (summary, reports) => {
-  console.log('Resports', reports);
+  console.log('-- REPORTS --\n', reports, '\n ---------------------- \n'); // ! Remove after commit
   summary.push({
     metric: 'SUMMARY-TESTING-1',
     description: 'La arquitectura de la aplicación se encuentra preparada para implementar test unitarios',
@@ -49,17 +53,20 @@ const securitySummary = (summary, reports) => {
     description: 'Existe un .env con variables de entorno en el proyecto',
     value: reports.some(elem => elem.metric === envMetrics.ENV_IS_USED && elem.value)
   });
+
   summary.push({
     metric: 'SUMMARY-SECURITY-2',
     description:
       'Las credenciales para firmar a producción se encuentran en un lugar seguro y disponible para el equipo de desarrollo y el TM',
     value: 'Manual'
   });
+
   summary.push({
     metric: 'SUMMARY-SECURITY-3',
     description: 'No se guardan claves secretas en texto plano o en constantes dentro de la aplicación',
     value: 'Manual'
   });
+
   summary.push({
     metric: 'SUMMARY-SECURITY-5',
     description: 'Las contraseñas no son nunca visibles para el usuario despues del login',
@@ -67,10 +74,84 @@ const securitySummary = (summary, reports) => {
   });
 };
 
+const buildingSummary = (summary, reports) => {
+  summary.push({
+    metric: 'SUMMARY-BUILDING-1',
+    description: 'El proyecto utiliza la ultima o anteultima versión del framework',
+    value: !reports.some(
+      elem => elem.metric === generalMetrics.OUTDATED_DEPENDENCIES && elem.value.includes('vue')
+    )
+  });
+
+  summary.push({
+    metric: 'SUMMARY-BUILDING-2',
+    description: 'Las dependencias del proyecto están actualizadas',
+    value:
+      reports.filter(elem => elem.metric === generalMetrics.UNUSED_DEPENDENCIES).length <=
+      limits.maxUnusedDependencies
+  });
+
+  summary.push({
+    metric: 'SUMMARY-BUILDING-3',
+    description: 'Se utiliza el package de deploy para la gestión de releases',
+    value: 'Manual'
+  });
+
+  summary.push({
+    metric: 'SUMMARY-BUILDING-4',
+    description: 'Se corre el checkeo de linter tanto antes de generar un build como de push',
+    value: reports.some(({ metric, value }) => metric === eslintMetrics.ESLINT_ERRORS && !!value)
+  });
+
+  summary.push({
+    metric: 'SUMMARY-BUILDING-5',
+    description: 'El proyecto genera archivos minificados en el build',
+    value: 'N/A'
+  });
+
+  summary.push({
+    metric: 'SUMMARY-BUILDING-6',
+    description:
+      'El proyecto usa webpack para generar el build en producción y babel para los imports con alias',
+    value: reports.find(report => report.metric === vueMetrics.CLI_SERVICE).value
+  });
+};
+
+const uiUxSummary = (summary, reports) => {
+  summary.push({
+    metric: 'SUMMARY-UI-UX-1',
+    description: 'El proyecto es mobile friendly según lighthouse',
+    value: reports.some(
+      elem => elem.metric === seoMetrics.LIGHTHOUSE_PWA_OVERALL && elem.value >= limits.pwaMin
+    )
+  });
+
+  summary.push({
+    metric: 'SUMMARY-UI-UX-2',
+    description: 'El proyecto usa Sass respetando el linter correspondiente',
+    value: reports.some(elem => elem.metric === eslintMetrics.ESLINT_CONFIG && elem.value)
+  });
+
+  summary.push({
+    metric: 'SUMMARY-UI-UX-3',
+    description: 'El proyecto posee internacionalización',
+    value: reports.some(elem => elem.metric === generalMetrics.I18N && elem.value >= limits.i18nPercentage)
+  });
+
+  // TODO: Review for Vue case
+  // summary.push({
+  //   metric: 'SUMMARY-UI-UX-4',
+  //   description: 'Proyecto respeta la estructura de directorios sugerida',
+  //   value: reports.filter(elem => elem.metric === generalMetrics.FOLDER_STRUCTURE).every(elem => elem.value)
+  // });
+};
+
 module.exports = reports => {
   //  TODO: Create a summary based on the vue DSP
   const summary = [];
   testSummary(summary, reports);
   securitySummary(summary, reports);
+  buildingSummary(summary, reports);
+  uiUxSummary(summary, reports);
   return [...summary, ...reports];
 };

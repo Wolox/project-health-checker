@@ -17,7 +17,8 @@ module.exports.generalMetrics = createObject([
   'CODE_OWNERS',
   'FOLDER_STRUCTURE',
   'BABEL_IMPORTS',
-  'CODE_QUALITY'
+  'CODE_QUALITY',
+  'I18N'
 ]);
 
 module.exports.DOCKERFILE_ATTRIBUTES = ['FROM', 'WORKDIR', 'COPY', 'RUN', 'ENV', 'WORKDIR'];
