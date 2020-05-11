@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const percentage = 100;
 
 const removeComments = match => match.line.filter(line => line.substring(0, 2) !== '//');
@@ -9,3 +11,5 @@ exports.analyzeMatches = matches => Object.keys(matches).filter(key => removeCom
 exports.calculatePercentage = (results, total) =>
   // eslint-disable-next-line prettier/prettier
   this.analyzeMatches(results).length / total * percentage;
+
+exports.fetchJSON = path => JSON.parse(fs.readFileSync(path));
