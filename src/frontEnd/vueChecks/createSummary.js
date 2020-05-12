@@ -2,7 +2,7 @@ const dependenciesChecks = require('../../dependenciesChecks/constants');
 const testMetrics = require('../../testChecks/constants');
 const envMetrics = require('../../envChecks/constants');
 const { generalMetrics } = require('../../generalChecks/constants');
-const { vueMetrics } = require('../../vueChecks/constants');
+const { vueMetrics } = require('../vueChecks/constants');
 const { eslintMetrics } = require('../../linterChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
 
@@ -113,7 +113,7 @@ const buildingSummary = (summary, reports) => {
     metric: 'SUMMARY-BUILDING-6',
     description:
       'El proyecto usa webpack para generar el build en producción y babel para los imports con alias',
-    value: reports.find(report => report.metric === vueMetrics.CLI_SERVICE).value
+    value: reports.find(({ metric }) => metric === vueMetrics.USE_CLI_SERVICE).value
   });
 };
 
@@ -138,12 +138,17 @@ const uiUxSummary = (summary, reports) => {
     value: reports.some(elem => elem.metric === generalMetrics.I18N && elem.value >= limits.i18nPercentage)
   });
 
-  // TODO: Review for Vue case
-  // summary.push({
-  //   metric: 'SUMMARY-UI-UX-4',
-  //   description: 'Proyecto respeta la estructura de directorios sugerida',
-  //   value: reports.filter(elem => elem.metric === generalMetrics.FOLDER_STRUCTURE).every(elem => elem.value)
-  // });
+  summary.push({
+    metric: 'SUMMARY-UI-UX-4',
+    description: 'Proyecto respeta la estructura de directorios sugerida',
+    value: reports.filter(elem => elem.metric === generalMetrics.FOLDER_STRUCTURE).every(elem => elem.value)
+  });
+
+  summary.push({
+    metric: 'SUMMARY-UI-UX-7',
+    description: 'SFC que no estén al nivel de app deben estar scoped',
+    value: false
+  });
 };
 
 module.exports = reports => {
