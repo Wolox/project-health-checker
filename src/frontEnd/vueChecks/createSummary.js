@@ -180,7 +180,7 @@ const clientServerSummary = (summary, reports) => {
       let hasVuexDependency = false;
       let hasVuexImport = false;
 
-      reports.foEarch(elem => {
+      reports.forEach(elem => {
         if (elem.metric === dependenciesMetrics.VUEX && elem.value) {
           hasVuexDependency = true;
         }

@@ -6,7 +6,6 @@ const dependenciesMetrics = require('../../dependenciesChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
 
 const { generalMetrics } = require('../../generalChecks/constants');
-const dependenciesMetrics = require('../../dependenciesChecks/constants');
 
 const { reactMetrics } = require('./constants');
 

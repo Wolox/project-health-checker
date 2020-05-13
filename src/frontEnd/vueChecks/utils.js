@@ -22,8 +22,8 @@ module.exports.checkVueTemplate = async testPath => {
 };
 
 module.exports.checkVuexUse = async testPath => {
-  const response = await find(/^import [Vv]uex from 'vuex'/, `${testPath}/src/store`, 'index.js$')
-    .then(results => console.log('Vuex results', results) || !!Object.keys(results).length)
+  const response = await find(/import [Vv]uex from 'vuex'/, `${testPath}/src/store`, 'index.js$')
+    .then(results => !!Object.keys(results).length)
     .catch(() => false);
 
   return response;
