@@ -1,24 +1,13 @@
-const fs = require('fs');
-const { vueMetrics, VUE_BUILD_SCRIPT_REGEX } = require('./constants');
-const { checkScopedFiles, checkVueTemplate, checkVuexUse } = require('./utils');
+const { vueMetrics } = require('./constants');
+const { checkScopedFiles, checkVueTemplate, checkVuexUse, checkBuildScript } = require('./utils');
 
 module.exports = async testPath => {
   const vueResult = [];
 
-  /*
-    When this https://github.com/Wolox/project-health-checker/pull/55 is merged
-    use the following code instead nest 2 lines:
-
-    const { fetchJSON } = '../../utils';
-    const { scripts } = fetchJSON(`${testPath}/package.json`);
-  */
-  const rawPackageJson = fs.readFileSync(`${testPath}/package.json`);
-  const { scripts } = JSON.parse(rawPackageJson);
-
   vueResult.push({
     metric: vueMetrics.USE_CLI_SERVICE,
     description: 'El proyecto usa @vue/cli-service para generar el build en producción',
-    value: VUE_BUILD_SCRIPT_REGEX.test(scripts.buid)
+    value: checkBuildScript(testPath)
   });
 
   vueResult.push({

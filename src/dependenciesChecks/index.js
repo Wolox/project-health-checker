@@ -42,25 +42,25 @@ module.exports = async (installInfo, testPath) => {
 
   dependenciesResults.push({
     metric: dependenciesMetrics.AXIOS_APISAUCE,
-    description: 'Está instalado axios o apisauce en el proyecto',
+    description: 'Esta instalado axios o apisauce en el proyecto',
     value: packages.some(({ moduleName }) => moduleName === 'axios' || moduleName === 'apisauce')
   });
 
   dependenciesResults.push({
     metric: dependenciesMetrics.JEST,
-    description: 'Está instalado Jest en el proyecto',
+    description: 'Esta instalado Jest en el proyecto',
     value: packages.some(({ moduleName }) => moduleName === 'jest')
   });
 
   dependenciesResults.push({
     metric: dependenciesMetrics.VUE_TEST_UTILS,
-    description: 'Está instalado vue-test-utils en el proyecto',
+    description: 'Esta instalado vue-test-utils en el proyecto',
     value: packages.some(({ moduleName }) => moduleName === 'vue-test-utils')
   });
 
   dependenciesResults.push({
     metric: dependenciesMetrics.VUEX,
-    description: 'Está instalado vuex en el proyecto',
+    description: 'Esta instalado vuex en el proyecto',
     value: packages.some(({ moduleName }) => moduleName === 'vuex')
   });
 

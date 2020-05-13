@@ -1,7 +1,8 @@
 const { find, findSync } = require('find-in-files');
+const { fetchJSON } = require('../../utils');
 
 /*
-  ⚠️scoped-style validation gonna be ommited when open tag is multi-line. For example:
+  ⚠️ scoped-style validation gonna be ommited when open tag is multi-line. For example:
     <style
       lang="scss"
       scoped
@@ -21,9 +22,14 @@ module.exports.checkVueTemplate = async testPath => {
 };
 
 module.exports.checkVuexUse = async testPath => {
-  const response = await find(/import [Vv]uex from 'vuex'/, `${testPath}/src/store`, 'index.js$')
+  const response = await find(/^import [Vv]uex from 'vuex'/, `${testPath}/src/store`, 'index.js$')
     .then(results => console.log('Vuex results', results) || !!Object.keys(results).length)
     .catch(() => false);
 
   return response;
+};
+
+module.exports.checkBuildScript = testPath => {
+  const packageJson = fetchJSON(`${testPath}/package.json`);
+  return /^vue-cli-service build/.test(packageJson.scripts.build);
 };
