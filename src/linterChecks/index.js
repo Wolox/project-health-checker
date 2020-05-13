@@ -1,15 +1,14 @@
-const shell = require('shelljs');
 const { eslintMetrics, eslintTechConfig } = require('./constants');
+const { getLinterErrorCount } = require('./utils');
 
 module.exports = (testPath, tech) => {
   const eslintResponse = [];
   const eslintConfig = require(`../../${testPath}/.eslintrc.js`);
-  const child = shell.exec(`npm run lint --prefix ${testPath}`);
 
   eslintResponse.push({
     metric: eslintMetrics.ESLINT_ERRORS,
     description: 'Errores de eslint',
-    value: (child.stdout.toString().match(/\berror\b/g) || []).length
+    value: getLinterErrorCount(testPath)
   });
 
   eslintResponse.push({
