@@ -4,6 +4,7 @@ const envMetrics = require('../../envChecks/constants');
 const { generalMetrics } = require('../../generalChecks/constants');
 const { vueMetrics } = require('../vueChecks/constants');
 const { eslintMetrics } = require('../../linterChecks/constants');
+const dependenciesMetrics = require('../../dependenciesChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
 
 const limits = {
@@ -11,7 +12,6 @@ const limits = {
 };
 
 const testSummary = (summary, reports) => {
-  console.log('-- REPORTS --\n', reports, '\n ---------------------- \n'); // ! Remove after commit
   summary.push({
     metric: 'SUMMARY-TESTING-1',
     description: 'La arquitectura de la aplicación se encuentra preparada para implementar test unitarios',
@@ -145,21 +145,52 @@ const uiUxSummary = (summary, reports) => {
   });
 
   summary.push({
-    metric: 'SUMMARY-UI-UX-4',
-    description: 'Proyecto respeta la estructura de directorios sugerida',
-    value: reports.filter(elem => elem.metric === generalMetrics.FOLDER_STRUCTURE).every(elem => elem.value)
-  });
-
-  summary.push({
     metric: 'SUMMARY-UI-UX-5',
-    description: 'El proyecto usa vue-loader para generar componentes de un solo archivo SFC ',
-    value: false
+    description: 'El proyecto usa vue-loader para generar componentes de un solo archivo SFC',
+    value: reports.some(elem => elem.metric === vueMetrics.USE_VUEX && elem.value)
   });
 
   summary.push({
     metric: 'SUMMARY-UI-UX-7',
     description: 'SFC que no estén al nivel de app deben estar scoped',
-    value: false
+    value: reports.some(elem => elem.metric === vueMetrics.SCOPED_STYLES && elem.value)
+  });
+};
+
+const clientServerSummary = (summary, reports) => {
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-1',
+    description: 'El proyecto posee services dedicados a los distintos recurso que posee',
+    value: reports.some(
+      elem =>
+        elem.metric === generalMetrics.FOLDER_STRUCTURE && elem.description.includes('services') && elem.value
+    )
+  });
+
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-2',
+    description: 'Se utiliza una configuración de apisauce / axios para cada API que se comunique',
+    value: reports.some(elem => elem.metric === dependenciesMetrics.AXIOS_APISAUCE && elem.value)
+  });
+
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-4',
+    description: 'Usa Vuex store para manejar el estado de la aplicación ',
+    value: (() => {
+      let hasVuexDependency = false;
+      let hasVuexImport = false;
+
+      reports.foEarch(elem => {
+        if (elem.metric === dependenciesMetrics.VUEX && elem.value) {
+          hasVuexDependency = true;
+        }
+        if (elem.metric === vueMetrics.USE_VUEX) {
+          hasVuexImport = true;
+        }
+      });
+
+      return hasVuexDependency && hasVuexImport;
+    })()
   });
 };
 
@@ -169,5 +200,6 @@ module.exports = reports => {
   securitySummary(summary, reports);
   buildingSummary(summary, reports);
   uiUxSummary(summary, reports);
+  clientServerSummary(summary, reports);
   return [...summary, ...reports];
 };

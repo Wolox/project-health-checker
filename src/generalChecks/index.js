@@ -58,8 +58,6 @@ module.exports = async (testPath, tech) => {
     });
   }
 
-  console.log('-- GENERAL METRICS --\n\n', generalResult, '\n\n ------------------------- \n\n');
-
   try {
     const data = require(`../../${testPath}/.babelrc.js`);
     const aliases = data.plugins.filter(

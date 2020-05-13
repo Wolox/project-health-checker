@@ -5,6 +5,7 @@ const testMetrics = require('../../testChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
 
 const { generalMetrics } = require('../../generalChecks/constants');
+const dependenciesMetrics = require('../../dependenciesChecks/constants');
 
 const { reactMetrics } = require('./constants');
 
@@ -144,7 +145,7 @@ const clientServerSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-2',
     description: 'Se utiliza una configuración de apisauce / axios para cada API que se comunique',
-    value: reports.some(elem => elem.metric === generalMetrics.AXIOS_APISAUCE && elem.value)
+    value: reports.some(elem => elem.metric === dependenciesMetrics.AXIOS_APISAUCE && elem.value)
   });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-3',

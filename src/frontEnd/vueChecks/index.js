@@ -1,8 +1,8 @@
 const fs = require('fs');
 const { vueMetrics, VUE_BUILD_SCRIPT_REGEX } = require('./constants');
-const { haveVueFilesScopedStyles, areComponentsInVueTemplate } = require('./utils');
+const { checkScopedFiles, checkVueTemplate, checkVuexUse } = require('./utils');
 
-module.exports = testPath => {
+module.exports = async testPath => {
   const vueResult = [];
 
   /*
@@ -23,14 +23,20 @@ module.exports = testPath => {
 
   vueResult.push({
     metric: vueMetrics.SCOPED_STYLES,
-    description: 'SFC que no estén al nivel de app deben estar scoped',
-    value: haveVueFilesScopedStyles(testPath)
+    description: 'Todos los componentes deben tener scoped-styles',
+    value: await checkScopedFiles(testPath)
   });
 
   vueResult.push({
-    metric: vueMetrics.ONLY_VUE_TEMPLATE,
-    description: 'Components are defined defined with Vue template',
-    value: areComponentsInVueTemplate(testPath)
+    metric: vueMetrics.VUE_TEMPLATE,
+    description: 'Los componentes son creados como SFC',
+    value: await checkVueTemplate(testPath)
+  });
+
+  vueResult.push({
+    metric: vueMetrics.USE_VUEX,
+    description: 'El proyecto usa vuex para la creación del store',
+    value: await checkVuexUse(testPath)
   });
 
   return vueResult;

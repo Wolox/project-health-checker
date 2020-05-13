@@ -58,5 +58,11 @@ module.exports = async (installInfo, testPath) => {
     value: packages.some(({ moduleName }) => moduleName === 'vue-test-utils')
   });
 
+  dependenciesResults.push({
+    metric: dependenciesMetrics.VUEX,
+    description: 'Está instalado vuex en el proyecto',
+    value: packages.some(({ moduleName }) => moduleName === 'vuex')
+  });
+
   return dependenciesResults;
 };

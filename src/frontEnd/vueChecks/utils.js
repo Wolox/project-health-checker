@@ -1,4 +1,4 @@
-const { findSync } = require('find-in-files');
+const { find, findSync } = require('find-in-files');
 
 /*
   ⚠️scoped-style validation gonna be ommited when open tag is multi-line. For example:
@@ -10,12 +10,20 @@ const { findSync } = require('find-in-files');
     </style>
 */
 
-module.exports.haveVueFilesScopedStyles = async testPath => {
-  const styleTagsFound = await findSync('<style', `${testPath}/src`, '.vue$');
-  return Object.values(styleTagsFound).every(({ line }) => line[0].includes('scoped'));
+module.exports.checkScopedFiles = async testPath => {
+  const results = await findSync('<style', `${testPath}/src`, '.vue$');
+  return Object.values(results).every(({ line }) => line[0].includes('scoped'));
 };
 
-module.exports.areComponentsInVueTemplate = async testPath => {
-  const badFiles = await findSync('Vue.component', `${testPath}/src`, '.js$');
+module.exports.checkVueTemplate = async testPath => {
+  const badFiles = await findSync(/[Vv]ue.component\(/, `${testPath}/src`, '.js$');
   return !Object.keys(badFiles).length;
+};
+
+module.exports.checkVuexUse = async testPath => {
+  const response = await find(/import [Vv]uex from 'vuex'/, `${testPath}/src/store`, 'index.js$')
+    .then(results => console.log('Vuex results', results) || !!Object.keys(results).length)
+    .catch(() => false);
+
+  return response;
 };
