@@ -145,6 +145,18 @@ const uiUxSummary = (summary, reports) => {
   });
 
   summary.push({
+    metric: 'SUMMARY-UI-UX-4',
+    description: 'Proyecto respeta la estructura de directorios sugerida',
+    value: reports.filter(elem => elem.metric === generalMetrics.FOLDER_STRUCTURE).every(elem => elem.value)
+  });
+
+  summary.push({
+    metric: 'SUMMARY-UI-UX-5',
+    description: 'El proyecto usa vue-loader para generar componentes de un solo archivo SFC ',
+    value: false
+  });
+
+  summary.push({
     metric: 'SUMMARY-UI-UX-7',
     description: 'SFC que no estén al nivel de app deben estar scoped',
     value: false
@@ -152,7 +164,6 @@ const uiUxSummary = (summary, reports) => {
 };
 
 module.exports = reports => {
-  //  TODO: Create a summary based on the vue DSP
   const summary = [];
   testSummary(summary, reports);
   securitySummary(summary, reports);
