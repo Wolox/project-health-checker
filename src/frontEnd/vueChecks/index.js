@@ -1,3 +1,4 @@
+const fs = require('fs');
 const { vueMetrics } = require('./constants');
 const { checkScopedFiles, checkVueTemplate, checkVuexUse, checkBuildScript } = require('./utils');
 
@@ -27,6 +28,14 @@ module.exports = async testPath => {
     description: 'El proyecto usa vuex para la creación del store',
     value: await checkVuexUse(testPath)
   });
+
+  vueResult.push({
+    metric: vueMetrics.STATE_MODULES,
+    description: 'El proyecto usa modulos para separar el estado de la aplicación',
+    value: fs.existsSync(`${testPath}/src/store/modules`)
+  });
+
+  console.log('✨VUE CHECKS ✨\n\n', vueResult);
 
   return vueResult;
 };

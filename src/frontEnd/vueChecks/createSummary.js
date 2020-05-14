@@ -192,6 +192,12 @@ const clientServerSummary = (summary, reports) => {
       return hasVuexDependency && hasVuexImport;
     })()
   });
+
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-5',
+    description: 'El estado global se separa en módulos',
+    value: reports.some(elem => elem.metric === vueMetrics.STATE_MODULES && elem.value)
+  });
 };
 
 module.exports = reports => {
