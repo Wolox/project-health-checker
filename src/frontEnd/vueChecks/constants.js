@@ -5,5 +5,6 @@ module.exports.vueMetrics = createObject([
   'SCOPED_STYLES',
   'VUE_TEMPLATE',
   'USE_VUEX',
-  'STATE_MODULES'
+  'STATE_MODULES',
+  'I18N'
 ]);

@@ -17,26 +17,14 @@ module.exports.generalMetrics = createObject([
   'CODE_OWNERS',
   'FOLDER_STRUCTURE',
   'BABEL_IMPORTS',
-  'CODE_QUALITY',
-  'I18N'
+  'CODE_QUALITY'
 ]);
 
 module.exports.DOCKERFILE_ATTRIBUTES = ['FROM', 'WORKDIR', 'COPY', 'RUN', 'ENV', 'WORKDIR'];
 
 module.exports.folderStructure = {
   react: ['app', 'config', 'constants', 'redux', 'scss', 'services', 'utils'],
-  vue: [
-    'assets',
-    'components',
-    'config',
-    'constants',
-    'mixins',
-    'scss',
-    'services',
-    'store',
-    'utils',
-    'views'
-  ],
+  vue: ['components', 'config', 'constants', 'scss', 'services', 'store', 'utils', 'views'],
   nuxt: [
     'assets',
     'components',

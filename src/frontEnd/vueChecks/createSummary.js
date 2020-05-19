@@ -8,7 +8,8 @@ const dependenciesMetrics = require('../../dependenciesChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
 
 const limits = {
-  reduxRecomposePercentage: 70
+  reduxRecomposePercentage: 70,
+  i18nPercentage: 40
 };
 
 const testSummary = (summary, reports) => {
@@ -42,7 +43,7 @@ const testSummary = (summary, reports) => {
 
   summary.push({
     metric: 'SUMMARY-TESTING-5',
-    description: 'El proyecto usa jest and vue-test-utils',
+    description: 'El proyecto usa vue-test-utils',
     value: reports.some(report => report.metric === dependenciesChecks.VUE_TEST_UTILS && report.value)
   });
 };
@@ -100,7 +101,7 @@ const buildingSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-BUILDING-4',
     description: 'Se corre el checkeo de linter tanto antes de generar un build como de push',
-    value: reports.some(({ metric, value }) => metric === eslintMetrics.ESLINT_ERRORS && !!value)
+    value: reports.some(({ metric, value }) => metric === eslintMetrics.ESLINT_ERRORS && !value)
   });
 
   summary.push({
@@ -113,7 +114,7 @@ const buildingSummary = (summary, reports) => {
     metric: 'SUMMARY-BUILDING-6',
     description:
       'El proyecto usa webpack para generar el build en producción y babel para los imports con alias',
-    value: reports.find(({ metric }) => metric === vueMetrics.USE_CLI_SERVICE).value
+    value: reports.some(({ metric, value }) => metric === vueMetrics.USE_CLI_SERVICE && value)
   });
 };
 
@@ -135,7 +136,7 @@ const uiUxSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-UI-UX-3',
     description: 'El proyecto posee internacionalización',
-    value: reports.some(elem => elem.metric === generalMetrics.I18N && elem.value >= limits.i18nPercentage)
+    value: reports.some(elem => elem.metric === vueMetrics.I18N && elem.value >= limits.i18nPercentage)
   });
 
   summary.push({

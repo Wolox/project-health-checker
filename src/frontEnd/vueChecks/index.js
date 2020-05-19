@@ -1,6 +1,12 @@
 const fs = require('fs');
 const { vueMetrics } = require('./constants');
-const { checkScopedFiles, checkVueTemplate, checkVuexUse, checkBuildScript } = require('./utils');
+const {
+  checkScopedFiles,
+  checkVueTemplate,
+  checkVuexUse,
+  checkBuildScript,
+  calculateI18nPercentage
+} = require('./utils');
 
 module.exports = async testPath => {
   const vueResult = [];
@@ -35,7 +41,11 @@ module.exports = async testPath => {
     value: fs.existsSync(`${testPath}/src/store/modules`)
   });
 
-  console.log('✨VUE CHECKS ✨\n\n', vueResult);
+  vueResult.push({
+    metric: vueMetrics.I18N,
+    description: 'Porcentaje de internacionalización',
+    value: await calculateI18nPercentage(testPath)
+  });
 
   return vueResult;
 };

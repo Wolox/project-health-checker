@@ -2,6 +2,7 @@
   "extends": "eslint-config-wolox",
   "rules": {
     "no-console": "off",
-    "camelcase": ["error", { "properties": "never" }]
+    "camelcase": ["error", { "properties": "never" }],
+    "no-extra-parens": "off"
 }
 }

@@ -97,7 +97,7 @@ const buildingSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-BUILDING-4',
     description: 'Se corre el checkeo de linter tanto antes de generar un build como de push',
-    value: reports.some(({ metric, value }) => metric === eslintMetrics.ESLINT_ERRORS && !!value)
+    value: reports.some(({ metric, value }) => metric === eslintMetrics.ESLINT_ERRORS && !value)
   });
 
   summary.push({
@@ -124,7 +124,7 @@ const uiUxSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-UI-UX-3',
     description: 'El proyecto posee internacionalización',
-    value: reports.some(elem => elem.metric === generalMetrics.I18N && elem.value >= limits.i18nPercentage)
+    value: reports.some(elem => elem.metric === reactMetrics.I18N && elem.value >= limits.i18nPercentage)
   });
   summary.push({
     metric: 'SUMMARY-UI-UX-4',
