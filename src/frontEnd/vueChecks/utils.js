@@ -29,5 +29,5 @@ module.exports.calculateI18nPercentage = async testPath => {
   const amountOfVueAppFolder = Object.keys(appResults).length;
   const i18nResults = await findSync(/\$t\(/, `${testPath}/src`, '.vue$');
 
-  return calculatePercentage(i18nResults, amountOfVueAppFolder, { skipComments: true });
+  return calculatePercentage(i18nResults, amountOfVueAppFolder, true);
 };

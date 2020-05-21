@@ -8,8 +8,12 @@ const dependenciesMetrics = require('../../dependenciesChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
 
 const limits = {
-  reduxRecomposePercentage: 70,
-  i18nPercentage: 40
+  i18nPercentage: 40,
+  minSeo: 80,
+  minTestCoverage: 70,
+  maxUnusedDependencies: 10,
+  pwaMin: 30,
+  minFirstPaint: 50
 };
 
 const testSummary = (summary, reports) => {
@@ -112,8 +116,7 @@ const buildingSummary = (summary, reports) => {
 
   summary.push({
     metric: 'SUMMARY-BUILDING-6',
-    description:
-      'El proyecto usa webpack para generar el build en producción y babel para los imports con alias',
+    description: 'El proyecto usa vue-cli-service para generar el build en producción',
     value: reports.some(({ metric, value }) => metric === vueMetrics.USE_CLI_SERVICE && value)
   });
 };
@@ -146,14 +149,8 @@ const uiUxSummary = (summary, reports) => {
   });
 
   summary.push({
-    metric: 'SUMMARY-UI-UX-5',
-    description: 'El proyecto usa vue-loader para generar componentes de un solo archivo SFC',
-    value: reports.some(elem => elem.metric === vueMetrics.USE_VUEX && elem.value)
-  });
-
-  summary.push({
     metric: 'SUMMARY-UI-UX-7',
-    description: 'SFC que no estén al nivel de app deben estar scoped',
+    description: 'Todos los SFCs deben ser scoped',
     value: reports.some(elem => elem.metric === vueMetrics.SCOPED_STYLES && elem.value)
   });
 };
@@ -177,27 +174,47 @@ const clientServerSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-4',
     description: 'Usa Vuex store para manejar el estado de la aplicación ',
-    value: (() => {
-      let hasVuexDependency = false;
-      let hasVuexImport = false;
-
-      reports.forEach(elem => {
-        if (elem.metric === dependenciesMetrics.VUEX && elem.value) {
-          hasVuexDependency = true;
-        }
-        if (elem.metric === vueMetrics.USE_VUEX) {
-          hasVuexImport = true;
-        }
-      });
-
-      return hasVuexDependency && hasVuexImport;
-    })()
+    value: reports.some(({ metric, value }) => metric === vueMetrics.USE_VUEX && value)
   });
 
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-5',
     description: 'El estado global se separa en módulos',
-    value: reports.some(elem => elem.metric === vueMetrics.STATE_MODULES && elem.value)
+    value: reports.some(({ metric, value }) => metric === vueMetrics.STATE_MODULES && value)
+  });
+
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-5',
+    description:
+      'Componentes de un solo archivo (SFC), no superan la lógica (script - template) no supera las 400 lineas',
+    value: false
+  });
+};
+
+const performanceSummary = (summary, reports) => {
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-1',
+    description: 'No hay render blocking js',
+    value: reports.some(
+      elem =>
+        elem.metric === seoMetrics.LIGHTHOUSE_BEST_PRACTICES_OVERALL && elem.value >= limits.minBestPractices
+    )
+  });
+
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-2',
+    description: 'El proyecto posee métricas de SEO (según lighthouse) mayor al 80%',
+    value: reports.some(
+      elem => elem.metric === seoMetrics.LIGHTHOUSE_SEO_OVERALL && elem.value >= limits.minSeo
+    )
+  });
+
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-3',
+    description: 'El proyecto posee un First Contentful Paint menor a 4 segundos',
+    value: reports.some(
+      elem => elem.metric === seoMetrics.FIRST_CONTENTFUL_PAINT && elem.value >= limits.minFirstPaint
+    )
   });
 };
 
@@ -208,5 +225,6 @@ module.exports = reports => {
   buildingSummary(summary, reports);
   uiUxSummary(summary, reports);
   clientServerSummary(summary, reports);
+  performanceSummary(summary, reports);
   return [...summary, ...reports];
 };
