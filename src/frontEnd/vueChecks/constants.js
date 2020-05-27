@@ -7,7 +7,8 @@ module.exports.vueMetrics = createObject([
   'USE_VUEX',
   'STATE_MODULES',
   'I18N',
-  'VUE_FILE_LINES'
+  'VUE_FILE_LINES',
+  'LAZY_ROUTES'
 ]);
 
 module.exports.limits = {

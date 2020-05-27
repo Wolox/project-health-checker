@@ -6,7 +6,8 @@ const {
   checkVuexUse,
   checkBuildScript,
   calculateI18nPercentage,
-  checkVueFilesLength
+  checkVueFilesLength,
+  checkLazyRoutes
 } = require('./utils');
 
 module.exports = async testPath => {
@@ -52,6 +53,12 @@ module.exports = async testPath => {
     metric: vueMetrics.VUE_FILE_LINES,
     description: 'Cantidad de SFC con mas de 400 líneas',
     value: await checkVueFilesLength(testPath)
+  });
+
+  vueResult.push({
+    metric: vueMetrics.LAZY_ROUTES,
+    description: 'Las rutas del proyecto son declarada con lazy-loading',
+    value: await checkLazyRoutes(testPath)
   });
 
   return vueResult;

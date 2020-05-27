@@ -1,3 +1,4 @@
+const fs = require('fs');
 const { find, findSync } = require('find-in-files');
 const { fetchJSON, calculatePercentage } = require('../../utils');
 const { limits } = require('./constants');
@@ -36,4 +37,12 @@ module.exports.calculateI18nPercentage = async testPath => {
 module.exports.checkVueFilesLength = async testPath => {
   const results = await findSync(/\n/, testPath, '.vue$');
   return Object.values(results).filter(({ count }) => count > limits.maxLines).length;
+};
+
+module.exports.checkLazyRoutes = async testPath => {
+  const viewsCount = fs.readdirSync(`${testPath}/src/views`).length;
+  const results = await findSync('webpackChunkName', `${testPath}/src/config`, 'routes.js$');
+  const linesFound = Object.values(results)[0].line;
+  const routesCount = linesFound.filter(line => !line.match(/^\/\//)).length;
+  return viewsCount === routesCount;
 };

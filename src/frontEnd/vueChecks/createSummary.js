@@ -209,9 +209,17 @@ const performanceSummary = (summary, reports) => {
   });
 
   summary.push({
+    metric: 'SUMMARY-PERFORMANCE-4',
+    description: 'El proyecto usa lazy loading para las rutas',
+    value: reports.some(
+      elem => elem.metric === seoMetrics.FIRST_CONTENTFUL_PAINT && elem.value >= limits.minFirstPaint
+    )
+  });
+
+  summary.push({
     metric: 'SUMMARY-PERFORMANCE-5',
     description: 'First Meaningful Paint no superior a 6s',
-    value: reports.some(elem => elem.metric === seoMetrics.LOAD_TIME && elem.value >= limits.minLoadTimeScore)
+    value: reports.some(({ metric, value }) => metric === vueMetrics.LAZY_ROUTES && value)
   });
 };
 
