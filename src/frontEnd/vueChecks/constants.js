@@ -7,8 +7,8 @@ module.exports.vueMetrics = createObject([
   'USE_VUEX',
   'STATE_MODULES',
   'I18N',
-  'VUE_FILE_LINES',
-  'LAZY_ROUTES'
+  'VALID_LINES_LENGTH',
+  'USE_LAZY_ROUTES'
 ]);
 
 module.exports.limits = {
@@ -17,7 +17,7 @@ module.exports.limits = {
   minTestCoverage: 70,
   maxUnusedDependencies: 10,
   pwaMin: 30,
-  minFirstPaint: 50,
-  minLoadTimeScore: 50,
-  maxLines: 400
+  minFirstPaintScore: 50,
+  maxLines: 400,
+  minBestPractices: 70
 };

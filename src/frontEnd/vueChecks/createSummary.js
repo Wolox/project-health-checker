@@ -164,13 +164,13 @@ const clientServerSummary = (summary, reports) => {
   });
 
   summary.push({
-    metric: 'SUMMARY-CLIENT-SERVER-4',
+    metric: 'SUMMARY-CLIENT-SERVER-3',
     description: 'Usa Vuex store para manejar el estado de la aplicación ',
     value: reports.some(({ metric, value }) => metric === vueMetrics.USE_VUEX && value)
   });
 
   summary.push({
-    metric: 'SUMMARY-CLIENT-SERVER-5',
+    metric: 'SUMMARY-CLIENT-SERVER-4',
     description: 'El estado global se separa en módulos',
     value: reports.some(({ metric, value }) => metric === vueMetrics.STATE_MODULES && value)
   });
@@ -178,7 +178,7 @@ const clientServerSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-5',
     description: 'Componentes de un solo archivo (SFC) no superan 400 lineas',
-    value: reports.some(({ metric, value }) => metric === vueMetrics.VUE_FILE_LINES && !value)
+    value: reports.some(({ metric, value }) => metric === vueMetrics.VALID_LINES_LENGTH && !value)
   });
 };
 
@@ -204,23 +204,24 @@ const performanceSummary = (summary, reports) => {
     metric: 'SUMMARY-PERFORMANCE-3',
     description: 'El proyecto posee un First Contentful Paint menor a 4 segundos',
     value: reports.some(
-      elem => elem.metric === seoMetrics.FIRST_CONTENTFUL_PAINT && elem.value >= limits.minFirstPaint
+      elem => elem.metric === seoMetrics.FIRST_CONTENTFUL_PAINT && elem.value >= limits.minFirstPaintScore
     )
   });
 
   summary.push({
     metric: 'SUMMARY-PERFORMANCE-4',
-    description: 'El proyecto usa lazy loading para las rutas',
-    value: reports.some(
-      elem => elem.metric === seoMetrics.FIRST_CONTENTFUL_PAINT && elem.value >= limits.minFirstPaint
-    )
+    description: 'El proyecto usa Lazy Loading para las rutas',
+    value: reports.some(({ metric, value }) => metric === vueMetrics.USE_LAZY_ROUTES && value)
   });
 
   summary.push({
     metric: 'SUMMARY-PERFORMANCE-5',
-    description: 'First Meaningful Paint no superior a 6s',
-    value: reports.some(({ metric, value }) => metric === vueMetrics.LAZY_ROUTES && value)
+    description: 'First Meaningful Paint no superior a 4s',
+    value: reports.some(
+      elem => elem.metric === seoMetrics.LOAD_TIME && elem.value >= limits.minFirstPaintScore
+    )
   });
+  console.log('Vue checks', summary);
 };
 
 module.exports = reports => {

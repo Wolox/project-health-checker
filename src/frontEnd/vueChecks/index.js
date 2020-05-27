@@ -50,13 +50,13 @@ module.exports = async testPath => {
   });
 
   vueResult.push({
-    metric: vueMetrics.VUE_FILE_LINES,
+    metric: vueMetrics.VALID_LINES_LENGTH,
     description: 'Cantidad de SFC con mas de 400 líneas',
     value: await checkVueFilesLength(testPath)
   });
 
   vueResult.push({
-    metric: vueMetrics.LAZY_ROUTES,
+    metric: vueMetrics.USE_LAZY_ROUTES,
     description: 'Las rutas del proyecto son declarada con lazy-loading',
     value: await checkLazyRoutes(testPath)
   });
