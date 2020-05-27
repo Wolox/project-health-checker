@@ -5,7 +5,8 @@ const {
   checkVueTemplate,
   checkVuexUse,
   checkBuildScript,
-  calculateI18nPercentage
+  calculateI18nPercentage,
+  checkVueFilesLength
 } = require('./utils');
 
 module.exports = async testPath => {
@@ -45,6 +46,12 @@ module.exports = async testPath => {
     metric: vueMetrics.I18N,
     description: 'Porcentaje de internacionalización',
     value: await calculateI18nPercentage(testPath)
+  });
+
+  vueResult.push({
+    metric: vueMetrics.VUE_FILE_LINES,
+    description: 'Cantidad de SFC con mas de 400 líneas',
+    value: await checkVueFilesLength(testPath)
   });
 
   return vueResult;

@@ -6,5 +6,17 @@ module.exports.vueMetrics = createObject([
   'VUE_TEMPLATE',
   'USE_VUEX',
   'STATE_MODULES',
-  'I18N'
+  'I18N',
+  'VUE_FILE_LINES'
 ]);
+
+module.exports.limits = {
+  i18nPercentage: 40,
+  minSeo: 80,
+  minTestCoverage: 70,
+  maxUnusedDependencies: 10,
+  pwaMin: 30,
+  minFirstPaint: 50,
+  minLoadTimeScore: 50,
+  maxLines: 400
+};

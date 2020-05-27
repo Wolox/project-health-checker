@@ -4,7 +4,6 @@ const { eslintMetrics } = require('../../linterChecks/constants');
 const testMetrics = require('../../testChecks/constants');
 const dependenciesMetrics = require('../../dependenciesChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
-
 const { generalMetrics } = require('../../generalChecks/constants');
 
 const { reactMetrics } = require('./constants');

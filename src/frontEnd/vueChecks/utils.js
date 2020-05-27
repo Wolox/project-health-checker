@@ -1,5 +1,6 @@
 const { find, findSync } = require('find-in-files');
 const { fetchJSON, calculatePercentage } = require('../../utils');
+const { limits } = require('./constants');
 
 module.exports.checkScopedFiles = async testPath => {
   const results = await findSync('<style', `${testPath}/src`, '.vue$');
@@ -30,4 +31,9 @@ module.exports.calculateI18nPercentage = async testPath => {
   const i18nResults = await findSync(/\$t\(/, `${testPath}/src`, '.vue$');
 
   return calculatePercentage(i18nResults, amountOfVueAppFolder, true);
+};
+
+module.exports.checkVueFilesLength = async testPath => {
+  const results = await findSync(/\n/, testPath, '.vue$');
+  return Object.values(results).filter(({ count }) => count > limits.maxLines).length;
 };

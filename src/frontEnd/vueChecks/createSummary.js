@@ -6,15 +6,7 @@ const { vueMetrics } = require('../vueChecks/constants');
 const { eslintMetrics } = require('../../linterChecks/constants');
 const dependenciesMetrics = require('../../dependenciesChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
-
-const limits = {
-  i18nPercentage: 40,
-  minSeo: 80,
-  minTestCoverage: 70,
-  maxUnusedDependencies: 10,
-  pwaMin: 30,
-  minFirstPaint: 50
-};
+const { limits } = require('./constants');
 
 const testSummary = (summary, reports) => {
   summary.push({
@@ -185,9 +177,8 @@ const clientServerSummary = (summary, reports) => {
 
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-5',
-    description:
-      'Componentes de un solo archivo (SFC), no superan la lógica (script - template) no supera las 400 lineas',
-    value: false
+    description: 'Componentes de un solo archivo (SFC) no superan 400 lineas',
+    value: reports.some(({ metric, value }) => metric === vueMetrics.VUE_FILE_LINES && !value)
   });
 };
 
@@ -215,6 +206,12 @@ const performanceSummary = (summary, reports) => {
     value: reports.some(
       elem => elem.metric === seoMetrics.FIRST_CONTENTFUL_PAINT && elem.value >= limits.minFirstPaint
     )
+  });
+
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-5',
+    description: 'First Meaningful Paint no superior a 6s',
+    value: reports.some(elem => elem.metric === seoMetrics.LOAD_TIME && elem.value >= limits.minLoadTimeScore)
   });
 };
 
