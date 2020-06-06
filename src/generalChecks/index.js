@@ -6,13 +6,13 @@ const { calculatePercentage } = require('../utils');
 
 const { BASE_ALIASES, folderStructure, generalMetrics, rootPath } = require('./constants');
 
-let amountOfJs = 0;
+let amountOfScriptFiles = 0;
 
 module.exports = async (testPath, tech) => {
   const generalResult = [];
 
-  const allResults = await findSync('', `${testPath}/${rootPath[tech]}`, '.js$');
-  amountOfJs = Object.keys(allResults).length;
+  const allResults = await findSync('', `${testPath}/${rootPath[tech]}`, /.(js|ts)$/);
+  amountOfScriptFiles = Object.keys(allResults).length;
 
   try {
     const data = read.sync(`${testPath}/.github/CODEOWNERS`, 'utf8');
@@ -71,8 +71,8 @@ module.exports = async (testPath, tech) => {
       })
     );
 
-    const importsResult = await findSync("from '@.+';", `${testPath}/${rootPath[tech]}`, '.js$');
-    const importCalculationResult = calculatePercentage(importsResult, amountOfJs);
+    const importsResult = await findSync("from '@.+';", `${testPath}/${rootPath[tech]}`, /.(js|ts)$/);
+    const importCalculationResult = calculatePercentage(importsResult, amountOfScriptFiles);
     generalResult.push({
       metric: 'Import',
       description: 'Porcentaje de imports absolutos del total',
@@ -85,6 +85,8 @@ module.exports = async (testPath, tech) => {
       value: false
     });
   }
+
+  console.log('Genral Results', generalResult);
 
   return generalResult;
 };

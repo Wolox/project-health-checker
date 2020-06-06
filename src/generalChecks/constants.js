@@ -37,11 +37,13 @@ module.exports.folderStructure = {
     'plugins',
     'services',
     'store'
-  ]
+  ],
+  angular: ['app', 'assets', 'config', 'environments', 'styles']
 };
 
 module.exports.rootPath = {
   react: 'src',
   vue: 'src',
-  nuxt: ''
+  nuxt: '',
+  angular: 'src'
 };

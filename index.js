@@ -17,7 +17,8 @@ const frontendChecks = require('./src/frontEnd');
 const createSummary = {
   react: require('./src/frontEnd/reactChecks/createSummary'),
   vue: require('./src/frontEnd/vueChecks/createSummary'),
-  nuxt: require('./src/frontEnd/vueChecks/createSummary')
+  nuxt: require('./src/frontEnd/vueChecks/createSummary'),
+  angular: require('./src/frontEnd/angularChecks/createSummary')
 };
 
 const args = parseArgs(process.argv);
@@ -87,9 +88,9 @@ async function executeChecks() {
   let generalData = [];
   let techData = [];
   let buildData = [];
-  let crashesData = [];
+  const crashesData = [];
   console.log(green, 'Comenzando auditoria...');
-  envData = await runEnvChecks(testPath);
+  envData = await runEnvChecks(testPath, techChecks);
   console.log(green, 'Chequeos de env terminados con exito ✓');
   generalData = await runGeneralChecks(testPath, techChecks);
   console.log(green, 'Chequeos generales terminados con exito ✓');
@@ -98,7 +99,7 @@ async function executeChecks() {
   techData = await frontendChecks(testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
   buildData = await runBuildChecks(testPath, techChecks, buildScriptName);
-  crashesData = await runCrashesChecks(apmProjectName);
+  // crashesData = await runCrashesChecks(apmProjectName);
   return [...envData, ...generalData, ...gitData, ...techData, ...buildData, ...crashesData];
 }
 
