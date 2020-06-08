@@ -88,7 +88,7 @@ async function executeChecks() {
   let generalData = [];
   let techData = [];
   let buildData = [];
-  const crashesData = [];
+  let crashesData = [];
   console.log(green, 'Comenzando auditoria...');
   envData = await runEnvChecks(testPath, techChecks);
   console.log(green, 'Chequeos de env terminados con exito ✓');
@@ -99,7 +99,7 @@ async function executeChecks() {
   techData = await frontendChecks(testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
   buildData = await runBuildChecks(testPath, techChecks, buildScriptName);
-  // crashesData = await runCrashesChecks(apmProjectName);
+  crashesData = await runCrashesChecks(apmProjectName);
   return [...envData, ...generalData, ...gitData, ...techData, ...buildData, ...crashesData];
 }
 
