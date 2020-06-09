@@ -4,7 +4,6 @@ const { eslintMetrics } = require('../../linterChecks/constants');
 const testMetrics = require('../../testChecks/constants');
 const dependenciesMetrics = require('../../dependenciesChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
-
 const { generalMetrics } = require('../../generalChecks/constants');
 
 const { reactMetrics } = require('./constants');
@@ -93,6 +92,13 @@ const buildingSummary = (summary, reports) => {
     description: 'Se utiliza el package de deploy para la gestión de releases',
     value: 'Manual'
   });
+
+  summary.push({
+    metric: 'SUMMARY-BUILDING-4',
+    description: 'Se corre el checkeo de linter tanto antes de generar un build como de push',
+    value: reports.some(({ metric, value }) => metric === eslintMetrics.ESLINT_ERRORS && !value)
+  });
+
   summary.push({
     metric: 'SUMMARY-BUILDING-6',
     description:

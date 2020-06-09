@@ -8,8 +8,9 @@ exports.createObject = keyArray => keyArray.reduce((acc, key) => ({ ...acc, [key
 
 exports.analyzeMatches = matches => Object.keys(matches).filter(key => removeComments(matches[key]).length);
 
-exports.calculatePercentage = (results, total) =>
-  // eslint-disable-next-line prettier/prettier
-  this.analyzeMatches(results).length / total * percentage;
+exports.calculatePercentage = (results, total, skipComments = false) => {
+  const filesCount = skipComments ? Object.keys(results).length : this.analyzeMatches(results).length;
+  return (filesCount / total) * percentage;
+};
 
 exports.fetchJSON = path => JSON.parse(fs.readFileSync(path));

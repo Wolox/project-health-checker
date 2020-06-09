@@ -52,5 +52,17 @@ module.exports = async (installInfo, testPath) => {
     value: packages.some(({ moduleName }) => moduleName === 'jest')
   });
 
+  dependenciesResults.push({
+    metric: dependenciesMetrics.VUE_TEST_UTILS,
+    description: 'Esta instalado vue-test-utils en el proyecto',
+    value: packages.some(({ moduleName }) => moduleName === 'vue-test-utils')
+  });
+
+  dependenciesResults.push({
+    metric: dependenciesMetrics.VUEX,
+    description: 'Esta instalado vuex en el proyecto',
+    value: packages.some(({ moduleName }) => moduleName === 'vuex')
+  });
+
   return dependenciesResults;
 };
