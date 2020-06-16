@@ -221,7 +221,6 @@ const performanceSummary = (summary, reports) => {
       elem => elem.metric === seoMetrics.LOAD_TIME && elem.value >= limits.minFirstPaintScore
     )
   });
-  console.log('Vue checks', summary);
 };
 
 module.exports = reports => {

@@ -17,7 +17,7 @@ const frontendChecks = require('./src/frontEnd');
 const createSummary = {
   react: require('./src/frontEnd/reactChecks/createSummary'),
   vue: require('./src/frontEnd/vueChecks/createSummary'),
-  nuxt: require('./src/frontEnd/vueChecks/createSummary')
+  nuxt: require('./src/frontEnd/nuxtChecks/createSummary')
 };
 
 const args = parseArgs(process.argv);
