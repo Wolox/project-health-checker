@@ -5,18 +5,12 @@ const dependenciesMetrics = require('../../dependenciesChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
 
 const { generalMetrics } = require('../../generalChecks/constants');
+const { angularMetrics } = require('./constants');
 
 const limits = {
   minTestCoverage: 80,
   maxUnusedDependencies: 10,
   pwaMin: 30
-  // i18nPercentage: 40,
-  // reduxRecomposePercentage: 70,
-  // maxFiles: 2,
-  // minPerformance: 70,
-  // minBestPractices: 70,
-  // minSeo: 90,
-  // minFirstPaint: 50,
 };
 
 const testSummary = (summary, reports) => {
@@ -47,7 +41,7 @@ const testSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-TESTING-5',
     description: 'El proyecto usa JEST. Jasmine y Karma han sido removidos',
-    value: 'N/A'
+    value: reports.filter(({ metric, value }) => metric === angularMetrics.USE_JEST && value)
   });
 };
 
@@ -66,17 +60,6 @@ const securitySummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-SECURITY-3',
     description: 'No se guardan claves secretas en texto plano o en constantes dentro de la aplicación',
-    value: 'Manual'
-  });
-  summary.push({
-    metric: 'SUMMARY-SECURITY-4',
-    description: 'Las distintas variables en el localstorage se guardan en un service encodeados en base 64',
-    value: true
-  });
-  // ? Need Review
-  summary.push({
-    metric: 'SUMMARY-SECURITY-5',
-    description: 'Las contraseñas no son nunca visibles para el usuario despues del login',
     value: 'Manual'
   });
   // ? Need Review
@@ -108,24 +91,10 @@ const buildingSummary = (summary, reports) => {
     description: 'Se utiliza el package de deploy para la gestión de releases',
     value: 'Manual'
   });
-  // ? Need Review
-  summary.push({
-    metric: 'SUMMARY-BUILDING-3',
-    description: 'Se corre el checkeo de linter tanto antes de generar un build como de push',
-    value: true
-  });
-  // ? Need Review
-  summary.push({
-    metric: 'SUMMARY-BUILDING-5',
-    description: 'El proyecto genera archivos minificados en el build',
-    value: true
-  });
-  // ? Need Review: Is this necessary in Angular project?
   summary.push({
     metric: 'SUMMARY-BUILDING-6',
-    description:
-      'El proyecto usa webpack para generar el build en producción y babel para los imports con alias',
-    value: true
+    description: 'El proyecto usa webpack para generar el build en producción',
+    value: reports.filter(({ metric, value }) => metric === angularMetrics.NG_BUILD && value)
   });
 };
 
@@ -137,20 +106,12 @@ const uiUxSummary = (summary, reports) => {
       elem => elem.metric === seoMetrics.LIGHTHOUSE_PWA_OVERALL && elem.value >= limits.pwaMin
     )
   });
-  //   summary.push({
-  //     metric: 'SUMMARY-UI-UX-2',
-  //     description: 'El proyecto usa Sass respetando el linter correspondiente',
-  //     value: reports.some(elem => elem.metric === eslintMetrics.ESLINT_CONFIG && elem.value)
-  //   });
-  //   summary.push({
-  //     metric: 'SUMMARY-UI-UX-3',
-  //     description: 'El proyecto posee internacionalización',
-  //     value: reports.some(elem => elem.metric === reactMetrics.I18N && elem.value >= limits.i18nPercentage)
-  //   });
   summary.push({
     metric: 'SUMMARY-UI-UX-4',
     description: 'Proyecto respeta la estructura de directorios sugerida',
-    value: reports.filter(elem => elem.metric === generalMetrics.FOLDER_STRUCTURE).every(elem => elem.value)
+    value: reports
+      .filter(({ metric }) => metric === generalMetrics.FOLDER_STRUCTURE)
+      .every(({ value }) => value)
   });
   // ? Need Review
   summary.push({
@@ -164,18 +125,20 @@ const clientServerSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-1',
     description: 'El proyecto posee services dedicados a los distintos recurso que posee',
-    value: true
+    value: reports
+      .filter(({ metric }) => metric === generalMetrics.FOLDER_STRUCTURE)
+      .some(elem => elem.description.includes('services'))
   });
-  summary.push({
-    metric: 'SUMMARY-CLIENT-SERVER-2',
-    description: 'Solo se utiliza el httpClient para comunicarse con API externas',
-    value: true
-  });
-  summary.push({
-    metric: 'SUMMARY-CLIENT-SERVER-3',
-    description: 'Utiliza services globales o ngRx para el manejo de la información global.',
-    value: 'Manual'
-  });
+  // summary.push({
+  //   metric: 'SUMMARY-CLIENT-SERVER-2',
+  //   description: 'Solo se utiliza el httpClient para comunicarse con API externas',
+  //   value: true
+  // });
+  // summary.push({
+  //   metric: 'SUMMARY-CLIENT-SERVER-3',
+  //   description: 'Utiliza services globales o ngRx para el manejo de la información global.',
+  //   value: 'Manual'
+  // });
 };
 
 module.exports = reports => {

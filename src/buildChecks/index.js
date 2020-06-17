@@ -24,8 +24,8 @@ module.exports = async (testPath, tech, buildScriptName) => {
   const testData = runTestChecks(testPath);
   const dependencyData = await runDependencyChecks(installInfo, testPath);
   console.log(green, 'Tests terminados con exito ✓');
-  // const eslintData = runEslintChecks(testPath, tech);
-  // console.log(green, 'Chequeos de eslint terminados con exito ✓');
+  const eslintData = runEslintChecks(testPath, tech);
+  console.log(green, 'Chequeos de eslint terminados con exito ✓');
   console.log(green, 'Generando el build...');
   const start = new Date();
   const buildExec = shell.exec(`npm run ${buildScriptName} --prefix ${testPath}`);
@@ -47,7 +47,7 @@ module.exports = async (testPath, tech, buildScriptName) => {
   }
 
   return [
-    // ...eslintData,
+    ...eslintData,
     ...testData,
     ...dependencyData,
     { metric: buildMetrics.BUILD_TIME, description: 'Build Time - Seg', value: buildTime },

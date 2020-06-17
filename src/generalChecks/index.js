@@ -6,13 +6,8 @@ const { calculatePercentage } = require('../utils');
 
 const { BASE_ALIASES, folderStructure, generalMetrics, rootPath } = require('./constants');
 
-let amountOfScriptFiles = 0;
-
 module.exports = async (testPath, tech) => {
   const generalResult = [];
-
-  const allResults = await findSync('', `${testPath}/${rootPath[tech]}`, /.(js|ts)$/);
-  amountOfScriptFiles = Object.keys(allResults).length;
 
   try {
     const data = read.sync(`${testPath}/.github/CODEOWNERS`, 'utf8');
@@ -36,12 +31,6 @@ module.exports = async (testPath, tech) => {
     value: fs.existsSync(`${testPath}/README.md`)
   });
 
-  generalResult.push({
-    metric: generalMetrics.BABEL,
-    description: 'Existe un archivo .babelrc',
-    value: fs.existsSync(`${testPath}/.babelrc.js`)
-  });
-
   if (fs.existsSync(`${testPath}/${rootPath[tech]}`)) {
     folderStructure[tech].forEach(element =>
       generalResult.push({
@@ -53,16 +42,23 @@ module.exports = async (testPath, tech) => {
   } else {
     generalResult.push({
       metric: generalMetrics.FOLDER_STRUCTURE,
-      description: 'Existe un archivo de src en el root de su proyecto',
+      description: `Existe un archivo de ${rootPath[tech]} en el root de su proyecto`,
       value: false
     });
   }
+
+  generalResult.push({
+    metric: generalMetrics.BABEL,
+    description: 'Existe un archivo .babelrc',
+    value: fs.existsSync(`${testPath}/.babelrc.js`)
+  });
 
   try {
     const data = require(`../../${testPath}/.babelrc.js`);
     const aliases = data.plugins.filter(
       plugin => Array.isArray(plugin) && plugin[0] === 'module-resolver'
     )[0][1].alias;
+
     BASE_ALIASES.forEach(alias =>
       generalResult.push({
         metric: generalMetrics.BABEL_IMPORTS,
@@ -70,14 +66,6 @@ module.exports = async (testPath, tech) => {
         value: Object.keys(aliases).includes(alias)
       })
     );
-
-    const importsResult = await findSync("from '@.+';", `${testPath}/${rootPath[tech]}`, /.(js|ts)$/);
-    const importCalculationResult = calculatePercentage(importsResult, amountOfScriptFiles);
-    generalResult.push({
-      metric: 'Import',
-      description: 'Porcentaje de imports absolutos del total',
-      value: importCalculationResult
-    });
   } catch {
     generalResult.push({
       metric: generalMetrics.BABEL_IMPORTS,
@@ -86,7 +74,22 @@ module.exports = async (testPath, tech) => {
     });
   }
 
-  console.log('Genral Results', generalResult);
+  let absoluteImportsPercentage = null;
+
+  try {
+    const allResults = await findSync('', `${testPath}/${rootPath[tech]}`, /.(js|ts)$/);
+    const amountOfScriptFiles = Object.keys(allResults).length;
+    const importsResult = await findSync("from '@.+';", `${testPath}/${rootPath[tech]}`, /.(js|ts)$/);
+    absoluteImportsPercentage = calculatePercentage(importsResult, amountOfScriptFiles);
+  } catch {
+    absoluteImportsPercentage = 0;
+  }
+
+  generalResult.push({
+    metric: generalMetrics.ABSOLUTE_IMPORTS_PERCENTAGE,
+    description: 'Porcentaje de imports absolutos del total',
+    value: absoluteImportsPercentage
+  });
 
   return generalResult;
 };

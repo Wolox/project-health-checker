@@ -2,15 +2,12 @@ const { eslintMetrics, eslintTechConfig } = require('./constants');
 const { getLinterErrorCount } = require('./utils');
 
 module.exports = (testPath, tech) => {
-  const eslintResponse = [];
-
-  let eslintConfig = null;
-
-  try {
-    eslintConfig = require(`../../${testPath}/.eslintrc.js`);
-  } catch (error) {
-    console.log("This project doesn't have Eslint configuration file");
+  if (tech === 'angular') {
+    return [];
   }
+
+  const eslintResponse = [];
+  const eslintConfig = require(`../../${testPath}/.eslintrc.js`);
 
   eslintResponse.push({
     metric: eslintMetrics.ESLINT_ERRORS,

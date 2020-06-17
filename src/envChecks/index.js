@@ -7,19 +7,19 @@ const envMetrics = require('./constants');
 
 module.exports = async (testPath, techChecks) => {
   const envresult = [];
+  let exitsEnvFile = false;
 
-  const checkEnvFile = async () => {
-    if (techChecks === 'angular') {
-      return fs.existsSync(`${testPath}/src/environments/environment.ts`);
-    }
+  if (techChecks === 'angular') {
+    exitsEnvFile = fs.existsSync(`${testPath}/src/environments/environment.ts`);
+  } else {
     const results = await findSync('process.env.', testPath, '.js$');
-    return !!analyzeMatches(results).length;
-  };
+    exitsEnvFile = !!analyzeMatches(results).length;
+  }
 
   envresult.push({
     metric: envMetrics.ENV_IS_USED,
     description: 'Se utiliza un .env en el proyecto',
-    value: await checkEnvFile(testPath, techChecks)
+    value: await exitsEnvFile
   });
 
   return envresult;
