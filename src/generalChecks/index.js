@@ -47,31 +47,33 @@ module.exports = async (testPath, tech) => {
     });
   }
 
-  generalResult.push({
-    metric: generalMetrics.BABEL,
-    description: 'Existe un archivo .babelrc',
-    value: fs.existsSync(`${testPath}/.babelrc.js`)
-  });
+  if (tech !== 'angular') {
+    generalResult.push({
+      metric: generalMetrics.BABEL,
+      description: 'Existe un archivo .babelrc',
+      value: fs.existsSync(`${testPath}/.babelrc.js`)
+    });
 
-  try {
-    const data = require(`../../${testPath}/.babelrc.js`);
-    const aliases = data.plugins.filter(
-      plugin => Array.isArray(plugin) && plugin[0] === 'module-resolver'
-    )[0][1].alias;
+    try {
+      const data = require(`../../${testPath}/.babelrc.js`);
+      const aliases = data.plugins.filter(
+        plugin => Array.isArray(plugin) && plugin[0] === 'module-resolver'
+      )[0][1].alias;
 
-    BASE_ALIASES.forEach(alias =>
+      BASE_ALIASES.forEach(alias =>
+        generalResult.push({
+          metric: generalMetrics.BABEL_IMPORTS,
+          description: `Existe import con alias para ${alias}`,
+          value: Object.keys(aliases).includes(alias)
+        })
+      );
+    } catch {
       generalResult.push({
         metric: generalMetrics.BABEL_IMPORTS,
-        description: `Existe import con alias para ${alias}`,
-        value: Object.keys(aliases).includes(alias)
-      })
-    );
-  } catch {
-    generalResult.push({
-      metric: generalMetrics.BABEL_IMPORTS,
-      description: 'El archivo .babelrc contiene el plugin "module-resolver',
-      value: false
-    });
+        description: 'El archivo .babelrc contiene el plugin "module-resolver',
+        value: false
+      });
+    }
   }
 
   let absoluteImportsPercentage = null;

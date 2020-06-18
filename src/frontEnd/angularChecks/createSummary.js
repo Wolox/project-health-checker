@@ -1,19 +1,32 @@
-const envMetrics = require('../../envChecks/constants');
+const fs = require('fs');
+const path = require('path');
 
+const envMetrics = require('../../envChecks/constants');
 const testMetrics = require('../../testChecks/constants');
 const dependenciesMetrics = require('../../dependenciesChecks/constants');
-const seoMetrics = require('../seoChecks/constants');
-
 const { generalMetrics } = require('../../generalChecks/constants');
+const seoMetrics = require('../seoChecks/constants');
+const { fetchJSON, getClocReport } = require('../../utils');
 const { angularMetrics } = require('./constants');
 
 const limits = {
   minTestCoverage: 80,
   maxUnusedDependencies: 10,
-  pwaMin: 30
+  pwaMin: 30,
+  maxNumberOfComponentLines: 200,
+  maxNumberOfTemplateLines: 150
 };
 
-const testSummary = (summary, reports) => {
+module.exports = (reports, testPath) => {
+  const summary = [];
+  const packageJson = fetchJSON(`${testPath}/package.json`);
+  const testConfigFile = fs.readFileSync(`${testPath}/src/test.ts`);
+  const clocReport = getClocReport(path.resolve(testPath), 'angular');
+  const componentFilePaths = Object.keys(clocReport).filter(filepath => /.component.ts$/.test(filepath));
+  const templateFilePaths = Object.keys(clocReport).filter(filepath => /.component.html$/.test(filepath));
+
+  // => Testing
+
   summary.push({
     metric: 'SUMMARY-TESTING-1',
     description: 'La arquitectura de la aplicación se encuentra preparada para implementar test unitarios',
@@ -41,11 +54,11 @@ const testSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-TESTING-5',
     description: 'El proyecto usa JEST. Jasmine y Karma han sido removidos',
-    value: reports.filter(({ metric, value }) => metric === angularMetrics.USE_JEST && value)
+    value: /^jest/.test(packageJson.scripts.test) || testConfigFile.includes("import 'jest-preset-angular'")
   });
-};
 
-const securitySummary = (summary, reports) => {
+  // => Security
+
   summary.push({
     metric: 'SUMMARY-SECURITY-1',
     description: 'Existe un .env con variables de entorno en el proyecto',
@@ -68,9 +81,9 @@ const securitySummary = (summary, reports) => {
     description: 'Usa renderer 2 para manipular el DOM cuando es necesario.',
     value: true
   });
-};
 
-const buildingSummary = (summary, reports) => {
+  // => Building
+
   summary.push({
     metric: 'SUMMARY-BUILDING-1',
     description: 'El proyecto utiliza la ultima o anteultima versión del framework',
@@ -94,11 +107,11 @@ const buildingSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-BUILDING-6',
     description: 'El proyecto usa webpack para generar el build en producción',
-    value: reports.filter(({ metric, value }) => metric === angularMetrics.NG_BUILD && value)
+    value: /^ng build --prod/.test(packageJson.scripts.build)
   });
-};
 
-const uiUxSummary = (summary, reports) => {
+  // => UI & UX
+
   summary.push({
     metric: 'SUMMARY-UI-UX-1',
     description: 'El proyecto es mobile friendly según lighthouse',
@@ -119,36 +132,39 @@ const uiUxSummary = (summary, reports) => {
     description: 'Se prioriza el uso de formularios reactivos',
     value: true
   });
-};
 
-const clientServerSummary = (summary, reports) => {
+  // => Client Server Integration
+
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-1',
     description: 'El proyecto posee services dedicados a los distintos recurso que posee',
     value: reports
       .filter(({ metric }) => metric === generalMetrics.FOLDER_STRUCTURE)
-      .some(elem => elem.description.includes('services'))
+      .some(({ description }) => description.includes('services'))
   });
-  // summary.push({
-  //   metric: 'SUMMARY-CLIENT-SERVER-2',
-  //   description: 'Solo se utiliza el httpClient para comunicarse con API externas',
-  //   value: true
-  // });
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-2',
+    description: 'Solo se utiliza el httpClient para comunicarse con API externas',
+    value: reports.filter(({ metric, value }) => metric === angularMetrics.USE_HTTP_CLIENT && value)
+  });
   // summary.push({
   //   metric: 'SUMMARY-CLIENT-SERVER-3',
   //   description: 'Utiliza services globales o ngRx para el manejo de la información global.',
   //   value: 'Manual'
   // });
-};
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-5',
+    description:
+      'Está bien delimitada la responsabilidad de los smart vs dummies components, teniendo components.ts menores a 200 líneas',
+    value: componentFilePaths.every(filepath => clocReport[filepath].code <= limits.maxNumberOfComponentLines)
+  });
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-6',
+    description: 'El template de los componentes tiene 150 líneas o menos.',
+    value: templateFilePaths.every(filepath => clocReport[filepath].code <= limits.maxNumberOfTemplateLines)
+  });
 
-module.exports = reports => {
-  const summary = [];
-  testSummary(summary, reports);
-  securitySummary(summary, reports);
-  buildingSummary(summary, reports);
-  uiUxSummary(summary, reports);
-  clientServerSummary(summary, reports);
-  // performanceSummary(summary, reports);
   console.log('Parcial Angular Summary', summary);
+
   return [...summary, ...reports];
 };

@@ -108,7 +108,8 @@ async function executeAudit() {
     filesToCreate.split(',').forEach(fileName => shell.exec(`touch ${testPath}/${fileName}`));
   }
   const reports = await executeChecks();
-  const reportWithSummary = createSummary[techChecks](reports);
+  const reportWithSummary = createSummary[techChecks](reports, testPath);
+  console.log('REPORTS WITH SUMMARY', reportWithSummary);
   const reportCodeQuality = codeQuality(reportWithSummary);
   console.log(green, 'Chequeos terminados con exito ✓');
   if (args.audit) {

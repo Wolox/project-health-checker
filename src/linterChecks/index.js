@@ -2,11 +2,12 @@ const { eslintMetrics, eslintTechConfig } = require('./constants');
 const { getLinterErrorCount } = require('./utils');
 
 module.exports = (testPath, tech) => {
+  const eslintResponse = [];
+
   if (tech === 'angular') {
-    return [];
+    return eslintResponse;
   }
 
-  const eslintResponse = [];
   const eslintConfig = require(`../../${testPath}/.eslintrc.js`);
 
   eslintResponse.push({

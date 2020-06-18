@@ -22,7 +22,7 @@ module.exports = async (testPath, tech, buildScriptName) => {
   console.log(green, 'Empezando instalacion de dependencias...');
   const installInfo = shell.exec(`npm i --prefix ${testPath}`);
   const testData = runTestChecks(testPath);
-  const dependencyData = await runDependencyChecks(installInfo, testPath);
+  const dependencyData = await runDependencyChecks(installInfo, testPath, tech);
   console.log(green, 'Tests terminados con exito ✓');
   const eslintData = runEslintChecks(testPath, tech);
   console.log(green, 'Chequeos de eslint terminados con exito ✓');

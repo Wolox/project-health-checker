@@ -1,7 +1,7 @@
 const dependenciesMetrics = require('./constants');
 const npmCheck = require('npm-check');
 
-module.exports = async (installInfo, testPath) => {
+module.exports = async (installInfo, testPath, tech) => {
   const dependenciesResults = [];
   const totalPackages = installInfo.stdout.slice(
     installInfo.stdout.search('audited') + 'audited'.length,
@@ -40,11 +40,13 @@ module.exports = async (installInfo, testPath) => {
     }
   });
 
-  dependenciesResults.push({
-    metric: dependenciesMetrics.AXIOS_APISAUCE,
-    description: 'Esta instalado axios o apisauce en el proyecto',
-    value: packages.some(({ moduleName }) => moduleName === 'axios' || moduleName === 'apisauce')
-  });
+  if (tech !== 'angular') {
+    dependenciesResults.push({
+      metric: dependenciesMetrics.AXIOS_APISAUCE,
+      description: 'Esta instalado axios o apisauce en el proyecto',
+      value: packages.some(({ moduleName }) => moduleName === 'axios' || moduleName === 'apisauce')
+    });
+  }
 
   dependenciesResults.push({
     metric: dependenciesMetrics.JEST,
