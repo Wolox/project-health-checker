@@ -6,5 +6,6 @@ module.exports = createObject([
   'DIRECT_DEPENDENCIES',
   'INDIRECT_DEPENDENCIES',
   'AXIOS_APISAUCE',
-  'JEST'
+  'JEST',
+  'NG_RX'
 ]);

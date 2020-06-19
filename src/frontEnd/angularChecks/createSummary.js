@@ -29,6 +29,8 @@ module.exports = (reports, testPath) => {
   const clocReport = getClocReport(path.resolve(testPath), 'angular');
   const componentFilePaths = Object.keys(clocReport).filter(filepath => /.component.ts$/.test(filepath));
   const templateFilePaths = Object.keys(clocReport).filter(filepath => /.component.html$/.test(filepath));
+  const mainFile = fs.readFileSync(path.resolve(testPath, 'src/main.ts')).toString('utf8');
+  console.log('Main File', mainFile);
 
   // => Testing
 
@@ -152,11 +154,11 @@ module.exports = (reports, testPath) => {
     description: 'Solo se utiliza el httpClient para comunicarse con API externas',
     value: reports.filter(({ metric, value }) => metric === angularMetrics.USE_HTTP_CLIENT && value)
   });
-  // summary.push({
-  //   metric: 'SUMMARY-CLIENT-SERVER-3',
-  //   description: 'Utiliza services globales o ngRx para el manejo de la información global.',
-  //   value: 'Manual'
-  // });
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-3',
+    description: 'Utiliza services globales o ngRx para el manejo de la información global.',
+    value: reports.filter(({ metric, value }) => metric === dependenciesMetrics.NG_RX && value)
+  });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-5',
     description:
@@ -193,12 +195,13 @@ module.exports = (reports, testPath) => {
       elem => elem.metric === seoMetrics.FIRST_CONTENTFUL_PAINT && elem.value >= limits.minFirstPaint
     )
   });
-
   summary.push({
     metric: 'SUMMARY-PERFORMANCE-6',
     description: 'Utilizar enableProdMode en produción',
-    value: findSync('', testPath, '')
+    value: mainFile.includes("if (ENV === 'production'") && mainFile.includes('enableProdMode()')
   });
+
+  console.log('Partial angular summary', summary);
 
   return [...summary, ...reports];
 };
