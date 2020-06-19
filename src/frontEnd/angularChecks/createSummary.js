@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { findSync } = require('find-in-files');
 
 const envMetrics = require('../../envChecks/constants');
 const testMetrics = require('../../testChecks/constants');
@@ -14,9 +15,13 @@ const limits = {
   maxUnusedDependencies: 10,
   pwaMin: 30,
   maxNumberOfComponentLines: 200,
-  maxNumberOfTemplateLines: 150
+  maxNumberOfTemplateLines: 150,
+  minBestPractices: 70,
+  minSeo: 90,
+  minFirstPaint: 50
 };
 
+// eslint-disable-next-line max-statements
 module.exports = (reports, testPath) => {
   const summary = [];
   const packageJson = fetchJSON(`${testPath}/package.json`);
@@ -164,7 +169,36 @@ module.exports = (reports, testPath) => {
     value: templateFilePaths.every(filepath => clocReport[filepath].code <= limits.maxNumberOfTemplateLines)
   });
 
-  console.log('Parcial Angular Summary', summary);
+  // => Perfomance
+
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-1',
+    description: 'No hay render blocking js',
+    value: reports.some(
+      ({ metric, value }) =>
+        metric === seoMetrics.LIGHTHOUSE_BEST_PRACTICES_OVERALL && value >= limits.minBestPractices
+    )
+  });
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-2',
+    description: 'El proyecto posee métricas de SEO (según lighthouse) mayor al 90%',
+    value: reports.some(
+      ({ metric, value }) => metric === seoMetrics.LIGHTHOUSE_SEO_OVERALL && value >= limits.minSeo
+    )
+  });
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-3',
+    description: 'El proyecto posee un First Contentful Paint menor a 4 segundos',
+    value: reports.some(
+      elem => elem.metric === seoMetrics.FIRST_CONTENTFUL_PAINT && elem.value >= limits.minFirstPaint
+    )
+  });
+
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-6',
+    description: 'Utilizar enableProdMode en produción',
+    value: findSync('', testPath, '')
+  });
 
   return [...summary, ...reports];
 };

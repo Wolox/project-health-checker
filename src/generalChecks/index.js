@@ -74,24 +74,24 @@ module.exports = async (testPath, tech) => {
         value: false
       });
     }
+
+    let absoluteImportsPercentage = null;
+
+    try {
+      const allResults = await findSync('', `${testPath}/${rootPath[tech]}`, /.(js|ts)$/);
+      const amountOfScriptFiles = Object.keys(allResults).length;
+      const importsResult = await findSync("from '@.+';", `${testPath}/${rootPath[tech]}`, /.(js|ts)$/);
+      absoluteImportsPercentage = calculatePercentage(importsResult, amountOfScriptFiles);
+    } catch {
+      absoluteImportsPercentage = 0;
+    }
+
+    generalResult.push({
+      metric: generalMetrics.ABSOLUTE_IMPORTS_PERCENTAGE,
+      description: 'Porcentaje de imports absolutos del total',
+      value: absoluteImportsPercentage
+    });
   }
-
-  let absoluteImportsPercentage = null;
-
-  try {
-    const allResults = await findSync('', `${testPath}/${rootPath[tech]}`, /.(js|ts)$/);
-    const amountOfScriptFiles = Object.keys(allResults).length;
-    const importsResult = await findSync("from '@.+';", `${testPath}/${rootPath[tech]}`, /.(js|ts)$/);
-    absoluteImportsPercentage = calculatePercentage(importsResult, amountOfScriptFiles);
-  } catch {
-    absoluteImportsPercentage = 0;
-  }
-
-  generalResult.push({
-    metric: generalMetrics.ABSOLUTE_IMPORTS_PERCENTAGE,
-    description: 'Porcentaje de imports absolutos del total',
-    value: absoluteImportsPercentage
-  });
 
   return generalResult;
 };
