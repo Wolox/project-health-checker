@@ -27,7 +27,7 @@ module.exports = (reports, testPath) => {
   const clocReport = getClocReport(path.resolve(testPath), 'angular');
   const componentFilePaths = Object.keys(clocReport).filter(filepath => /.component.ts$/.test(filepath));
   const templateFilePaths = Object.keys(clocReport).filter(filepath => /.component.html$/.test(filepath));
-  const mainFile = fs.readFileSync(path.resolve(testPath, 'src/main.ts')).toString('utf8');
+  const mainFile = fs.readFileSync(path.resolve(testPath, 'src/main.ts'));
 
   // => Testing
 
@@ -216,7 +216,7 @@ module.exports = (reports, testPath) => {
   summary.push({
     metric: 'SUMMARY-PERFORMANCE-6',
     description: 'Utilizar enableProdMode en produción',
-    value: mainFile.includes("if (ENV === 'production'") && mainFile.includes('enableProdMode()')
+    value: mainFile.toString().includes("if (ENV === 'production'") && mainFile.includes('enableProdMode()')
   });
 
   console.log('Partial angular summary', summary);
