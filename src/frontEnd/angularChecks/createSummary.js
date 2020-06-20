@@ -30,7 +30,6 @@ module.exports = (reports, testPath) => {
   const componentFilePaths = Object.keys(clocReport).filter(filepath => /.component.ts$/.test(filepath));
   const templateFilePaths = Object.keys(clocReport).filter(filepath => /.component.html$/.test(filepath));
   const mainFile = fs.readFileSync(path.resolve(testPath, 'src/main.ts')).toString('utf8');
-  console.log('Main File', mainFile);
 
   // => Testing
 
@@ -157,7 +156,21 @@ module.exports = (reports, testPath) => {
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-3',
     description: 'Utiliza services globales o ngRx para el manejo de la información global.',
-    value: reports.filter(({ metric, value }) => metric === dependenciesMetrics.NG_RX && value)
+    value: reports.some(({ metric, value }) => metric === dependenciesMetrics.NG_RX && value)
+  });
+  summary.push({
+    metric: 'SUMMARY-CLIENT-SERVER-4',
+    description: 'Singleton services por screen',
+    value: (() => {
+      const screensPath = path.resolve(testPath, 'src/app/pages');
+      const screenFolders = fs.readdirSync(screensPath);
+      const getFolderContent = (result, folder) =>
+        Object.assign(result, { [folder]: fs.readdirSync(path.join(screensPath, folder)) });
+      const screensContent = screenFolders.reduce(getFolderContent, {});
+      const folderHasService = screenContent => screenContent.some(file => /.services.ts$/.test(file));
+
+      return Object.values(screensContent).every(folderHasService);
+    })()
   });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-5',
