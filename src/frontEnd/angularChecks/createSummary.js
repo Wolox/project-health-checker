@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const { findSync } = require('find-in-files');
 
 const envMetrics = require('../../envChecks/constants');
 const testMetrics = require('../../testChecks/constants');
@@ -8,7 +7,6 @@ const dependenciesMetrics = require('../../dependenciesChecks/constants');
 const { generalMetrics } = require('../../generalChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
 const { fetchJSON, getClocReport } = require('../../utils');
-const { angularMetrics } = require('./constants');
 
 const limits = {
   minTestCoverage: 80,
@@ -151,7 +149,14 @@ module.exports = (reports, testPath) => {
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-2',
     description: 'Solo se utiliza el httpClient para comunicarse con API externas',
-    value: reports.filter(({ metric, value }) => metric === angularMetrics.USE_HTTP_CLIENT && value)
+    value: (() => {
+      try {
+        const apiConfigFile = fs.readFileSync(path.join(testPath, 'src/app/services/api.service.ts'));
+        return apiConfigFile.toString().includes("import { HttpClient } from '@angular/common/http'");
+      } catch {
+        return false;
+      }
+    })()
   });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-3',
