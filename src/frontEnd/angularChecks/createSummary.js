@@ -58,7 +58,9 @@ module.exports = (reports, testPath) => {
   summary.push({
     metric: 'SUMMARY-TESTING-5',
     description: 'El proyecto usa JEST. Jasmine y Karma han sido removidos',
-    value: /^jest/.test(packageJson.scripts.test) || testConfigFile.includes("import 'jest-preset-angular'")
+    value:
+      /^jest/.test(packageJson.scripts.test) ||
+      testConfigFile.toString().includes("import 'jest-preset-angular'")
   });
 
   // => Security
@@ -92,8 +94,8 @@ module.exports = (reports, testPath) => {
     metric: 'SUMMARY-BUILDING-1',
     description: 'El proyecto utiliza la ultima o anteultima versión del framework',
     value: !reports.some(
-      elem =>
-        elem.metric === dependenciesMetrics.OUTDATED_DEPENDENCIES && elem.value.includes('@angular/core')
+      ({ metric, value }) =>
+        metric === dependenciesMetrics.OUTDATED_DEPENDENCIES && value.includes('@angular/core')
     )
   });
   summary.push({
