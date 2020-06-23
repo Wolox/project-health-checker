@@ -2,12 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const { findSync } = require('find-in-files');
 const { fetchJSON, getClocReport } = require('../../utils');
-const { angularMetrics, limits } = require('./constants');
-
-const JEST_REGEX = /^jest/;
-const NG_BUILD_REGEX = /^ng build --prod/;
-const HTTP_CLIENT_IMPORT = "import { HttpClient } from '@angular/common/http'";
-const folderHasService = folder => folder.some(file => /.services.ts$/.test(file));
+const {
+  angularMetrics,
+  limits,
+  folderHasService,
+  JEST_REGEX,
+  NG_BUILD_REGEX,
+  HTTP_CLIENT_IMPORT
+} = require('./constants');
 
 module.exports = testPath => {
   const angularResult = [];

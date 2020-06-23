@@ -181,7 +181,6 @@ const performanceSummary = (summary, reports) => {
   });
 };
 
-// eslint-disable-next-line max-statements
 module.exports = reports => {
   const summary = [];
 
@@ -191,8 +190,6 @@ module.exports = reports => {
   uiUxSummary(summary, reports);
   clientServerSummary(summary, reports);
   performanceSummary(summary, reports);
-
-  console.log('Partial angular summary', summary);
 
   return [...summary, ...reports];
 };
