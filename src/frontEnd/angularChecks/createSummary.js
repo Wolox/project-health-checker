@@ -1,40 +1,16 @@
-const fs = require('fs');
-const path = require('path');
-
+const { limits } = require('./constants');
 const envMetrics = require('../../envChecks/constants');
 const testMetrics = require('../../testChecks/constants');
 const dependenciesMetrics = require('../../dependenciesChecks/constants');
 const { generalMetrics } = require('../../generalChecks/constants');
 const seoMetrics = require('../seoChecks/constants');
-const { fetchJSON, getClocReport } = require('../../utils');
+const { angularMetrics } = require('./constants');
 
-const limits = {
-  minTestCoverage: 80,
-  maxUnusedDependencies: 10,
-  pwaMin: 30,
-  maxNumberOfComponentLines: 200,
-  maxNumberOfTemplateLines: 150,
-  minBestPractices: 70,
-  minSeo: 90,
-  minFirstPaint: 50
-};
-
-// eslint-disable-next-line max-statements
-module.exports = (reports, testPath) => {
-  const summary = [];
-  const packageJson = fetchJSON(`${testPath}/package.json`);
-  const testConfigFile = fs.readFileSync(`${testPath}/src/test.ts`);
-  const clocReport = getClocReport(path.resolve(testPath), 'angular');
-  const componentFilePaths = Object.keys(clocReport).filter(filepath => /.component.ts$/.test(filepath));
-  const templateFilePaths = Object.keys(clocReport).filter(filepath => /.component.html$/.test(filepath));
-  const mainFile = fs.readFileSync(path.resolve(testPath, 'src/main.ts'));
-
-  // => Testing
-
+const testSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-TESTING-1',
     description: 'La arquitectura de la aplicación se encuentra preparada para implementar test unitarios',
-    value: reports.some(elem => elem.metric === dependenciesMetrics.JEST && elem.value)
+    value: reports.some(({ metric, value }) => metric === dependenciesMetrics.JEST && value)
   });
   summary.push({
     metric: 'SUMMARY-TESTING-2',
@@ -58,13 +34,11 @@ module.exports = (reports, testPath) => {
   summary.push({
     metric: 'SUMMARY-TESTING-5',
     description: 'El proyecto usa JEST. Jasmine y Karma han sido removidos',
-    value:
-      /^jest/.test(packageJson.scripts.test) ||
-      testConfigFile.toString().includes("import 'jest-preset-angular'")
+    value: reports.some(({ metric, value }) => metric === angularMetrics.USE_JEST && value)
   });
+};
 
-  // => Security
-
+const securitySummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-SECURITY-1',
     description: 'Existe un .env con variables de entorno en el proyecto',
@@ -87,9 +61,9 @@ module.exports = (reports, testPath) => {
     description: 'Usa renderer 2 para manipular el DOM cuando es necesario.',
     value: true
   });
+};
 
-  // => Building
-
+const buildingSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-BUILDING-1',
     description: 'El proyecto utiliza la ultima o anteultima versión del framework',
@@ -113,11 +87,11 @@ module.exports = (reports, testPath) => {
   summary.push({
     metric: 'SUMMARY-BUILDING-6',
     description: 'El proyecto usa webpack para generar el build en producción',
-    value: /^ng build --prod/.test(packageJson.scripts.build)
+    value: reports.some(({ metric, value }) => metric === angularMetrics.NG_BUILD && value)
   });
+};
 
-  // => UI & UX
-
+const uiUxSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-UI-UX-1',
     description: 'El proyecto es mobile friendly según lighthouse',
@@ -138,27 +112,21 @@ module.exports = (reports, testPath) => {
     description: 'Se prioriza el uso de formularios reactivos',
     value: true
   });
+};
 
-  // => Client Server Integration
-
+const clientServerSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-1',
     description: 'El proyecto posee services dedicados a los distintos recurso que posee',
-    value: reports
-      .filter(({ metric }) => metric === generalMetrics.FOLDER_STRUCTURE)
-      .some(({ description }) => description.includes('services'))
+    value: reports.some(
+      ({ metric, description }) =>
+        metric === generalMetrics.FOLDER_STRUCTURE && description.includes('services')
+    )
   });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-2',
     description: 'Solo se utiliza el httpClient para comunicarse con API externas',
-    value: (() => {
-      try {
-        const apiConfigFile = fs.readFileSync(path.join(testPath, 'src/app/services/api.service.ts'));
-        return apiConfigFile.toString().includes("import { HttpClient } from '@angular/common/http'");
-      } catch {
-        return false;
-      }
-    })()
+    value: reports.some(({ metric, value }) => metric === angularMetrics.USE_HTTP_CLIENT && value)
   });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-3',
@@ -168,31 +136,22 @@ module.exports = (reports, testPath) => {
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-4',
     description: 'Singleton services por screen',
-    value: (() => {
-      const screensPath = path.resolve(testPath, 'src/app/pages');
-      const screenFolders = fs.readdirSync(screensPath);
-      const getFolderContent = (result, folder) =>
-        Object.assign(result, { [folder]: fs.readdirSync(path.join(screensPath, folder)) });
-      const screensContent = screenFolders.reduce(getFolderContent, {});
-      const folderHasService = screenContent => screenContent.some(file => /.services.ts$/.test(file));
-
-      return Object.values(screensContent).every(folderHasService);
-    })()
+    value: reports.some(({ metric, value }) => metric === angularMetrics.SERVICE_PER_SCREEN && value)
   });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-5',
     description:
       'Está bien delimitada la responsabilidad de los smart vs dummies components, teniendo components.ts menores a 200 líneas',
-    value: componentFilePaths.every(filepath => clocReport[filepath].code <= limits.maxNumberOfComponentLines)
+    value: reports.some(({ metric, value }) => metric === angularMetrics.COMPONENTS_LENGTH && value)
   });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-6',
     description: 'El template de los componentes tiene 150 líneas o menos.',
-    value: templateFilePaths.every(filepath => clocReport[filepath].code <= limits.maxNumberOfTemplateLines)
+    value: reports.some(({ metric, value }) => metric === angularMetrics.TEMPLATE_LENGTH && value)
   });
+};
 
-  // => Perfomance
-
+const performanceSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-PERFORMANCE-1',
     description: 'No hay render blocking js',
@@ -212,14 +171,26 @@ module.exports = (reports, testPath) => {
     metric: 'SUMMARY-PERFORMANCE-3',
     description: 'El proyecto posee un First Contentful Paint menor a 4 segundos',
     value: reports.some(
-      elem => elem.metric === seoMetrics.FIRST_CONTENTFUL_PAINT && elem.value >= limits.minFirstPaint
+      ({ metric, value }) => metric === seoMetrics.FIRST_CONTENTFUL_PAINT && value >= limits.minFirstPaint
     )
   });
   summary.push({
     metric: 'SUMMARY-PERFORMANCE-6',
     description: 'Utilizar enableProdMode en produción',
-    value: mainFile.toString().includes("if (ENV === 'production'") && mainFile.includes('enableProdMode()')
+    value: reports.some(({ metric, value }) => metric === angularMetrics.PRODUCTION_MODE_ENABLED && value)
   });
+};
+
+// eslint-disable-next-line max-statements
+module.exports = reports => {
+  const summary = [];
+
+  testSummary(summary, reports);
+  securitySummary(summary, reports);
+  buildingSummary(summary, reports);
+  uiUxSummary(summary, reports);
+  clientServerSummary(summary, reports);
+  performanceSummary(summary, reports);
 
   console.log('Partial angular summary', summary);
 

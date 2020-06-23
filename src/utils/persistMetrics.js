@@ -49,6 +49,5 @@ module.exports = (reportCodeQuality, tech, env, repoName) => {
         value: elem.value
       }))
   };
-  // axiosApi.post('/metrics', body).catch(error => console.log(`Error: ${error}`));
-  console.log(body);
+  axiosApi.post('/metrics', body).catch(error => console.log(`Error: ${error}`));
 };
