@@ -179,6 +179,11 @@ const performanceSummary = (summary, reports) => {
     description: 'Utilizar enableProdMode en produción',
     value: reports.some(({ metric, value }) => metric === angularMetrics.PRODUCTION_MODE_ENABLED && value)
   });
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-8',
+    description: '*ngFor utilizar trackBy',
+    value: reports.some(({ metric, value }) => metric === angularMetrics.NG_FOR_TRACK_BY && value)
+  });
 };
 
 module.exports = reports => {

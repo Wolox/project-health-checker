@@ -7,7 +7,8 @@ module.exports.angularMetrics = createObject([
   'COMPONENTS_LENGTH',
   'TEMPLATE_LENGTH',
   'SERVICE_PER_SCREEN',
-  'PRODUCTION_MODE_ENABLED'
+  'PRODUCTION_MODE_ENABLED',
+  'NG_FOR_TRACK_BY'
 ]);
 
 module.exports.limits = {

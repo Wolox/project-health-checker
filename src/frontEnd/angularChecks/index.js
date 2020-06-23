@@ -68,6 +68,23 @@ module.exports = testPath => {
     description: '',
     value: findSync('enableProdMode()', path.join(testPath, 'src'), 'main.ts$')
   });
+  angularResult.push({
+    metric: angularMetrics.NG_FOR_TRACK_BY,
+    description: 'Cuando se utiliza ngFor se define el atributo trackBy',
+    value: (() => {
+      let ngForUseTrackBy = false;
+
+      findSync('ngFor', path.join(testPath, 'src/app'), 'component.html$').then(result => {
+        ngForUseTrackBy = Object.values(result).every(({ line }) =>
+          ['trackBy', 'ngForTrackBy'].includes(line)
+        );
+      });
+
+      return ngForUseTrackBy;
+    })()
+  });
+
+  console.log(angularResult);
 
   return angularResult;
 };
