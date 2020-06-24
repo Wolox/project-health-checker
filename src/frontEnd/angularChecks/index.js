@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const { findSync } = require('find-in-files');
 const { fetchJSON, getClocReport } = require('../../utils');
 const {
   angularMetrics,
@@ -10,8 +9,10 @@ const {
   NG_BUILD_REGEX,
   HTTP_CLIENT_IMPORT
 } = require('./constants');
+const { checkTrackByUse } = require('./utils');
+const { findSync } = require('find-in-files');
 
-module.exports = testPath => {
+module.exports = async testPath => {
   const angularResult = [];
   const packageJson = fetchJSON(`${testPath}/package.json`);
   const testConfigFile = fs.readFileSync(`${testPath}/src/test.ts`);
@@ -22,6 +23,9 @@ module.exports = testPath => {
   const clocReport = getClocReport(path.resolve(testPath), 'angular');
   const componentFilePaths = Object.keys(clocReport).filter(filepath => /.component.ts$/.test(filepath));
   const templateFilePaths = Object.keys(clocReport).filter(filepath => /.component.html$/.test(filepath));
+  const mainFilePath = path.join(testPath, 'src/main.ts');
+  const mainFile = fs.existsSync(mainFilePath) && fs.readFileSync(mainFilePath);
+  const appRoutesFile = fs.readFileSync(path.join(testPath, 'src/app/app-routing.module.ts'));
 
   const everyScreenHasService = () => {
     const screens = screensFolder.reduce(
@@ -66,21 +70,23 @@ module.exports = testPath => {
   angularResult.push({
     metric: angularMetrics.PRODUCTION_MODE_ENABLED,
     description: '',
-    value: findSync('enableProdMode()', path.join(testPath, 'src'), 'main.ts$')
+    value: mainFile && mainFile.toString().includes('enableProdMode()')
   });
   angularResult.push({
     metric: angularMetrics.NG_FOR_TRACK_BY,
     description: 'Cuando se utiliza ngFor se define el atributo trackBy',
+    value: await checkTrackByUse(testPath)
+  });
+  angularResult.push({
+    metric: angularMetrics.LAZY_LOADING,
+    description: 'Los componentes de las rutas se obtienen utilizando lazy loading',
     value: (() => {
-      let ngForUseTrackBy = false;
+      const appRoutesFileStrig = appRoutesFile.toString();
+      const nPaths = (appRoutesFileStrig.match(/path: /g) || []).length;
+      const nRedirectTo = (appRoutesFileStrig.match(/redirectTo: /g) || []).length;
+      const nLoadChildren = (appRoutesFileStrig.match(/loadChildren: /g) || []).length;
 
-      findSync('ngFor', path.join(testPath, 'src/app'), 'component.html$').then(result => {
-        ngForUseTrackBy = Object.values(result).every(({ line }) =>
-          ['trackBy', 'ngForTrackBy'].includes(line)
-        );
-      });
-
-      return ngForUseTrackBy;
+      return nLoadChildren === nPaths - nRedirectTo;
     })()
   });
 

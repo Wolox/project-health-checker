@@ -55,12 +55,6 @@ const securitySummary = (summary, reports) => {
     description: 'No se guardan claves secretas en texto plano o en constantes dentro de la aplicación',
     value: 'Manual'
   });
-  // ? Need Review
-  summary.push({
-    metric: 'SUMMARY-SECURITY-6',
-    description: 'Usa renderer 2 para manipular el DOM cuando es necesario.',
-    value: true
-  });
 };
 
 const buildingSummary = (summary, reports) => {
@@ -173,6 +167,11 @@ const performanceSummary = (summary, reports) => {
     value: reports.some(
       ({ metric, value }) => metric === seoMetrics.FIRST_CONTENTFUL_PAINT && value >= limits.minFirstPaint
     )
+  });
+  summary.push({
+    metric: '',
+    description: 'La aplicación es dividida en módulos e implementa lazy loading',
+    value: reports.some(({ metric, value }) => metric === angularMetrics.LAZY_LOADING && value)
   });
   summary.push({
     metric: 'SUMMARY-PERFORMANCE-6',
