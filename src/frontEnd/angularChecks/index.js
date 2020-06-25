@@ -10,7 +10,6 @@ const {
   HTTP_CLIENT_IMPORT
 } = require('./constants');
 const { checkTrackByUse } = require('./utils');
-const { findSync } = require('find-in-files');
 
 module.exports = async testPath => {
   const angularResult = [];
@@ -42,41 +41,49 @@ module.exports = async testPath => {
       JEST_REGEX.test(packageJson.scripts.test) ||
       testConfigFile.toString().includes("import 'jest-preset-angular'")
   });
+
   angularResult.push({
     metric: angularMetrics.NG_BUILD,
     description: 'El proyecto usa ng-build para el building',
     value: NG_BUILD_REGEX.test(packageJson.scripts.build)
   });
+
   angularResult.push({
     metric: angularMetrics.USE_HTTP_CLIENT,
     description: 'Usa http-client para la configuración del api.service.ts',
     value: apiConfigFile && apiConfigFile.includes(HTTP_CLIENT_IMPORT)
   });
+
   angularResult.push({
     metric: angularMetrics.SERVICE_PER_SCREEN,
     description: 'Cada screen tiene un service.ts',
-    value: screensFolder && everyScreenHasService(screensFolder)
+    value: screensFolder && everyScreenHasService()
   });
+
   angularResult.push({
     metric: angularMetrics.COMPONENTS_LENGTH,
     description: 'Los archivos component.ts no superan las 200 líneas',
     value: componentFilePaths.every(filepath => clocReport[filepath].code <= limits.maxNumberOfComponentLines)
   });
+
   angularResult.push({
     metric: angularMetrics.TEMPLATE_LENGTH,
     description: 'Los archivos component.html no superan las 150 líneas',
     value: templateFilePaths.every(filepath => clocReport[filepath].code <= limits.maxNumberOfTemplateLines)
   });
+
   angularResult.push({
     metric: angularMetrics.PRODUCTION_MODE_ENABLED,
     description: '',
     value: mainFile && mainFile.toString().includes('enableProdMode()')
   });
+
   angularResult.push({
     metric: angularMetrics.NG_FOR_TRACK_BY,
     description: 'Cuando se utiliza ngFor se define el atributo trackBy',
     value: await checkTrackByUse(testPath)
   });
+
   angularResult.push({
     metric: angularMetrics.LAZY_LOADING,
     description: 'Los componentes de las rutas se obtienen utilizando lazy loading',
@@ -86,11 +93,9 @@ module.exports = async testPath => {
       const nRedirectTo = (appRoutesFileStrig.match(/redirectTo: /g) || []).length;
       const nLoadChildren = (appRoutesFileStrig.match(/loadChildren: /g) || []).length;
 
-      return nLoadChildren === nPaths - nRedirectTo;
+      return nPaths === nLoadChildren + nRedirectTo;
     })()
   });
-
-  console.log(angularResult);
 
   return angularResult;
 };

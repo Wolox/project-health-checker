@@ -1,7 +1,7 @@
 const dependenciesMetrics = require('./constants');
 const npmCheck = require('npm-check');
 
-module.exports = async (installInfo, testPath, tech) => {
+module.exports = async (installInfo, testPath) => {
   const dependenciesResults = [];
   const totalPackages = installInfo.stdout.slice(
     installInfo.stdout.search('audited') + 'audited'.length,
@@ -46,19 +46,17 @@ module.exports = async (installInfo, testPath, tech) => {
     value: packages.some(({ moduleName }) => moduleName === 'jest')
   });
 
-  if (tech === 'angular') {
-    dependenciesResults.push({
-      metric: dependenciesMetrics.NG_RX,
-      description: 'Esta instalado ngRx en el proyecto',
-      value: packages.some(({ moduleName }) => moduleName === '@ngrx/store')
-    });
-  } else {
-    dependenciesResults.push({
-      metric: dependenciesMetrics.AXIOS_APISAUCE,
-      description: 'Esta instalado axios o apisauce en el proyecto',
-      value: packages.some(({ moduleName }) => moduleName === 'axios' || moduleName === 'apisauce')
-    });
-  }
+  dependenciesResults.push({
+    metric: dependenciesMetrics.NG_RX,
+    description: 'Esta instalado ngRx en el proyecto',
+    value: packages.some(({ moduleName }) => moduleName === '@ngrx/store')
+  });
+
+  dependenciesResults.push({
+    metric: dependenciesMetrics.AXIOS_APISAUCE,
+    description: 'Esta instalado axios o apisauce en el proyecto',
+    value: packages.some(({ moduleName }) => moduleName === 'axios' || moduleName === 'apisauce')
+  });
 
   return dependenciesResults;
 };

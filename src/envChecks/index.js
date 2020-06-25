@@ -10,7 +10,7 @@ module.exports = async (testPath, techChecks) => {
   let exitsEnvFile = false;
 
   if (techChecks === 'angular') {
-    exitsEnvFile = fs.existsSync(`${testPath}/src/environments/environment.ts`);
+    exitsEnvFile = await fs.existsSync(`${testPath}/src/environments/environment.ts`);
   } else {
     const results = await findSync('process.env.', testPath, '.js$');
     exitsEnvFile = !!analyzeMatches(results).length;
@@ -19,7 +19,7 @@ module.exports = async (testPath, techChecks) => {
   envresult.push({
     metric: envMetrics.ENV_IS_USED,
     description: 'Se utiliza un .env en el proyecto',
-    value: await exitsEnvFile
+    value: exitsEnvFile
   });
 
   return envresult;
