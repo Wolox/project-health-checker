@@ -10,7 +10,8 @@ module.exports.angularMetrics = createObject([
   'PRODUCTION_MODE_ENABLED',
   'NG_FOR_TRACK_BY',
   'LAZY_LOADING',
-  'PURE_PIPES'
+  'PURE_PIPES',
+  'INJECTABLE_DECORATOR'
 ]);
 
 module.exports.limits = {

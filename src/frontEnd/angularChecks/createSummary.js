@@ -100,12 +100,6 @@ const uiUxSummary = (summary, reports) => {
       .filter(({ metric }) => metric === generalMetrics.FOLDER_STRUCTURE)
       .every(({ value }) => value)
   });
-  // ? Need Review
-  summary.push({
-    metric: 'SUMMARY-UI-UX-5',
-    description: 'Se prioriza el uso de formularios reactivos',
-    value: true
-  });
 };
 
 const clientServerSummary = (summary, reports) => {
@@ -169,9 +163,14 @@ const performanceSummary = (summary, reports) => {
     )
   });
   summary.push({
-    metric: angularMetrics.LAZY_LOADING,
+    metric: 'SUMMARY-PERFORMANCE-4',
     description: 'La aplicación es dividida en módulos e implementa lazy loading',
     value: reports.some(({ metric, value }) => metric === angularMetrics.LAZY_LOADING && value)
+  });
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-5',
+    description: 'Usar injectable()  a diferencia de module -> providers[]',
+    value: reports.some(({ metric, value }) => metric === angularMetrics.INJECTABLE_DECORATOR && value)
   });
   summary.push({
     metric: 'SUMMARY-PERFORMANCE-6',

@@ -9,7 +9,7 @@ const {
   NG_BUILD_REGEX,
   HTTP_CLIENT_IMPORT
 } = require('./constants');
-const { checkTrackByUse, checkPurePipes } = require('./utils');
+const { checkTrackByUse, checkInjectable, filesHasString } = require('./utils');
 
 module.exports = async testPath => {
   const angularResult = [];
@@ -17,20 +17,14 @@ module.exports = async testPath => {
   const testConfigFile = fs.readFileSync(`${testPath}/src/test.ts`);
   const apiConfigPath = path.join(testPath, 'src/app/services/api.service.ts');
   const apiConfigFile = fs.existsSync(apiConfigPath) && fs.readFileSync(apiConfigPath);
-  const screensPath = path.resolve(testPath, 'src/app/screens');
-  const screensFolder = fs.existsSync(screensPath) && fs.readFileSync(screensPath);
+  const screensPath = path.join(testPath, 'src/app/pages');
+  const screensFolder = fs.existsSync(screensPath) && fs.readdirSync(screensPath);
   const clocReport = getClocReport(path.resolve(testPath), 'angular');
   const componentFilePaths = Object.keys(clocReport).filter(filepath => /.component.ts$/.test(filepath));
   const templateFilePaths = Object.keys(clocReport).filter(filepath => /.component.html$/.test(filepath));
   const mainFilePath = path.join(testPath, 'src/main.ts');
   const mainFile = fs.existsSync(mainFilePath) && fs.readFileSync(mainFilePath);
   const appRoutesFile = fs.readFileSync(path.join(testPath, 'src/app/app-routing.module.ts'));
-
-  const everyScreenHasService = () =>
-    screensFolder.every(screen => {
-      const screenContent = fs.readdirSync(path.join(testPath, screen));
-      return folderHasService(screenContent);
-    });
 
   angularResult.push({
     metric: angularMetrics.USE_JEST,
@@ -55,7 +49,12 @@ module.exports = async testPath => {
   angularResult.push({
     metric: angularMetrics.SERVICE_PER_SCREEN,
     description: 'Cada screen tiene un service.ts',
-    value: screensFolder && everyScreenHasService()
+    value:
+      screensFolder &&
+      screensFolder.every(screen => {
+        const screenContent = fs.readdirSync(path.join(screensPath, screen));
+        return folderHasService(screenContent);
+      })
   });
 
   angularResult.push({
@@ -98,10 +97,14 @@ module.exports = async testPath => {
   angularResult.push({
     metric: angularMetrics.PURE_PIPES,
     description: 'Todos los custom-pipes son puros',
-    value: await checkPurePipes(testPath)
+    value: await filesHasString('pure: true', path.join(testPath, 'src'), 'pipe.ts$')
   });
 
-  console.log(angularResult);
+  angularResult.push({
+    metric: angularMetrics.INJECTABLE_DECORATOR,
+    description: 'Los services utilizan @Injectable en lugar de providers',
+    value: await checkInjectable(screensFolder, screensPath, testPath)
+  });
 
   return angularResult;
 };
