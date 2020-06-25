@@ -169,7 +169,7 @@ const performanceSummary = (summary, reports) => {
     )
   });
   summary.push({
-    metric: '',
+    metric: angularMetrics.LAZY_LOADING,
     description: 'La aplicación es dividida en módulos e implementa lazy loading',
     value: reports.some(({ metric, value }) => metric === angularMetrics.LAZY_LOADING && value)
   });
@@ -177,6 +177,11 @@ const performanceSummary = (summary, reports) => {
     metric: 'SUMMARY-PERFORMANCE-6',
     description: 'Utilizar enableProdMode en produción',
     value: reports.some(({ metric, value }) => metric === angularMetrics.PRODUCTION_MODE_ENABLED && value)
+  });
+  summary.push({
+    metric: 'SUMMARY-PERFORMANCE-7',
+    description: 'Usar pipe puros',
+    value: reports.some(({ metric, value }) => metric === angularMetrics.PURE_PIPES && value)
   });
   summary.push({
     metric: 'SUMMARY-PERFORMANCE-8',

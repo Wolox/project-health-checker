@@ -9,7 +9,8 @@ module.exports.angularMetrics = createObject([
   'SERVICE_PER_SCREEN',
   'PRODUCTION_MODE_ENABLED',
   'NG_FOR_TRACK_BY',
-  'LAZY_LOADING'
+  'LAZY_LOADING',
+  'PURE_PIPES'
 ]);
 
 module.exports.limits = {
@@ -27,5 +28,4 @@ module.exports.folderHasService = folder => folder.some(file => /.services.ts$/.
 module.exports.JEST_REGEX = /^jest/;
 module.exports.NG_BUILD_REGEX = /^ng build --prod/;
 module.exports.HTTP_CLIENT_IMPORT = "import { HttpClient } from '@angular/common/http'";
-module.exports.DOM_MUTATION_REGEX = /.nativeElement.[\w\d_.]+ =/i;
 module.exports.TRACK_BY_REGEX = /\b(trackBy|ngForTrackBy)\b/;

@@ -9,7 +9,7 @@ const {
   NG_BUILD_REGEX,
   HTTP_CLIENT_IMPORT
 } = require('./constants');
-const { checkTrackByUse } = require('./utils');
+const { checkTrackByUse, checkPurePipes } = require('./utils');
 
 module.exports = async testPath => {
   const angularResult = [];
@@ -26,13 +26,11 @@ module.exports = async testPath => {
   const mainFile = fs.existsSync(mainFilePath) && fs.readFileSync(mainFilePath);
   const appRoutesFile = fs.readFileSync(path.join(testPath, 'src/app/app-routing.module.ts'));
 
-  const everyScreenHasService = () => {
-    const screens = screensFolder.reduce(
-      (result, folder) => Object.assign(result, { [folder]: fs.readdirSync(path.join(screensPath, folder)) }),
-      {}
-    );
-    return Object.values(screens).every(folderHasService);
-  };
+  const everyScreenHasService = () =>
+    screensFolder.every(screen => {
+      const screenContent = fs.readdirSync(path.join(testPath, screen));
+      return folderHasService(screenContent);
+    });
 
   angularResult.push({
     metric: angularMetrics.USE_JEST,
@@ -96,6 +94,14 @@ module.exports = async testPath => {
       return nPaths === nLoadChildren + nRedirectTo;
     })()
   });
+
+  angularResult.push({
+    metric: angularMetrics.PURE_PIPES,
+    description: 'Todos los custom-pipes son puros',
+    value: await checkPurePipes(testPath)
+  });
+
+  console.log(angularResult);
 
   return angularResult;
 };
