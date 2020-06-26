@@ -17,6 +17,7 @@ const frontendChecks = require('./src/frontEnd');
 const createSummary = {
   react: require('./src/frontEnd/reactChecks/createSummary'),
   vue: require('./src/frontEnd/vueChecks/createSummary'),
+  angular: require('./src/frontEnd/angularChecks/createSummary'),
   nuxt: require('./src/frontEnd/nuxtChecks/createSummary')
 };
 
@@ -89,7 +90,7 @@ async function executeChecks() {
   let buildData = [];
   let crashesData = [];
   console.log(green, 'Comenzando auditoria...');
-  envData = await runEnvChecks(testPath);
+  envData = await runEnvChecks(testPath, techChecks);
   console.log(green, 'Chequeos de env terminados con exito ✓');
   generalData = await runGeneralChecks(testPath, techChecks);
   console.log(green, 'Chequeos generales terminados con exito ✓');

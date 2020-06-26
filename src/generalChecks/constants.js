@@ -17,7 +17,8 @@ module.exports.generalMetrics = createObject([
   'CODE_OWNERS',
   'FOLDER_STRUCTURE',
   'BABEL_IMPORTS',
-  'CODE_QUALITY'
+  'CODE_QUALITY',
+  'ABSOLUTE_IMPORTS_PERCENTAGE'
 ]);
 
 module.exports.DOCKERFILE_ATTRIBUTES = ['FROM', 'WORKDIR', 'COPY', 'RUN', 'ENV', 'WORKDIR'];
@@ -37,11 +38,13 @@ module.exports.folderStructure = {
     'plugins',
     'services',
     'store'
-  ]
+  ],
+  angular: ['components', 'helpers', 'interfaces', 'screens', 'services']
 };
 
 module.exports.rootPath = {
   react: 'src',
   vue: 'src',
-  nuxt: ''
+  nuxt: '',
+  angular: 'app'
 };

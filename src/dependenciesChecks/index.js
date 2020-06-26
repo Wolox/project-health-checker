@@ -41,15 +41,21 @@ module.exports = async (installInfo, testPath) => {
   });
 
   dependenciesResults.push({
-    metric: dependenciesMetrics.AXIOS_APISAUCE,
-    description: 'Esta instalado axios o apisauce en el proyecto',
-    value: packages.some(({ moduleName }) => moduleName === 'axios' || moduleName === 'apisauce')
-  });
-
-  dependenciesResults.push({
     metric: dependenciesMetrics.JEST,
     description: 'Esta instalado Jest en el proyecto',
     value: packages.some(({ moduleName }) => moduleName === 'jest')
+  });
+
+  dependenciesResults.push({
+    metric: dependenciesMetrics.NG_RX,
+    description: 'Esta instalado ngRx en el proyecto',
+    value: packages.some(({ moduleName }) => moduleName === '@ngrx/store')
+  });
+
+  dependenciesResults.push({
+    metric: dependenciesMetrics.AXIOS_APISAUCE,
+    description: 'Esta instalado axios o apisauce en el proyecto',
+    value: packages.some(({ moduleName }) => moduleName === 'axios' || moduleName === 'apisauce')
   });
 
   dependenciesResults.push({

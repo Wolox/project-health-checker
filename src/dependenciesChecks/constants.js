@@ -7,6 +7,7 @@ module.exports = createObject([
   'INDIRECT_DEPENDENCIES',
   'AXIOS_APISAUCE',
   'JEST',
+  'NG_RX',
   'VUE_TEST_UTILS',
   'VUEX'
 ]);

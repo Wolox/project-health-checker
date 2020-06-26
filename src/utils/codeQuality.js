@@ -3,7 +3,7 @@ const hundred = 100;
 
 module.exports = reports => {
   const onlyBooleanSummary = reports.filter(
-    elem => elem.metric.includes('SUMMARY') && typeof elem.value === 'boolean'
+    ({ metric, value }) => metric.includes('SUMMARY') && typeof value === 'boolean'
   );
   return [
     ...reports,

@@ -45,6 +45,7 @@ module.exports = async (testPath, tech, buildScriptName) => {
       'El build no se pudo generar con exito. BUILD_TIME y APP_SIZE no se han podido sacar correctamente'
     );
   }
+
   return [
     ...eslintData,
     ...testData,
