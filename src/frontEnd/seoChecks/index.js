@@ -29,7 +29,7 @@ module.exports = async url => {
     const results = await lighthouse(url, opts);
     const csv = ReportGenerator.generateReport(results.lhr, 'csv');
     const metrics = await csvtojson().fromString(csv);
-    const firstMeaningfulPaint = metrics.find(({ name }) => name === 'first-meaningful-paint');
+    const largestContentfulPaint = metrics.find(({ name }) => name === 'largest-contentful-paint');
     const firstContentfulPaint = metrics.find(({ name }) => name === 'first-contentful-paint');
 
     seoResults.push({
@@ -39,8 +39,8 @@ module.exports = async url => {
     });
     seoResults.push({
       metric: seoMetrics.LOAD_TIME,
-      description: firstMeaningfulPaint.title,
-      value: firstMeaningfulPaint.score * hundred
+      description: largestContentfulPaint.title,
+      value: largestContentfulPaint.score * hundred
     });
     lighthouseSummary.forEach(({ metric, id }) =>
       seoResults.push({
