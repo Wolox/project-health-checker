@@ -5,7 +5,7 @@ const techs = {
   react: require('./reactChecks'),
   angular: require('./angularChecks'),
   vue: require('./vueChecks'),
-  nuxt: require('./vueChecks')
+  nuxt: require('./nuxtChecks')
 };
 
 module.exports = async (testPath, tech, seoLink) => {
