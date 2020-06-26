@@ -17,7 +17,7 @@ module.exports = async testPath => {
   const testConfigFile = fs.readFileSync(`${testPath}/src/test.ts`);
   const apiConfigPath = path.join(testPath, 'src/app/services/api.service.ts');
   const apiConfigFile = fs.existsSync(apiConfigPath) && fs.readFileSync(apiConfigPath);
-  const screensPath = path.join(testPath, 'src/app/pages');
+  const screensPath = path.join(testPath, 'src/app/screens');
   const screensFolder = fs.existsSync(screensPath) && fs.readdirSync(screensPath);
   const clocReport = getClocReport(path.resolve(testPath), 'angular');
   const componentFilePaths = Object.keys(clocReport).filter(filepath => /.component.ts$/.test(filepath));
