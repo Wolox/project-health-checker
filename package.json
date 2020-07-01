@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch --setupFiles dotenv/config",
-    "cloc": "cloc"
+    "test": "jest --watch --setupFiles dotenv/config"
   },
   "author": "",
   "license": "ISC",

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const { fetchJSON, getClocReport } = require('../../utils');
+const shell = require('shelljs');
+const { fetchJSON } = require('../../utils');
 const {
   angularMetrics,
   limits,
@@ -13,15 +14,16 @@ const { checkTrackByUse, checkInjectable, filesHasString } = require('./utils');
 
 module.exports = async testPath => {
   const angularResult = [];
+  const { stdout: execClocStdout } = shell.exec(
+    `node_modules/.bin/cloc --by-file --match-f='component.(ts|html)$' --json ${testPath}`
+  );
+  const clocReport = JSON.parse(execClocStdout);
   const packageJson = fetchJSON(`${testPath}/package.json`);
   const testConfigFile = fs.readFileSync(`${testPath}/src/test.ts`);
   const apiConfigPath = path.join(testPath, 'src/app/services/api.service.ts');
   const apiConfigFile = fs.existsSync(apiConfigPath) && fs.readFileSync(apiConfigPath);
   const screensPath = path.join(testPath, 'src/app/screens');
   const screensFolder = fs.existsSync(screensPath) && fs.readdirSync(screensPath);
-  const clocReport = getClocReport(path.resolve(testPath), 'angular');
-  const componentFilePaths = Object.keys(clocReport).filter(filepath => /.component.ts$/.test(filepath));
-  const templateFilePaths = Object.keys(clocReport).filter(filepath => /.component.html$/.test(filepath));
   const mainFilePath = path.join(testPath, 'src/main.ts');
   const mainFile = fs.existsSync(mainFilePath) && fs.readFileSync(mainFilePath);
   const appRoutesFile = fs.readFileSync(path.join(testPath, 'src/app/app-routing.module.ts'));
@@ -60,13 +62,17 @@ module.exports = async testPath => {
   angularResult.push({
     metric: angularMetrics.COMPONENTS_LENGTH,
     description: 'Los archivos component.ts no superan las 200 líneas',
-    value: componentFilePaths.every(filepath => clocReport[filepath].code <= limits.maxNumberOfComponentLines)
+    value: Object.keys(clocReport)
+      .filter(filepath => /.component.ts$/.test(filepath))
+      .every(filepath => clocReport[filepath].code <= limits.maxNumberOfComponentLines)
   });
 
   angularResult.push({
     metric: angularMetrics.TEMPLATE_LENGTH,
     description: 'Los archivos component.html no superan las 150 líneas',
-    value: templateFilePaths.every(filepath => clocReport[filepath].code <= limits.maxNumberOfTemplateLines)
+    value: Object.keys(clocReport)
+      .filter(filepath => /.component.html$/.test(filepath))
+      .every(filepath => clocReport[filepath].code <= limits.maxNumberOfTemplateLines)
   });
 
   angularResult.push({
