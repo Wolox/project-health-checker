@@ -94,9 +94,5 @@ module.exports = async (testPath, tech) => {
     });
   }
 
-  console.log('====================================');
-  console.log(generalResult);
-  console.log('====================================');
-
   return generalResult;
 };

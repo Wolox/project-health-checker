@@ -27,7 +27,6 @@ module.exports.limits = {
   minFirstPaint: 50
 };
 
-// module.exports.folderHasService = folder => folder.some(file => /.services.ts$/.test(file));
 module.exports.JEST_REGEX = /^jest/;
 module.exports.NG_BUILD_REGEX = /^ng build --prod/;
 module.exports.HTTP_CLIENT_IMPORT = "import { HttpClient } from '@angular/common/http'";

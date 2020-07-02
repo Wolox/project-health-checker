@@ -1,24 +1,12 @@
 const fs = require('fs');
 const path = require('path');
-const shell = require('shelljs');
 const { findSync } = require('find-in-files');
 const { fetchJSON, getDirectories } = require('../../utils');
-const {
-  angularMetrics,
-  limits,
-  // folderHasService,
-  JEST_REGEX,
-  NG_BUILD_REGEX,
-  HTTP_CLIENT_IMPORT
-} = require('./constants');
+const { angularMetrics, limits, JEST_REGEX, NG_BUILD_REGEX, HTTP_CLIENT_IMPORT } = require('./constants');
 const { checkTrackByUse, checkInjectable } = require('./utils');
 
 module.exports = async testPath => {
   const angularResult = [];
-  const { stdout: execClocStdout } = shell.exec(
-    `node_modules/.bin/cloc --by-file --match-f='component.(ts|html)$' --json ${testPath}`
-  );
-  const clocReport = JSON.parse(execClocStdout);
   const packageJson = fetchJSON(`${testPath}/package.json`);
   const testConfigFile = fs.readFileSync(`${testPath}/src/test.ts`);
   const apiConfigPath = path.join(testPath, 'src/app/services/api.service.ts');
@@ -71,17 +59,17 @@ module.exports = async testPath => {
   angularResult.push({
     metric: angularMetrics.COMPONENTS_LENGTH,
     description: 'Los archivos component.ts no superan las 200 líneas',
-    value: Object.keys(clocReport)
-      .filter(filepath => /.component.ts$/.test(filepath))
-      .every(filepath => clocReport[filepath].code <= limits.maxNumberOfComponentLines)
+    value: Object.values(await findSync('\n', testPath, '.component.ts$')).every(
+      ({ count }) => count <= limits.maxNumberOfComponentLines
+    )
   });
 
   angularResult.push({
     metric: angularMetrics.TEMPLATE_LENGTH,
     description: 'Los archivos component.html no superan las 150 líneas',
-    value: Object.keys(clocReport)
-      .filter(filepath => /.component.html$/.test(filepath))
-      .every(filepath => clocReport[filepath].code <= limits.maxNumberOfTemplateLines)
+    value: Object.values(await findSync('\n', testPath, '.component.html$')).every(
+      ({ count }) => count <= limits.maxNumberOfTemplateLines
+    )
   });
 
   angularResult.push({
