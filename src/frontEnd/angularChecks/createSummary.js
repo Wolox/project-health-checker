@@ -121,6 +121,8 @@ const clientServerSummary = (summary, reports) => {
     description: 'Utiliza services globales o ngRx para el manejo de la información global.',
     value: reports.some(({ metric, value }) => metric === dependenciesMetrics.NG_RX && value)
   });
+  // src/app/services/app.services.ts (when no ngRx)
+  // src/app/app.services.ts (when no ngRx)
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-4',
     description: 'Singleton services por screen',

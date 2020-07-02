@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const shell = require('shelljs');
+const { findSync } = require('find-in-files');
 const { fetchJSON } = require('../../utils');
 const {
   angularMetrics,
@@ -10,7 +11,7 @@ const {
   NG_BUILD_REGEX,
   HTTP_CLIENT_IMPORT
 } = require('./constants');
-const { checkTrackByUse, checkInjectable, filesHasString } = require('./utils');
+const { checkTrackByUse, checkInjectable } = require('./utils');
 
 module.exports = async testPath => {
   const angularResult = [];
@@ -103,7 +104,7 @@ module.exports = async testPath => {
   angularResult.push({
     metric: angularMetrics.PURE_PIPES,
     description: 'Todos los custom-pipes son puros',
-    value: await filesHasString('pure: true', path.join(testPath, 'src'), 'pipe.ts$')
+    value: !Object.keys(await findSync('pure: false', path.join(testPath, 'src'), 'pipe.ts$')).length
   });
 
   angularResult.push({
