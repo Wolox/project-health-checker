@@ -5,9 +5,7 @@ module.exports = reports => {
   const onlyBooleanSummary = reports.filter(
     ({ metric, value }) => metric.includes('SUMMARY') && typeof value === 'boolean'
   );
-  console.log('====================================');
-  console.log(onlyBooleanSummary);
-  console.log('====================================');
+
   return [
     ...reports,
     {
