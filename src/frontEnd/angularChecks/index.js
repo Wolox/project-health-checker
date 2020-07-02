@@ -113,5 +113,14 @@ module.exports = async testPath => {
     value: await checkInjectable(screensFolder, screensPath, testPath)
   });
 
+  angularResult.push({
+    metric: angularMetrics.NGRX_OR_SERVICES,
+    description: 'El estado de la aplicación se maneja con ngRx o estados globales',
+    value:
+      fs.existsSync(path.join(testPath, 'src/app/services/app.services.ts')) ||
+      fs.existsSync(path.join(testPath, 'src/app/app.services.ts')) ||
+      (await findSync('StoreModule.forRoot', path.join(testPath, 'src/app'), 'app.module.ts'))
+  });
+
   return angularResult;
 };

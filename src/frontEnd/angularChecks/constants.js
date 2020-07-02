@@ -11,7 +11,8 @@ module.exports.angularMetrics = createObject([
   'NG_FOR_TRACK_BY',
   'LAZY_LOADING',
   'PURE_PIPES',
-  'INJECTABLE_DECORATOR'
+  'INJECTABLE_DECORATOR',
+  'NGRX_OR_SERVICES'
 ]);
 
 module.exports.limits = {
