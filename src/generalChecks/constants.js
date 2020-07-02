@@ -46,5 +46,5 @@ module.exports.rootPath = {
   react: 'src',
   vue: 'src',
   nuxt: '',
-  angular: 'app'
+  angular: 'src/app'
 };

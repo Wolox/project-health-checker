@@ -119,7 +119,9 @@ const clientServerSummary = (summary, reports) => {
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-3',
     description: 'Utiliza services globales o ngRx para el manejo de la información global.',
-    value: reports.some(({ metric, value }) => metric === angularMetrics.NGRX_OR_SERVICES && value)
+    value:
+      reports.some(({ metric, value }) => metric === angularMetrics.NGRX && value) ||
+      reports.some(({ metric, value }) => metric === angularMetrics.GLOBAL_SERVICES && value)
   });
   summary.push({
     metric: 'SUMMARY-CLIENT-SERVER-4',

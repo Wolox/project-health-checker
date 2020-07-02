@@ -2,11 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const shell = require('shelljs');
 const { findSync } = require('find-in-files');
-const { fetchJSON } = require('../../utils');
+const { fetchJSON, getDirectories } = require('../../utils');
 const {
   angularMetrics,
   limits,
-  folderHasService,
+  // folderHasService,
   JEST_REGEX,
   NG_BUILD_REGEX,
   HTTP_CLIENT_IMPORT
@@ -22,9 +22,9 @@ module.exports = async testPath => {
   const packageJson = fetchJSON(`${testPath}/package.json`);
   const testConfigFile = fs.readFileSync(`${testPath}/src/test.ts`);
   const apiConfigPath = path.join(testPath, 'src/app/services/api.service.ts');
-  const apiConfigFile = fs.existsSync(apiConfigPath) && fs.readFileSync(apiConfigPath);
+  const apiConfigFile = fs.existsSync(apiConfigPath) ? fs.readFileSync(apiConfigPath) : undefined;
   const screensPath = path.join(testPath, 'src/app/screens');
-  const screensFolder = fs.existsSync(screensPath) && fs.readdirSync(screensPath);
+  const screensFolder = fs.existsSync(screensPath) ? getDirectories(screensPath) : undefined;
   const mainFilePath = path.join(testPath, 'src/main.ts');
   const mainFile = fs.existsSync(mainFilePath) && fs.readFileSync(mainFilePath);
   const appRoutesFile = fs.readFileSync(path.join(testPath, 'src/app/app-routing.module.ts'));
@@ -50,14 +50,22 @@ module.exports = async testPath => {
   });
 
   angularResult.push({
-    metric: angularMetrics.SERVICE_PER_SCREEN,
-    description: 'Cada screen tiene un service.ts',
+    metric: angularMetrics.NGRX,
+    description: 'Usa ngRx para el manejo de estados',
+    value: await findSync('StoreModule.forRoot', path.join(testPath, 'src/app'), 'app.module.ts')
+  });
+
+  angularResult.push({
+    metric: angularMetrics.SINGLETON_SERVICE,
+    description: 'Cada screen tiene un service si no se usa ngRx',
     value:
       screensFolder &&
-      screensFolder.every(screen => {
-        const screenContent = fs.readdirSync(path.join(screensPath, screen));
-        return folderHasService(screenContent);
-      })
+      screensFolder.every(
+        screen =>
+          angularResult.some(({ metric, value }) => metric === angularMetrics.NGRX && value) &&
+          (fs.existsSync(path.join(screensPath, screen, `${screen}.services.ts`)) ||
+            fs.existsSync(path.join(screensPath, screen, `services/${screen}.services.ts`)))
+      )
   });
 
   angularResult.push({
@@ -114,12 +122,12 @@ module.exports = async testPath => {
   });
 
   angularResult.push({
-    metric: angularMetrics.NGRX_OR_SERVICES,
-    description: 'El estado de la aplicación se maneja con ngRx o estados globales',
+    metric: angularMetrics.STATE_MANAGEMENT,
+    description: 'El estado de la aplicación se maneja a través de servicios globales o ngRx',
     value:
+      angularResult.some(({ metric, value }) => metric === angularResult.NGRX && value) ||
       fs.existsSync(path.join(testPath, 'src/app/services/app.services.ts')) ||
-      fs.existsSync(path.join(testPath, 'src/app/app.services.ts')) ||
-      (await findSync('StoreModule.forRoot', path.join(testPath, 'src/app'), 'app.module.ts'))
+      fs.existsSync(path.join(testPath, 'src/app/app.services.ts'))
   });
 
   return angularResult;

@@ -1,4 +1,4 @@
-const fs = require('fs');
+const { readdirSync, readFileSync } = require('fs');
 
 const percentage = 100;
 
@@ -13,4 +13,9 @@ exports.calculatePercentage = (results, total, skipComments = false) => {
   return (filesCount / total) * percentage;
 };
 
-exports.fetchJSON = filePath => JSON.parse(fs.readFileSync(filePath));
+exports.fetchJSON = filePath => JSON.parse(readFileSync(filePath));
+
+exports.getDirectories = source =>
+  readdirSync(source, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name);
