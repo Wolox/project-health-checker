@@ -28,7 +28,7 @@
     "lighthouse": "^6.1.0",
     "lodash.flattendeep": "^4.4.0",
     "lodash.kebabcase": "^4.1.1",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.3",
     "moment": "^2.24.0",
     "npm-check": "^5.9.0",
     "read-file": "^0.2.0",
