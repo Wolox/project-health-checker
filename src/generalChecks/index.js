@@ -1,5 +1,6 @@
-const { findSync } = require('find-in-files');
 const fs = require('fs');
+const path = require('path');
+const { findSync } = require('find-in-files');
 const read = require('read-file');
 
 const { calculatePercentage } = require('../utils');
@@ -31,12 +32,12 @@ module.exports = async (testPath, tech) => {
     value: fs.existsSync(`${testPath}/README.md`)
   });
 
-  if (fs.existsSync(`${testPath}/${rootPath[tech]}`)) {
+  if (fs.existsSync(path.join(testPath, rootPath[tech]))) {
     folderStructure[tech].forEach(element =>
       generalResult.push({
         metric: generalMetrics.FOLDER_STRUCTURE,
         description: `Existe un archivo ${element} dentro del root del proyecto`,
-        value: fs.existsSync(`${testPath}/${rootPath[tech]}/${element}`)
+        value: fs.existsSync(path.join(testPath, rootPath[tech], element))
       })
     );
   } else {

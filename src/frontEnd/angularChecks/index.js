@@ -1,27 +1,18 @@
 const fs = require('fs');
 const path = require('path');
-const { fetchJSON, getClocReport } = require('../../utils');
-const {
-  angularMetrics,
-  limits,
-  folderHasService,
-  JEST_REGEX,
-  NG_BUILD_REGEX,
-  HTTP_CLIENT_IMPORT
-} = require('./constants');
-const { checkTrackByUse, checkInjectable, filesHasString } = require('./utils');
+const { findSync } = require('find-in-files');
+const { fetchJSON, getDirectories } = require('../../utils');
+const { angularMetrics, limits, JEST_REGEX, NG_BUILD_REGEX, HTTP_CLIENT_IMPORT } = require('./constants');
+const { checkTrackByUse, checkInjectable } = require('./utils');
 
 module.exports = async testPath => {
   const angularResult = [];
   const packageJson = fetchJSON(`${testPath}/package.json`);
   const testConfigFile = fs.readFileSync(`${testPath}/src/test.ts`);
   const apiConfigPath = path.join(testPath, 'src/app/services/api.service.ts');
-  const apiConfigFile = fs.existsSync(apiConfigPath) && fs.readFileSync(apiConfigPath);
+  const apiConfigFile = fs.existsSync(apiConfigPath) ? fs.readFileSync(apiConfigPath) : undefined;
   const screensPath = path.join(testPath, 'src/app/screens');
-  const screensFolder = fs.existsSync(screensPath) && fs.readdirSync(screensPath);
-  const clocReport = getClocReport(path.resolve(testPath), 'angular');
-  const componentFilePaths = Object.keys(clocReport).filter(filepath => /.component.ts$/.test(filepath));
-  const templateFilePaths = Object.keys(clocReport).filter(filepath => /.component.html$/.test(filepath));
+  const screensFolder = fs.existsSync(screensPath) ? getDirectories(screensPath) : undefined;
   const mainFilePath = path.join(testPath, 'src/main.ts');
   const mainFile = fs.existsSync(mainFilePath) && fs.readFileSync(mainFilePath);
   const appRoutesFile = fs.readFileSync(path.join(testPath, 'src/app/app-routing.module.ts'));
@@ -47,26 +38,38 @@ module.exports = async testPath => {
   });
 
   angularResult.push({
-    metric: angularMetrics.SERVICE_PER_SCREEN,
-    description: 'Cada screen tiene un service.ts',
+    metric: angularMetrics.NGRX,
+    description: 'Usa ngRx para el manejo de estados',
+    value: await findSync('StoreModule.forRoot', path.join(testPath, 'src/app'), 'app.module.ts')
+  });
+
+  angularResult.push({
+    metric: angularMetrics.SINGLETON_SERVICE,
+    description: 'Cada screen tiene un service si no se usa ngRx',
     value:
       screensFolder &&
-      screensFolder.every(screen => {
-        const screenContent = fs.readdirSync(path.join(screensPath, screen));
-        return folderHasService(screenContent);
-      })
+      screensFolder.every(
+        screen =>
+          angularResult.some(({ metric, value }) => metric === angularMetrics.NGRX && value) &&
+          (fs.existsSync(path.join(screensPath, screen, `${screen}.services.ts`)) ||
+            fs.existsSync(path.join(screensPath, screen, `services/${screen}.services.ts`)))
+      )
   });
 
   angularResult.push({
     metric: angularMetrics.COMPONENTS_LENGTH,
     description: 'Los archivos component.ts no superan las 200 líneas',
-    value: componentFilePaths.every(filepath => clocReport[filepath].code <= limits.maxNumberOfComponentLines)
+    value: Object.values(await findSync('\n', testPath, '.component.ts$')).every(
+      ({ count }) => count <= limits.maxNumberOfComponentLines
+    )
   });
 
   angularResult.push({
     metric: angularMetrics.TEMPLATE_LENGTH,
     description: 'Los archivos component.html no superan las 150 líneas',
-    value: templateFilePaths.every(filepath => clocReport[filepath].code <= limits.maxNumberOfTemplateLines)
+    value: Object.values(await findSync('\n', testPath, '.component.html$')).every(
+      ({ count }) => count <= limits.maxNumberOfTemplateLines
+    )
   });
 
   angularResult.push({
@@ -97,13 +100,22 @@ module.exports = async testPath => {
   angularResult.push({
     metric: angularMetrics.PURE_PIPES,
     description: 'Todos los custom-pipes son puros',
-    value: await filesHasString('pure: true', path.join(testPath, 'src'), 'pipe.ts$')
+    value: !Object.keys(await findSync('pure: false', path.join(testPath, 'src'), 'pipe.ts$')).length
   });
 
   angularResult.push({
     metric: angularMetrics.INJECTABLE_DECORATOR,
     description: 'Los services utilizan @Injectable en lugar de providers',
     value: await checkInjectable(screensFolder, screensPath, testPath)
+  });
+
+  angularResult.push({
+    metric: angularMetrics.STATE_MANAGEMENT,
+    description: 'El estado de la aplicación se maneja a través de servicios globales o ngRx',
+    value:
+      angularResult.some(({ metric, value }) => metric === angularResult.NGRX && value) ||
+      fs.existsSync(path.join(testPath, 'src/app/services/app.services.ts')) ||
+      fs.existsSync(path.join(testPath, 'src/app/app.services.ts'))
   });
 
   return angularResult;

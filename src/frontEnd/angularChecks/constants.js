@@ -6,12 +6,14 @@ module.exports.angularMetrics = createObject([
   'USE_HTTP_CLIENT',
   'COMPONENTS_LENGTH',
   'TEMPLATE_LENGTH',
-  'SERVICE_PER_SCREEN',
+  'SINGLETON_SERVICE',
   'PRODUCTION_MODE_ENABLED',
   'NG_FOR_TRACK_BY',
   'LAZY_LOADING',
   'PURE_PIPES',
-  'INJECTABLE_DECORATOR'
+  'INJECTABLE_DECORATOR',
+  'NGRX',
+  'STATE_MANAGEMENT'
 ]);
 
 module.exports.limits = {
@@ -25,7 +27,6 @@ module.exports.limits = {
   minFirstPaint: 50
 };
 
-module.exports.folderHasService = folder => folder.some(file => /.services.ts$/.test(file));
 module.exports.JEST_REGEX = /^jest/;
 module.exports.NG_BUILD_REGEX = /^ng build --prod/;
 module.exports.HTTP_CLIENT_IMPORT = "import { HttpClient } from '@angular/common/http'";

@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch --setupFiles dotenv/config",
-    "cloc": "cloc"
+    "test": "jest --watch --setupFiles dotenv/config"
   },
   "author": "",
   "license": "ISC",
@@ -15,7 +14,6 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "cloc": "^2.5.1",
     "count-files": "^2.6.2",
     "csvtojson": "^2.0.10",
     "docker-file-parser": "^1.0.4",
