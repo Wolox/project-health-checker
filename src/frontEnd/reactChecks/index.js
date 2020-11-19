@@ -1,4 +1,5 @@
 const { findSync } = require('find-in-files');
+const fs = require('fs');
 
 const { calculatePercentage } = require('../../utils');
 const { reactMetrics, limits } = require('./constants');
@@ -8,6 +9,9 @@ let amountOfJsAppFolder = 0;
 
 module.exports = async testPath => {
   const reactResult = [];
+  if (!fs.existsSync(`${testPath}/src/app`)) {
+    return reactResult;
+  }
   const appResults = await findSync('', `${testPath}/src/app`, '.js$');
   const actionResults = await findSync('', testPath, 'actions.js$');
 
