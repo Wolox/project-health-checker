@@ -19,13 +19,13 @@ module.exports = async (testPath, tech, buildScriptName) => {
   let buildTime = undefined;
   let buildSize = undefined;
   const techBuildPath = buildPath[tech];
-  console.log(green, 'Empezando instalacion de dependencias...');
+  console.log(green, 'Empezando instalación de dependencias...');
   const installInfo = shell.exec(`npm i --prefix ${testPath}`);
   const testData = runTestChecks(testPath);
   const dependencyData = await runDependencyChecks(installInfo, testPath);
-  console.log(green, 'Tests terminados con exito ✓');
+  console.log(green, 'Tests terminados con éxito ✓');
   const eslintData = runEslintChecks(testPath, tech);
-  console.log(green, 'Chequeos de eslint terminados con exito ✓');
+  console.log(green, 'Chequeos de eslint terminados con éxito ✓');
   console.log(green, 'Generando el build...');
   const start = new Date();
   const buildExec = shell.exec(`npm run ${buildScriptName} --prefix ${testPath}`);
@@ -34,7 +34,7 @@ module.exports = async (testPath, tech, buildScriptName) => {
   }
   if (fs.existsSync(`${testPath}/${techBuildPath}`)) {
     buildTime = (new Date().getTime() - start.getTime()) / seconds;
-    console.log(green, 'Build terminado con exito ✓');
+    console.log(green, 'Build terminado con éxito ✓');
     const data = await promisify(getSize)(`${testPath}/${techBuildPath}`);
     buildSize = data / mega;
     rimraf.sync(`${testPath}/node_modules`);
@@ -42,7 +42,7 @@ module.exports = async (testPath, tech, buildScriptName) => {
   } else {
     console.log(
       red,
-      'El build no se pudo generar con exito. BUILD_TIME y APP_SIZE no se han podido sacar correctamente'
+      'El build no se pudo generar con éxito. BUILD_TIME y APP_SIZE no se han podido sacar correctamente'
     );
   }
 

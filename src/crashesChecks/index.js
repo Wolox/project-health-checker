@@ -34,6 +34,6 @@ module.exports = async projectName => {
     crashesCheck(projectName, DEFAULT_ENVIRONMENTS_INFO.PRODUCTION),
     crashesCheck(projectName, DEFAULT_ENVIRONMENTS_INFO.PRE_PRODUCTION)
   ]);
-  console.log(green, 'Chequeos de crashes terminados con exito ✓');
+  console.log(green, 'Chequeos de crashes terminados con éxito ✓');
   return crashesMetrics;
 };

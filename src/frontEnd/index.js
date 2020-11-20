@@ -13,7 +13,7 @@ module.exports = async (testPath, tech, seoLink) => {
   let specificTechData = [];
   if (seoLink) {
     seoData = await runSeoChecks(seoLink);
-    console.log(green, 'Chequeos de SEO terminados con exito ✓');
+    console.log(green, 'Chequeos de SEO terminados con éxito ✓');
   } else {
     console.log(red, 'No se paso una url para revisar el SEO ✓');
   }

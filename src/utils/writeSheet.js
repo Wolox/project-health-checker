@@ -30,7 +30,7 @@ module.exports = async (reports, testPath) => {
             );
           })
       );
-      Promise.all(requests).then(() => console.log(green, 'Auditoria terminada con exito'));
+      Promise.all(requests).then(() => console.log(green, 'Auditoría terminada con éxito'));
     }
   );
 };

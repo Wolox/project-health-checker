@@ -89,15 +89,15 @@ async function executeChecks() {
   let techData = [];
   let buildData = [];
   let crashesData = [];
-  console.log(green, 'Comenzando auditoria...');
+  console.log(green, 'Comenzando auditoría...');
   envData = await runEnvChecks(testPath, techChecks);
-  console.log(green, 'Chequeos de env terminados con exito ✓');
+  console.log(green, 'Chequeos de env terminados con éxito ✓');
   generalData = await runGeneralChecks(testPath, techChecks);
-  console.log(green, 'Chequeos generales terminados con exito ✓');
+  console.log(green, 'Chequeos generales terminados con éxito ✓');
   gitData = await runGitChecks(repoName, organization);
-  console.log(green, 'Chequeos de github terminados con exito ✓');
+  console.log(green, 'Chequeos de github terminados con éxito ✓');
   techData = await frontendChecks(testPath, techChecks, seoLink);
-  console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
+  console.log(green, 'Chequeos de tecnología terminados con éxito ✓');
   buildData = await runBuildChecks(testPath, techChecks, buildScriptName);
   crashesData = await runCrashesChecks(apmProjectName);
   return [...envData, ...generalData, ...gitData, ...techData, ...buildData, ...crashesData];
@@ -110,12 +110,12 @@ async function executeAudit() {
   const reports = await executeChecks();
   const reportWithSummary = createSummary[techChecks](reports);
   const reportCodeQuality = codeQuality(reportWithSummary);
-  console.log(green, 'Chequeos terminados con exito ✓');
+  console.log(green, 'Chequeos terminados con éxito ✓');
   if (args.audit) {
     console.log(green, 'Cargando Spreadsheet...');
     writeSpreadSheet(reportCodeQuality, testPath);
   } else {
-    console.log(green, 'Persistiendo Metricas...');
+    console.log(green, 'Persistiendo Métricas...');
     persistMetrics(reportCodeQuality, techChecks, environment, repoName);
   }
 }
