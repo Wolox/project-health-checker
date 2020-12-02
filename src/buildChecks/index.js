@@ -20,7 +20,7 @@ module.exports = async (testPath, tech, buildScriptName) => {
   let buildSize = undefined;
   const techBuildPath = buildPath[tech];
   console.log(green, 'Empezando instalacion de dependencias...');
-  const installInfo = shell.exec(`npm i --prefix ${testPath}`);
+  const installInfo = shell.exec(`npm --production=false install --prefix ${testPath}`);
   const testData = runTestChecks(testPath);
   const dependencyData = await runDependencyChecks(installInfo, testPath);
   console.log(green, 'Tests terminados con exito ✓');
