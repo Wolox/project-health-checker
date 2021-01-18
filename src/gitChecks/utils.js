@@ -35,15 +35,30 @@ exports.countBranches = gitResponse =>
       branch.node.name !== 'master' && branch.node.name !== 'stage' && branch.node.name !== 'development'
   ).length;
 
+const getHoursBetween = (startDate, endDate) => (new Date(endDate) - new Date(startDate)) / milisecondsInHour;
+
 exports.pullRequestLifeSpan = gitResponse => {
   const mergedPRs = gitResponse.data.data.repository.pullRequests.edges.filter(
     pullRequest => pullRequest.node.merged
   );
   const hours = mergedPRs.reduce(
     (accumulator, pullRequest) =>
-      accumulator +
-      (new Date(pullRequest.node.closedAt) - new Date(pullRequest.node.createdAt)) / milisecondsInHour,
+      accumulator + getHoursBetween(pullRequest.node.createdAt, pullRequest.node.closedAt),
     0
   );
   return Math.round(hours / mergedPRs.length);
+};
+
+exports.pickUpTime = gitResponse => {
+  const pullRequests = gitResponse.data.data.repository.pullRequests.edges;
+  const hoursUntilPickup = pullRequests.reduce((accumulator, pullRequest) => {
+    if (pullRequest.node.reviews && pullRequest.node.reviews.edges.length > 0) {
+      const pickupDate = pullRequest.node.reviews.edges[0].node.createdAt;
+      return accumulator + getHoursBetween(pullRequest.node.createdAt, pickupDate);
+    }
+    return accumulator;
+  }, 0);
+
+  // eslint-disable-next-line no-magic-numbers
+  return Math.round((hoursUntilPickup / pullRequests.length) * 100) / 100;
 };
