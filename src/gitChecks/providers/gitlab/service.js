@@ -32,4 +32,5 @@ const repositoryInfoQuery = (repository, namespace) => ({
     }`
 });
 
-exports.getRepositoryInfo = repository => axios.post(GITLAB_API, repositoryInfoQuery(repository), config);
+exports.getRepositoryInfo = (repository, namespace) =>
+  axios.post(GITLAB_API, repositoryInfoQuery(repository, namespace), config);
