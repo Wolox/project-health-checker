@@ -51,6 +51,7 @@ Note: Once the project becomes a npm package this command will change
 |`-l --link [github.com]`|This argument is necessary if you want to run a lighthouse audit against the project's site in any environment|Won't run the check|
 |`-b --buildScript ['build development']`| npm script name which is used to generate the project's build| The default value will be 'build'|
 |`-f --requiredFiles ['file1,file2']`|Files that need to exist before building the project||
+|`-k --key [apiKey]`|API key to be able to persist the metrics in the DB||
 
 ### Examples
 

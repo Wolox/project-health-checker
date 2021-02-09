@@ -31,6 +31,7 @@ let environment = 'development';
 let buildScriptName = 'build';
 let filesToCreate = undefined;
 let apmProjectName = '';
+let apiKey = '';
 
 if (args.env) {
   environment = args.env;
@@ -82,6 +83,12 @@ if (args.apm) {
   apmProjectName = repoName;
 }
 
+if (args.key) {
+  apiKey = args.key;
+} else if (args.k) {
+  apiKey = args.k;
+}
+
 async function executeChecks() {
   let gitData = [];
   let envData = [];
@@ -116,7 +123,7 @@ async function executeAudit() {
     writeSpreadSheet(reportCodeQuality, testPath);
   } else {
     console.log(green, 'Persistiendo Metricas...');
-    persistMetrics(reportCodeQuality, techChecks, environment, repoName);
+    persistMetrics(reportCodeQuality, techChecks, environment, repoName, apiKey);
   }
 }
 
