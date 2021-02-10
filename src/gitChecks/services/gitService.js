@@ -10,8 +10,8 @@ const config = {
 // Owner and name should be typed between ""
 const repositoryInfoQuery = (repository, organization) => ({
   query: `{
-        repository(owner:"${organization}", name:"${repository}") {
-         refs(refPrefix: "refs/heads/", first: 100) {
+      repository(owner:"${organization}", name:"${repository}") {
+        refs(refPrefix: "refs/heads/", first: 100) {
           edges {
             node {
               name
@@ -36,7 +36,8 @@ const repositoryInfoQuery = (repository, organization) => ({
               reviews(first: 30) {
                 edges {
                   node {
-                    state
+                    state,
+                    createdAt
                   }
                 }
               }
