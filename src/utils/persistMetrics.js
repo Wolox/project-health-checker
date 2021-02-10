@@ -33,7 +33,7 @@ const axiosApi = axios.create({
 
 const getGeneralTech = tech => (tech === 'nuxt' ? 'vue' : tech);
 
-module.exports = (reportCodeQuality, tech, env, repoName) => {
+module.exports = (reportCodeQuality, tech, env, repoName, apiKey) => {
   const metrics = reportCodeQuality.filter(metric =>
     engineeringMetrics.some(engMetric => engMetric === metric.metric)
   );
@@ -49,5 +49,5 @@ module.exports = (reportCodeQuality, tech, env, repoName) => {
         value: elem.value
       }))
   };
-  axiosApi.post('/metrics', body).catch(error => console.log(`Error: ${error}`));
+  axiosApi.post('/metrics', body, { headers: { Authorization: apiKey } }).catch(error => console.log(`Error: ${error}`));
 };
