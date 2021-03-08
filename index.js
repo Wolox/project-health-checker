@@ -32,6 +32,7 @@ let buildScriptName = 'build';
 let filesToCreate = undefined;
 let apmProjectName = '';
 let apiKey = '';
+let gitProvider = 'github';
 
 if (args.env) {
   environment = args.env;
@@ -89,6 +90,13 @@ if (args.key) {
   apiKey = args.k;
 }
 
+if (args.gitProvider) {
+  // eslint-disable-next-line prefer-destructuring
+  gitProvider = args.gitProvider;
+} else if (args.g) {
+  gitProvider = args.g;
+}
+
 async function executeChecks() {
   let gitData = [];
   let envData = [];
@@ -101,7 +109,7 @@ async function executeChecks() {
   console.log(green, 'Chequeos de env terminados con exito ✓');
   generalData = await runGeneralChecks(testPath, techChecks);
   console.log(green, 'Chequeos generales terminados con exito ✓');
-  gitData = await runGitChecks(repoName, organization);
+  gitData = await runGitChecks(gitProvider)(repoName, organization);
   console.log(green, 'Chequeos de github terminados con exito ✓');
   techData = await frontendChecks(testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');

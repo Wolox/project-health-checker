@@ -1,5 +1,6 @@
 const axios = require('axios');
-const { API } = require('../constants');
+
+const API = 'https://api.github.com/graphql';
 
 const config = {
   headers: {
@@ -27,7 +28,7 @@ const repositoryInfoQuery = (repository, organization) => ({
             }
           }
         }
-        pullRequests(first: 100) {
+        pullRequests(last: 100) {
           edges {
             node {
               closedAt,
