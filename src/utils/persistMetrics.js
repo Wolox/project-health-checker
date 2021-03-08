@@ -50,6 +50,7 @@ module.exports = (reportCodeQuality, tech, env, repoName, apiKey) => {
         value: elem.value
       }))
   };
+  console.log('Metricas a persistir', body);
   axiosApi
     .post('/metrics', body, { headers: { Authorization: apiKey } })
     .catch(error => console.log(`Error: ${error}`));
