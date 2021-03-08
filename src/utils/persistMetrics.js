@@ -33,6 +33,7 @@ const axiosApi = axios.create({
 
 const getGeneralTech = tech => (tech === 'nuxt' ? 'vue' : tech);
 
+// eslint-disable-next-line max-params
 module.exports = (reportCodeQuality, tech, env, repoName, apiKey) => {
   const metrics = reportCodeQuality.filter(metric =>
     engineeringMetrics.some(engMetric => engMetric === metric.metric)
@@ -49,5 +50,7 @@ module.exports = (reportCodeQuality, tech, env, repoName, apiKey) => {
         value: elem.value
       }))
   };
-  axiosApi.post('/metrics', body, { headers: { Authorization: apiKey } }).catch(error => console.log(`Error: ${error}`));
+  axiosApi
+    .post('/metrics', body, { headers: { Authorization: apiKey } })
+    .catch(error => console.log(`Error: ${error}`));
 };

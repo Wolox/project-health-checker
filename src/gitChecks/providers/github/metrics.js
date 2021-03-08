@@ -1,7 +1,6 @@
-const { REVIEW_STATE } = require('./constants');
+const { REVIEW_STATE } = require('../../constants');
 const flattenDeep = require('lodash.flattendeep');
-
-const milisecondsInHour = 1000 * 3600;
+const { getHoursBetween } = require('../utils');
 
 const branchRules = (node, branch) =>
   node.pattern === branch && node.requiresApprovingReviews && node.dismissesStaleReviews;
@@ -34,8 +33,6 @@ exports.countBranches = gitResponse =>
     branch =>
       branch.node.name !== 'master' && branch.node.name !== 'stage' && branch.node.name !== 'development'
   ).length;
-
-const getHoursBetween = (startDate, endDate) => (new Date(endDate) - new Date(startDate)) / milisecondsInHour;
 
 exports.pullRequestLifeSpan = gitResponse => {
   const mergedPRs = gitResponse.data.data.repository.pullRequests.edges.filter(
