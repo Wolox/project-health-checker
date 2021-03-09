@@ -6,7 +6,7 @@ module.exports = async (repository, organization) => {
   const gitData = [];
 
   try {
-    const repositoryInfo = await getRepositoryInfo(repository, organization);
+    const repositoryInfo = await getRepositoryInfo(repository.toLowerCase(), organization);
     gitData.push({
       metric: gitMetrics.CODE_REVIEW_AVG_TIME,
       description: 'Promedio de existencia de PR hasta merge - Hs',
