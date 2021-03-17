@@ -9,8 +9,12 @@ const dependenciesMetrics = require('../dependenciesChecks/constants');
 
 const { generalMetrics } = require('../generalChecks/constants');
 
-const { gitMetrics } = require('../gitChecks/constants');
 const { DEFAULT_ENVIRONMENTS_INFO } = require('../crashesChecks/constants');
+
+const gitMetrics = {
+  CODE_REVIEW_AVG_TIME: 'code-review-avg-time',
+  PICK_UP_TIME: 'pick-up-time'
+};
 
 const engineeringMetrics = [
   testMetrics.CODE_COVERAGE,
@@ -38,6 +42,7 @@ module.exports = (reportCodeQuality, tech, env, repoName, apiKey) => {
   const metrics = reportCodeQuality.filter(metric =>
     engineeringMetrics.some(engMetric => engMetric === metric.metric)
   );
+
   const body = {
     env,
     tech: getGeneralTech(tech),
