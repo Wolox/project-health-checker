@@ -4,7 +4,7 @@ const shell = require('shelljs');
 
 const runEnvChecks = require('./src/envChecks');
 const runGeneralChecks = require('./src/generalChecks');
-const runGitChecks = require('./src/gitChecks');
+const runGitChecks = require('@wolox/git-metrics');
 const runBuildChecks = require('./src/buildChecks');
 const runCrashesChecks = require('./src/crashesChecks');
 
@@ -97,8 +97,9 @@ if (args.gitProvider) {
   gitProvider = args.g;
 }
 
-async function executeChecks() {
-  let gitData = [];
+const authToken = gitProvider === 'github' ? process.env.OAUTH_TOKEN : process.env.GITLAB_OAUTH_TOKEN;
+
+async function executeQualityChecks() {
   let envData = [];
   let generalData = [];
   let techData = [];
@@ -109,20 +110,27 @@ async function executeChecks() {
   console.log(green, 'Chequeos de env terminados con exito ✓');
   generalData = await runGeneralChecks(testPath, techChecks);
   console.log(green, 'Chequeos generales terminados con exito ✓');
-  gitData = await runGitChecks(gitProvider)(repoName, organization);
-  console.log(green, 'Chequeos de github terminados con exito ✓');
   techData = await frontendChecks(testPath, techChecks, seoLink);
   console.log(green, 'Chequeos de tecnologia terminados con exito ✓');
   buildData = await runBuildChecks(testPath, techChecks, buildScriptName);
   crashesData = await runCrashesChecks(apmProjectName);
-  return [...envData, ...generalData, ...gitData, ...techData, ...buildData, ...crashesData];
+  return [...envData, ...generalData, ...techData, ...buildData, ...crashesData];
+}
+
+async function gitChecks() {
+  let gitData = [];
+  gitData = await runGitChecks(gitProvider, authToken)(repoName, organization);
+  console.log(green, 'Chequeos de github terminados con exito ✓');
+  return gitData;
 }
 
 async function executeAudit() {
   if (filesToCreate) {
     filesToCreate.split(',').forEach(fileName => shell.exec(`touch ${testPath}/${fileName}`));
   }
-  const reports = await executeChecks();
+  const gitReports = await gitChecks();
+  const qualityReports = await executeQualityChecks();
+  const reports = [...qualityReports, ...gitReports.map(({ name, value }) => ({ metric: name, value }))];
   const reportWithSummary = createSummary[techChecks](reports);
   const reportCodeQuality = codeQuality(reportWithSummary);
   console.log(green, 'Chequeos terminados con exito ✓');
