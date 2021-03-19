@@ -2,7 +2,6 @@ const { generalMetrics } = require('../generalChecks/constants');
 const hundred = 100;
 
 module.exports = reports => {
-  console.log(reports);
   const onlyBooleanSummary = reports.filter(
     reportValue => reportValue.metric && reportValue.metric.includes('SUMMARY') && typeof value === 'boolean'
   );
