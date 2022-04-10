@@ -28,7 +28,7 @@
     "js-yaml": "^3.13.1",
     "lighthouse": "^6.1.0",
     "lodash.kebabcase": "^4.1.1",
-    "minimist": "^1.2.3",
+    "minimist": "^1.2.6",
     "moment": "^2.24.0",
     "npm-check": "^5.9.0",
     "read-file": "^0.2.0",
