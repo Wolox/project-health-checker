@@ -26,7 +26,7 @@
     "googleapis": "^39.2.0",
     "graphql-request": "^1.8.2",
     "js-yaml": "^3.13.1",
-    "lighthouse": "^6.1.0",
+    "lighthouse": "^9.6.7",
     "lodash.kebabcase": "^4.1.1",
     "minimist": "^1.2.3",
     "moment": "^2.24.0",
