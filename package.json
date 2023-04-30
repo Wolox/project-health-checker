@@ -24,7 +24,7 @@
     "get-folder-size": "^2.0.1",
     "google-spreadsheet": "^2.0.8",
     "googleapis": "^39.2.0",
-    "graphql-request": "^1.8.2",
+    "graphql-request": "^6.0.0",
     "js-yaml": "^3.13.1",
     "lighthouse": "^6.1.0",
     "lodash.kebabcase": "^4.1.1",
