@@ -34,7 +34,7 @@
     "read-file": "^0.2.0",
     "rimraf": "^3.0.0",
     "shelljs": "^0.8.3",
-    "stylelint": "^10.0.1"
+    "stylelint": "^15.10.1"
   },
   "devDependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.6.0",
